@@ -1,14 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import './css/RootStyle.css';
 import * as serviceWorker from './serviceWorker';
+import Messages from './components/Messages';
+import UserList from './components/UserList';
+import PendingTransfers from './components/PendingTransfers';
+import TransferStatus from './components/TransferStatus';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+    <React.StrictMode>
+        <div className="AppDiv">
+            <Messages />
+            <div className="Col">
+                <UserList />
+                <PendingTransfers />
+                <TransferStatus />
+            </div>
+        </div>
+    </React.StrictMode>,
+    document.getElementById('root')
 );
 
 // If you want your app to work offline and load faster, you can change

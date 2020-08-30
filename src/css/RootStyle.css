@@ -1,0 +1,17 @@
+html, body, #root {
+    width: 100%;
+    height: 100%;
+}
+
+.AppDiv {
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.Col {
+    display: flex;
+    flex-direction: column;
+}
