@@ -36,12 +36,23 @@
     font-size: 14px;
 
     margin: 5px 5px 5px 5px;
+
+    width: 100%;
+
+    color: #ffffff;
+
+    transition: all 0.2s;
 }
 
 .InputField::placeholder {
-    font-family: "OpenSans";
+    font-family: "OpenSansBold";
     
-    color: #9b9b9b;
+    color: #afafaf;
+}
+
+.InputField:focus {
+    border: 1px solid #c4c4c4;
+    background-color: #7c7c7c;
 }
 
 p {
@@ -51,7 +62,7 @@ p {
 
 .Title {
     font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
-    color: #b6b6b6;
+    color: #c4c4c4;
     margin: 0px;
     margin-bottom: 10px;
 }

@@ -1,0 +1,67 @@
+@font-face {
+    font-family: "OpenSansBold";
+    src: url('OpenSans/opensans-bold-webfont.woff2') format('woff2'),
+         url('OpenSans/opensans-bold-webfont.woff') format('woff');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "OpenSans";
+    src: url('OpenSans/opensans-regular-webfont.woff2') format('woff2'),
+         url('OpenSans/opensans-regular-webfont.woff') format('woff');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "PTMono-Regular";
+    src: url('PTMono/PTMono-Regular.woff') format('woff');
+    font-weight: normal;
+}
+
+.MessageContainer {
+    padding: 7.5px;
+
+    height: 100%;
+    
+    background-color: #5c5c5c;
+    border-radius: 5px;
+}
+
+.Message {
+    margin: 5px;
+}
+
+.MessageContent {
+    font-family: "PTMono-Regular", Arial, Helvetica, sans-serif;;
+    color: #c7c7c7;
+}
+
+.SubmitButton {
+    transform:scale(1);
+    font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    display:inline-block;
+
+    margin: 5px 5px 5px 5px;
+    box-sizing: border-box;
+    border-radius:5px;
+    box-shadow: none;
+
+    color:#ffffff;
+    border: 1px solid #45bbff;
+    background-color: #45bbff;
+
+    transition: all 0.15s;
+    outline:none;
+}
+
+.SubmitButton:hover{
+    transform:scale(1.05);
+    cursor:pointer;
+    box-shadow: 1px 1px 5px 1px #1d1d1d;
+}
+
+.Activated {
+    border: 1px solid #ffffff;
+    background-color: #96fa60;
+}

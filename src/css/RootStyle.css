@@ -4,8 +4,12 @@ html, body, #root {
 }
 
 .AppDiv {
+    box-sizing: border-box;
+    
     width: 100%;
     height: 100%;
+
+    padding: 5px;
 
     display: grid;
     grid-template-columns: repeat(2, 1fr);
