@@ -18,7 +18,11 @@
     font-weight: normal;
 }
 
-.MessageContainer {
+.ComponentContainer {
+    display: block;
+    
+    overflow-y:scroll;
+    
     padding: 7.5px;
 
     height: 100%;
@@ -64,4 +68,46 @@
 .Activated {
     border: 1px solid #ffffff;
     background-color: #96fa60;
+}
+
+.User {
+    margin: 2px;
+    padding: 8px;
+
+    border-radius: 5px;
+    background-color: #5c5c5c;
+}
+
+.User:hover {
+    background-color: #727272;
+    cursor: pointer;
+}
+
+.UserName {
+    font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+    color: #dadada;
+    margin: 1px;
+}
+
+.Ip {
+    font-family: "PTMono-Regular", 'Times New Roman', Times, serif;
+    color: #c5c5c5;
+    margin: 1px;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    border-radius: 5px;
+    background: #5c5c5c;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    border-radius: 5px;
+    background: #4b4b4b;
 }

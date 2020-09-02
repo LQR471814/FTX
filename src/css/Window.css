@@ -15,7 +15,6 @@
 .Window {
     display: flex;
     flex-direction: column;
-    flex: 1;
 
     background-color: #707070;
     margin: 5px;

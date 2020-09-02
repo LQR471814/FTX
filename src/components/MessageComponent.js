@@ -71,8 +71,6 @@ class MessageComponent extends React.Component {
         this.setState({submitStyle:"SubmitButton Activated"})
         this.setState({msgIn:""})
         document.getElementById("MsgInField").value = ""
-
-        eel.hello()
     }
 
     async onButtonAnimationEnd(event) {
@@ -86,8 +84,8 @@ class MessageComponent extends React.Component {
 
     render() {
         return (
-            <div className="Col">
-                <div className="Window">
+            <div className="Col" style={{overflow: "hidden"}}>
+                <div className="Window" style={{height: "100%", overflow: "hidden"}}>
                     <p className="Title">Messages - {this.props.channels[this.props.currentChannel].user}</p>
                     <MessageList messages={this.props.channels[this.props.currentChannel].channelMessages} />
                 </div>

@@ -33,7 +33,7 @@ ReactDOM.render(
     <Provider store={store}>
         <div className="AppDiv">
             <MessageComponentContainer />
-            <div className="Col">
+            <div className="Col" style={{overflow: "hidden"}}>
                 <UserList />
                 <PendingTransfers />
                 <TransferStatus />

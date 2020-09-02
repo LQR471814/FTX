@@ -4,7 +4,7 @@ import '../css/Window.css';
 class PendingTransfers extends React.Component {
     render() {
         return (
-            <div className="Window">
+            <div className="Window" style={{height: "25%"}}>
                 <p className="Title">Pending Transfers</p>
             </div>
         );

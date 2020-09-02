@@ -9,7 +9,7 @@ import Message from './Message';
 class MessageList extends React.Component {
     render() {
         return (
-            <div className="MessageContainer">
+            <div className="ComponentContainer" style={{overflowY: "scroll"}}>
                 {this.props.messages.map((message)=>{
                     return <Message key={uniqid()} text={message.content} author={message.author} />
                 })}
