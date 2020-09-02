@@ -19,6 +19,7 @@ import '../css/Window.css';
 import '../css/RootStyle.css';
 import MessageList from './MessageList';
 import PropTypes from 'prop-types';
+import { eel } from '../eel';
 
 class MessageComponent extends React.Component {
     constructor(props) {
@@ -70,6 +71,8 @@ class MessageComponent extends React.Component {
         this.setState({submitStyle:"SubmitButton Activated"})
         this.setState({msgIn:""})
         document.getElementById("MsgInField").value = ""
+
+        eel.hello()
     }
 
     async onButtonAnimationEnd(event) {
