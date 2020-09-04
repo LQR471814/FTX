@@ -26,7 +26,7 @@ def commServer():
 async def UserUpdate(websocket, path):
     while True:
         msgBytes, address = ReceiveMCastSock.recvfrom(1024)
-        messageType = int.from_bytes(msgBytes[0], "big")
+        messageType = ord(msgBytes[0])
         if messageType == 0:
             deviceName = msgBytes[1:].decode('utf8')
             await websocket.send(json.dumps({"type":"addUser", "user":{"name":deviceName, "ip":address}}))
