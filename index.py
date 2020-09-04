@@ -17,11 +17,6 @@ def handle_exit(ar1, ar2):
     print("Quitting...")
     sys.exit(0)
 
-def receiveMCastThread(recvSocket):
-    while True:
-        msgBytes = ReceiveMCastSock.recv(1024)
-        print(msgBytes)
-
 def commServer():
     asyncio.set_event_loop(websocketEventLoop)
     start_server = websockets.serve(UserUpdate, "localhost", 4000)
@@ -30,11 +25,17 @@ def commServer():
 
 async def UserUpdate(websocket, path):
     while True:
-        try:
-            await websocket.send(json.dumps({"type":"addUser", "user":{"name":"test", "ip":"127.0.0.1"}}))
-        except:
-            asyncio.get_event_loop().stop()
-        await asyncio.sleep(3)
+        msgBytes, address = ReceiveMCastSock.recvfrom(1024)
+        messageType = int.from_bytes(msgBytes[0], "big")
+        if messageType == 0:
+            deviceName = msgBytes[1:].decode('utf8')
+            await websocket.send(json.dumps({"type":"addUser", "user":{"name":deviceName, "ip":address}}))
+
+        # try:
+        #     await websocket.send(json.dumps({"type":"addUser", "user":{"name":"test", "ip":"127.0.0.1"}}))
+        # except:
+        #     asyncio.get_event_loop().stop()
+        # await asyncio.sleep(3)
 
 if __name__ == "__main__":
     try:
@@ -69,9 +70,6 @@ if __name__ == "__main__":
         mreq = struct.pack("4sL", group, socket.INADDR_ANY)
         ReceiveMCastSock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-        receiveThread = threading.Thread(target=receiveMCastThread, kwargs={"recvSocket":ReceiveMCastSock}, daemon=True)
-        receiveThread.start()
-
         SendMCastSocket.sendto((0).to_bytes(1, 'big') + socket.gethostname().encode("utf8"), MULTICAST_GROUP)
 
         websocketEventLoop = asyncio.new_event_loop()
@@ -82,4 +80,3 @@ if __name__ == "__main__":
         eel.start('index.html', port=3000, host="localhost", close_callback=handle_exit, mode="chrome", block=True)
     except Exception as err:
         print(err)
-
