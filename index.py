@@ -66,7 +66,7 @@ if __name__ == "__main__":
         receiveThread = threading.Thread(target=receiveMCastThread, kwargs={"recvSocket":ReceiveMCastSock}, daemon=True)
         receiveThread.start()
 
-        SendMCastSocket.send((0).to_bytes(1, 'big') + socket.gethostname().encode("utf8"))
+        SendMCastSocket.sendto((0).to_bytes(1, 'big') + socket.gethostname().encode("utf8"), MULTICAST_GROUP)
 
         eel.init('build')
         eel.start('index.html', port=3000, host="localhost", close_callback=handle_exit, mode="chrome", block=False)
