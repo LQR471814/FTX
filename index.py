@@ -22,6 +22,12 @@ def receiveMCastThread(recvSocket):
         msgBytes = ReceiveMCastSock.recv(1024)
         print(msgBytes)
 
+def commServer():
+    asyncio.set_event_loop(websocketEventLoop)
+    start_server = websockets.serve(UserUpdate, "localhost", 4000)
+    asyncio.get_event_loop().run_until_complete(start_server)
+    asyncio.get_event_loop().run_forever()
+
 async def UserUpdate(websocket, path):
     while True:
         try:
@@ -68,14 +74,12 @@ if __name__ == "__main__":
 
         SendMCastSocket.sendto((0).to_bytes(1, 'big') + socket.gethostname().encode("utf8"), MULTICAST_GROUP)
 
-        eel.init('build')
-        eel.start('index.html', port=3000, host="localhost", close_callback=handle_exit, mode="chrome", block=False)
+        websocketEventLoop = asyncio.new_event_loop()
+        commServerThread = threading.Thread(target=commServer, daemon=True)
+        commServerThread.start()
         
-        eel.sleep(1)
-
-        start_server = websockets.serve(UserUpdate, "localhost", 4000)
-        asyncio.get_event_loop().run_until_complete(start_server)
-        asyncio.get_event_loop().run_forever()
+        eel.init('build')
+        eel.start('index.html', port=3000, host="localhost", close_callback=handle_exit, mode="chrome", block=True)
     except Exception as err:
         print(err)
 
