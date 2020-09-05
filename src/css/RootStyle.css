@@ -9,7 +9,8 @@ html, body, #root {
     padding: 5px;
 
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 45px auto;
 
     height: 100%;
 }

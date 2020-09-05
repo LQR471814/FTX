@@ -3,33 +3,14 @@ import '../css/Window.css';
 import '../css/MiniComponents.css';
 import User from './User';
 import uniqid from 'uniqid';
-import { w3cwebsocket as WebSocketClient } from 'websocket';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 
 class UserList extends React.Component {
     constructor(props) {
         super(props)
 
         this.state = {users:[]}
-
-        this.updateUsersClient = new WebSocketClient("ws://localhost:4000")
-        this.updateUsersClient.onopen = () => {
-            console.log("Connected to backend.")
-        }
-        this.updateUsersClient.onmessage = (message) => {
-            console.log(message)
-            var messageObj = JSON.parse(message.data);
-            switch (messageObj.type) {
-                case "addUser":
-                    this.addUser(messageObj.user)
-                    break;
-                case "removeUser":
-                    this.removeUser(messageObj.user)
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
     addUser(user) {
@@ -56,6 +37,10 @@ class UserList extends React.Component {
             </div>
         );
     }
+}
+
+UserList.propTypes = {
+    commSocket: PropTypes.object.isRequired
 }
 
 export default UserList;

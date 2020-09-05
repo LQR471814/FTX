@@ -9,6 +9,8 @@ import TransferStatus from './components/TransferStatus';
 import ftClient from './appReducer';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
+import { w3cwebsocket as WebSocketClient } from 'websocket';
+import SetupMulticastBanner from './components/SetupMulticastBanner';
 
 const defaultChannels = [
     {
@@ -29,12 +31,32 @@ const initState = {
 }
 const store = createStore(ftClient, initState);
 
+var commSocket = new WebSocketClient("ws://localhost:4000")
+commSocket.onopen = () => {
+    console.log("Connected to backend.")
+}
+commSocket.onmessage = (message) => {
+    console.log(message)
+    var messageObj = JSON.parse(message.data);
+    switch (messageObj.type) {
+        case "addUser":
+            this.addUser(messageObj.user)
+            break;
+        case "removeUser":
+            this.removeUser(messageObj.user)
+            break;
+        default:
+            break;
+    }
+}
+
 ReactDOM.render(
     <Provider store={store}>
-        <div className="AppDiv">
+        <div className="AppDiv" id="AppGrid">
+            <SetupMulticastBanner />
             <MessageComponentContainer />
             <div className="Col" style={{overflow: "hidden"}}>
-                <UserList />
+                <UserList commSocket={commSocket} />
                 <PendingTransfers />
                 <TransferStatus />
             </div>

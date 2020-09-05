@@ -1,0 +1,73 @@
+@font-face {
+    font-family: "OpenSansBold";
+    src: url('OpenSans/opensans-bold-webfont.woff2') format('woff2'),
+         url('OpenSans/opensans-bold-webfont.woff') format('woff');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "OpenSans";
+    src: url('OpenSans/opensans-regular-webfont.woff2') format('woff2'),
+         url('OpenSans/opensans-regular-webfont.woff') format('woff');
+    font-weight: normal;
+}
+
+span {
+    align-self: center;
+    
+    font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.BannerContainer {
+    grid-column: 1 / 3;
+    
+    display: flex;
+    
+    border-radius: 5px;
+    margin: 5px;
+    background-color: #ff9100;
+    padding: 5px;
+
+    justify-content: center;
+}
+
+.SetupButton {
+    margin: 0px 5px 0px 5px;
+    padding: 0px 3px 1px 3px;
+    border-radius: 5px;
+    border: 2px solid #ffffff;
+    font-family: "OpenSans";
+    font-size: 14px;
+    color: #ffffff;
+    background-color: #ff9100;
+
+    outline:none;
+    transition: all 0.1s;
+}
+
+.SetupButton:hover {
+    color: #ff9100;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+.CloseButton {
+    position: relative;
+
+    margin: 0px 5px 0px 5px;
+    padding: 0px;
+    border: none;
+    background-color: #ffffff00;
+
+    outline: none;
+
+    fill: #ffffff;
+    transition: all 0.2s;
+}
+
+.CloseButton:hover {
+    cursor: pointer;
+    fill: #ff4444;
+}

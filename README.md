@@ -1,3 +1,3 @@
-# FTClient
+# FTX
 
-React.js Client for interfacing with ftcore.
+React.js Frontend + Eel backend File Transfer Client.

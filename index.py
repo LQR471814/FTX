@@ -32,18 +32,13 @@ async def UserUpdate(websocket, path):
             deviceName = msgBytes[1:].decode('utf8')
             await websocket.send(json.dumps({"type":"addUser", "user":{"name":deviceName, "ip":address[0]}}))
 
-        # try:
-        #     await websocket.send(json.dumps({"type":"addUser", "user":{"name":"test", "ip":"127.0.0.1"}}))
-        # except:
-        #     asyncio.get_event_loop().stop()
-        # await asyncio.sleep(3)
-
 if __name__ == "__main__":
     try:
         print("Getting things ready...")
 
         #? Fetching Ip Address
         hostname = socket.gethostname()
+        currentOS = platform.system()
         if platform.system() == "Windows":
             ip = socket.gethostbyname_ex(hostname)[-1]
             for address in ip:
@@ -71,7 +66,7 @@ if __name__ == "__main__":
         mreq = struct.pack("4sL", group, socket.INADDR_ANY)
         ReceiveMCastSock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-        SendMCastSocket.sendto((0).to_bytes(1, 'big') + socket.gethostname().encode("utf8"), MULTICAST_GROUP)
+        SendMCastSocket.sendto((0).to_bytes(1, 'big') + hostname.encode("utf8"), MULTICAST_GROUP)
 
         websocketEventLoop = asyncio.new_event_loop()
         commServerThread = threading.Thread(target=commServer, daemon=True)
