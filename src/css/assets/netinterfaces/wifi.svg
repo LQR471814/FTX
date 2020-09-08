@@ -1,0 +1,15 @@
+<svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="120px"
+      height="120px"
+      viewBox="0 0 34.67 34.67"
+    >
+    <style type="text/css">
+      .st0{fill:#bdbdbd;}
+    </style>
+      <g transform="translate(-73.827 -117.33)">
+        <path class="st0" d="M107.74 117.33a34.767 34.767 0 00-33.914 33.915H83.1a25.496 25.496 0 0124.64-24.64z"></path>
+        <path class="st0" d="M107.74 131.87a20.228 20.228 0 00-19.368 19.368h8.808a11.433 11.433 0 0110.56-10.559z"></path>
+        <circle class="st0" cx="105" cy="148.5" r="3.496"></circle>
+      </g>
+</svg>

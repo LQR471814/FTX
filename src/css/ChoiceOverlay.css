@@ -1,0 +1,19 @@
+.Undisplayed {
+    display: none;
+    column-gap: 0px;
+}
+
+.ChoiceContainer {
+    display: grid;
+    position: absolute;
+
+    grid-template-columns: repeat(5, 1fr);
+    
+    column-gap: 0px;
+    
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    transition: 0.25s all ease-in-out;
+}

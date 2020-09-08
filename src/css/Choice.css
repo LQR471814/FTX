@@ -1,0 +1,41 @@
+@font-face {
+    font-family: "OpenSansBold";
+    src: url('OpenSans/opensans-bold-webfont.woff2') format('woff2'),
+         url('OpenSans/opensans-bold-webfont.woff') format('woff');
+    font-weight: normal;
+}
+
+.Tag {
+    font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+    color: #cecece;
+    margin: 10px;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.ChoiceDiv {
+    text-align: center;
+    border: 2px solid #ffffff00;
+    border-radius: 10px;
+
+    padding: 20px 20px 20px 20px;
+
+    transition: 0.1s all;
+}
+
+.ChoiceDiv:hover {
+    border: 2px solid #ffffff94;
+    cursor: pointer;
+    background-color: #ffffff1a;
+
+    transform: scale(1.1);
+}
+
+.ChoiceDiv:active {
+    border: 2px solid #9dff0073;
+    background-color: #9dff0048;
+    border-radius: 5px;
+}

@@ -1,4 +1,6 @@
 import asyncio
+import json
+import os
 import platform
 import socket
 import struct
@@ -6,10 +8,11 @@ import subprocess
 import sys
 import threading
 import time
-import json
 
 import eel
 import websockets
+
+import elevate
 
 
 @eel.expose
@@ -17,13 +20,52 @@ def handle_exit(ar1, ar2):
     print("Quitting...")
     sys.exit(0)
 
-def commServer():
-    asyncio.set_event_loop(websocketEventLoop)
-    start_server = websockets.serve(UserUpdate, "localhost", 4000)
+def userUpdateDaemon():
+    asyncio.set_event_loop(userUpdateEventLoop)
+    start_server = websockets.serve(UpdateUsers, "localhost", 4001)
     asyncio.get_event_loop().run_until_complete(start_server)
     asyncio.get_event_loop().run_forever()
 
-async def UserUpdate(websocket, path):
+def resourceDaemon():
+    asyncio.set_event_loop(resourceEventLoop)
+    start_server = websockets.serve(resource, "localhost", 4000)
+    asyncio.get_event_loop().run_until_complete(start_server)
+    asyncio.get_event_loop().run_forever()
+
+async def resource(websocket, path):
+    while True:
+        try:
+            request = await websocket.recv()
+            request = json.loads(request)
+        except:
+            return
+        print(request)
+        switch = {
+            "getInterfaces": getInterfaces,
+            "setInterfaces": setInterfaces,
+            "getOS": getOS
+        }
+        await websocket.send(json.dumps({"type":request["name"],"response":switch[request["name"]](request["parameters"])}))
+
+def setInterfaces(parameters):
+    try:
+        subprocess.call([os.path.dirname(os.path.abspath(__file__)) + "\\" + "MSSetInterface.exe"])
+    except Exception as err:
+        return str(err)
+
+def getInterfaces(parameters):
+    output = subprocess.check_output("""netsh interface ipv4 show joins""", shell=True).decode("utf8")
+    interfaces = [line for line in output.split('\n') if "Interface" in line]
+    for line, i in zip(interfaces, range(len(interfaces))):
+        resultLine = line.split(": ")
+        resultLine[0] = int(resultLine[0].replace("Interface ", ""))
+        interfaces[i] = {"id":resultLine[0], "name":resultLine[1]}
+    return json.dumps(interfaces)
+
+def getOS(parameters):
+    return platform.system()
+
+async def UpdateUsers(websocket, path):
     while True:
         msgBytes, address = ReceiveMCastSock.recvfrom(1024)
         print(msgBytes, address)
@@ -66,11 +108,22 @@ if __name__ == "__main__":
         mreq = struct.pack("4sL", group, socket.INADDR_ANY)
         ReceiveMCastSock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
+        #? Multicast Ping (Join)
         SendMCastSocket.sendto((0).to_bytes(1, 'big') + hostname.encode("utf8"), MULTICAST_GROUP)
 
-        websocketEventLoop = asyncio.new_event_loop()
-        commServerThread = threading.Thread(target=commServer, daemon=True)
-        commServerThread.start()
+        #? Event Loops
+        userUpdateEventLoop = asyncio.new_event_loop()
+        resourceEventLoop = asyncio.new_event_loop()
+        actionEventLoop = asyncio.new_event_loop()
+
+        #? Websocket Thread Daemons
+        userUpdateThread = threading.Thread(target=userUpdateDaemon, daemon=True) #* To update user discovery
+        userUpdateThread.start()
+
+        resourceThread = threading.Thread(target=resourceDaemon, daemon=True) #* When frontend requires a resource that it cannot access
+        resourceThread.start()
+
+
         
         eel.init('build')
         eel.start('index.html', port=3000, host="localhost", close_callback=handle_exit, mode="chrome", block=True)
