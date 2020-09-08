@@ -12,9 +12,6 @@ import time
 import eel
 import websockets
 
-import elevate
-
-
 @eel.expose
 def handle_exit(ar1, ar2):
     print("Quitting...")
@@ -49,7 +46,7 @@ async def resource(websocket, path):
 
 def setInterfaces(parameters):
     try:
-        subprocess.call([os.path.dirname(os.path.abspath(__file__)) + "\\" + "MSSetInterface.exe"])
+        subprocess.call([os.path.dirname(os.path.abspath(__file__)) + "\\" + "SetupMulticastWin.exe"])
     except Exception as err:
         return str(err)
 
