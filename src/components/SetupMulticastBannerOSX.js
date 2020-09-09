@@ -7,7 +7,6 @@ class SetupMulticastBannerOSX extends React.Component {
         super(props)
 
         this.onClickClose = this.onClickClose.bind(this);
-        this.onClickSetup = this.onClickSetup.bind(this);
         
         this.state = {display:"flex"}
     }

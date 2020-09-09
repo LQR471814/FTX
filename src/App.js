@@ -21,6 +21,7 @@ class App extends React.Component {
 
         this.resourceSocket = new WebSocketClient("ws://localhost:4000")
         this.resourceSocket.onopen = () => {
+            console.log("Connected to resource.")
             this.resourceSocket.send(JSON.stringify({name: "getOS", parameters: {}}))
         }
         this.resourceSocket.onmessage = (message) => {
