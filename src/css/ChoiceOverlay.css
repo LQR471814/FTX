@@ -1,3 +1,10 @@
+@font-face {
+    font-family: "OpenSansBold";
+    src: url('OpenSans/opensans-bold-webfont.woff2') format('woff2'),
+         url('OpenSans/opensans-bold-webfont.woff') format('woff');
+    font-weight: normal;
+}
+
 .Undisplayed {
     display: none;
     column-gap: 0px;
@@ -12,8 +19,27 @@
     column-gap: 0px;
     
     left: 50%;
-    top: 50%;
+    top: 55%;
     transform: translate(-50%, -50%);
 
     transition: 0.25s all ease-in-out;
+}
+
+.Info {
+    position: absolute;
+
+    left: 50%;
+    top: -20%;
+    transform: translate(-50%, 0%);
+    
+    font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+    color: #cecece;
+    margin: 0px;
+
+    font-size: 25px;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }

@@ -1,9 +1,8 @@
 import React from 'react';
 import '../css/SetupMulticastBanner.css'
 import { ReactComponent as CloseIcon } from '../css/assets/close.svg';
-import PropTypes from 'prop-types';
 
-class SetupMulticastBanner extends React.Component {
+class SetupMulticastBannerOSX extends React.Component {
     constructor(props) {
         super(props)
 
@@ -18,28 +17,14 @@ class SetupMulticastBanner extends React.Component {
         document.getElementById("AppGrid").style.gridTemplateRows = "auto";
     }
 
-    onClickSetup(e) {
-        this.setState({display:"none"})
-        document.getElementById("AppGrid").style.gridTemplateRows = "auto";
-
-        this.props.displayChoiceNetworkInterfaces(true)
-    }
-    
     render() {
         return (
             <div className="BannerContainer" style={{display: this.state.display}}>
-                <div style={{flex: "1", justifyContent: "center"}}>
-                    <span>Make sure device discovery is working on your device</span>
-                    <button className="SetupButton" onClick={this.onClickSetup}>Setup</button>
-                </div>
+                <span>Make sure device discovery is working on your device, go to system preferences, sharing and check "File Sharing"</span>
                 <button onClick={this.onClickClose} className="CloseButton"><CloseIcon /></button>
             </div>
         );
     }
 }
 
-SetupMulticastBanner.propTypes = {
-    displayChoiceNetworkInterfaces: PropTypes.func.isRequired
-}
-
-export default SetupMulticastBanner;
+export default SetupMulticastBannerOSX;

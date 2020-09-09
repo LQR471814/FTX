@@ -1,5 +1,6 @@
 import React from 'react';
-import SetupMulticastBanner from './components/SetupMulticastBanner';
+import SetupMulticastBannerWin from './components/SetupMulticastBannerWin';
+import SetupMulticastBannerOSX from './components/SetupMulticastBannerOSX';
 import MessageComponentContainer from './components/containers/MessageComponentContainer';
 import UserList from './components/UserList';
 import PendingTransfers from './components/PendingTransfers';
@@ -13,7 +14,7 @@ class App extends React.Component {
 
         this.state = {
             showChoiceNetworkInterfaces: false,
-            showSetupBanner: false
+            showSetupBannerWin: false
         }
         
         this.displayChoiceNetworkInterfaces = this.displayChoiceNetworkInterfaces.bind(this)
@@ -34,9 +35,11 @@ class App extends React.Component {
                     break;
                 case "getOS":
                     this.os = messageObj.response
+                    console.log(this.os)
                     if (this.os === "Windows") {
-                        console.log(this.os)
-                        this.showSetupBanner(true)
+                        this.showSetupBannerWin(true)
+                    } else if (this.os === "Darwin") {
+                        this.showSetupBannerOSX(true)
                     }
                     break;
                 default:
@@ -51,15 +54,20 @@ class App extends React.Component {
         this.setState({showChoiceNetworkInterfaces: show})
     }
 
-    showSetupBanner(show) {
-        this.setState({showSetupBanner: show})
+    showSetupBannerWin(show) {
+        this.setState({showSetupBannerWin: show})
+    }
+
+    showSetupBannerOSX(show) {
+        this.setState({showSetupBannerOSX: show})
     }
     
     render() {
         return (
             <div style={{height: "100%"}}>
                 <div className="AppDiv" id="AppGrid">
-                    {this.state.showSetupBanner && <SetupMulticastBanner displayChoiceNetworkInterfaces={this.displayChoiceNetworkInterfaces} />}
+                    {this.state.showSetupBannerWin && <SetupMulticastBannerWin displayChoiceNetworkInterfaces={this.displayChoiceNetworkInterfaces} />}
+                    {this.state.showSetupBannerOSX && <SetupMulticastBannerOSX />}
                     <MessageComponentContainer />
                     <div className="Col" style={{overflow: "hidden"}}>
                         <UserList />

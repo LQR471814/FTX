@@ -39,6 +39,7 @@ class NetInterfaceChoice extends React.Component {
     render() {
         return (
             <div className="ChoiceContainer" id="NetInterfaceChoiceContainer" onTransitionEnd={this.closeChoice}>
+                <span className="Info">Choose a network interface to receive multicast</span>
                 {this.state.interfaces.map((netInterface)=>{
                     return <NetInterface key={uniqid()} interface={netInterface} resourceClient={this.props.resourceClient} />
                 })}

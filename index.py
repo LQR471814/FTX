@@ -73,7 +73,7 @@ async def UpdateUsers(websocket, path):
 
 if __name__ == "__main__":
     try:
-        print("Getting things ready...")
+        print("Starting...")
 
         #? Fetching Ip Address
         hostname = socket.gethostname()
