@@ -38,12 +38,11 @@ class UserList extends React.Component {
         console.log(user, this.props.hostname)
         while (this.props.hostname === undefined) {await new Promise(r => setTimeout(r, 1))}
         if (user.name === this.props.hostname.value) {
-            this.props.showSetupBanner(false)
-        } else {
-            var newUsers = _.cloneDeep(this.state.users)
-            newUsers.push(user)
-            this.setState({users:newUsers})
+            return
         }
+        var newUsers = _.cloneDeep(this.state.users)
+        newUsers.push(user)
+        this.setState({users:newUsers})
     }
 
     removeUser(user) {
@@ -67,9 +66,7 @@ class UserList extends React.Component {
 }
 
 UserList.propTypes = {
-    hostname: PropTypes.object.isRequired,
-    os: PropTypes.object.isRequired,
-    showSetupBanner: PropTypes.func.isRequired
+    hostname: PropTypes.object.isRequired
 }
 
 export default UserList;

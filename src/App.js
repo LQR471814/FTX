@@ -77,7 +77,7 @@ class App extends React.Component {
                     {this.state.showSetupBanner && <this.setupBanner displayChoiceNetworkInterfaces={this.displayChoiceNetworkInterfaces} />}
                     <MessageComponentContainer />
                     <div className="Col" style={{overflow: "hidden"}}>
-                        <UserList hostname={this.hostname} showSetupBanner={this.showSetupBanner} />
+                        <UserList hostname={this.hostname} />
                         <PendingTransfers />
                         <TransferStatus />
                     </div>
