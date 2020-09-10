@@ -7,6 +7,7 @@ import PendingTransfers from './components/PendingTransfers';
 import TransferStatus from './components/TransferStatus';
 import NetInterfaceChoice from './components/NetInterfaceChoice'
 import { w3cwebsocket as WebSocketClient } from 'websocket';
+import EmptyBanner from './components/EmptyBanner';
 
 class App extends React.Component {
     constructor(props) {
@@ -14,14 +15,18 @@ class App extends React.Component {
 
         this.state = {
             showChoiceNetworkInterfaces: false,
-            showSetupBannerWin: false
+            showSetupBanner: true
         }
         
         this.displayChoiceNetworkInterfaces = this.displayChoiceNetworkInterfaces.bind(this)
+        this.showSetupBanner = this.showSetupBanner.bind(this)
+
+        this.setupBanner = EmptyBanner
 
         this.resourceSocket = new WebSocketClient("ws://localhost:4000")
         this.resourceSocket.onopen = () => {
             console.log("Connected to resource.")
+            this.resourceSocket.send(JSON.stringify({name: "getHostname", parameters: {}}))
             this.resourceSocket.send(JSON.stringify({name: "getOS", parameters: {}}))
         }
         this.resourceSocket.onmessage = (message) => {
@@ -35,14 +40,17 @@ class App extends React.Component {
                     console.log(messageObj.response)
                     break;
                 case "getOS":
-                    this.os = messageObj.response
-                    console.log(this.os)
-                    if (this.os === "Windows") {
-                        this.showSetupBannerWin(true)
+                    this.os = {value: messageObj.response}
+                    if (this.os.value === "Windows") {
+                        this.setupBanner = SetupMulticastBannerWin
+                        this.forceUpdate()
                     } else if (this.os === "Darwin") {
-                        this.showSetupBannerOSX(true)
+                        this.setupBanner = SetupMulticastBannerOSX
+                        this.forceUpdate()
                     }
                     break;
+                case "getHostname":
+                    this.hostname = {value: messageObj.response}
                 default:
                     break;
             }
@@ -55,23 +63,21 @@ class App extends React.Component {
         this.setState({showChoiceNetworkInterfaces: show})
     }
 
-    showSetupBannerWin(show) {
-        this.setState({showSetupBannerWin: show})
+    showSetupBanner(show) {
+        if (show === false) {
+            document.getElementById("AppGrid").style.gridTemplateRows = "auto";
+        }
+        this.setState({showSetupBanner: show})
     }
 
-    showSetupBannerOSX(show) {
-        this.setState({showSetupBannerOSX: show})
-    }
-    
     render() {
         return (
             <div style={{height: "100%"}}>
                 <div className="AppDiv" id="AppGrid">
-                    {this.state.showSetupBannerWin && <SetupMulticastBannerWin displayChoiceNetworkInterfaces={this.displayChoiceNetworkInterfaces} />}
-                    {this.state.showSetupBannerOSX && <SetupMulticastBannerOSX />}
+                    {this.state.showSetupBanner && <this.setupBanner displayChoiceNetworkInterfaces={this.displayChoiceNetworkInterfaces} />}
                     <MessageComponentContainer />
                     <div className="Col" style={{overflow: "hidden"}}>
-                        <UserList />
+                        <UserList hostname={this.hostname} showSetupBanner={this.showSetupBanner} />
                         <PendingTransfers />
                         <TransferStatus />
                     </div>

@@ -19,7 +19,9 @@ class SetupMulticastBannerOSX extends React.Component {
     render() {
         return (
             <div className="BannerContainer" style={{display: this.state.display}}>
-                <span>Make sure device discovery is working on your device, go to system preferences, sharing and check "File Sharing"</span>
+                <div style={{flex: "1", justifyContent: "center"}}>
+                    <span>Make sure device discovery is working on your device, go to system preferences, sharing and check "File Sharing"</span>
+                </div>
                 <button onClick={this.onClickClose} className="CloseButton"><CloseIcon /></button>
             </div>
         );

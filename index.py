@@ -40,7 +40,8 @@ async def resource(websocket, path):
         switch = {
             "getInterfaces": getInterfaces,
             "setInterfaces": setInterfaces,
-            "getOS": getOS
+            "getOS": getOS,
+            "getHostname": getHostname
         }
         await websocket.send(json.dumps({"type":request["name"],"response":switch[request["name"]](request["parameters"])}))
 
@@ -62,7 +63,15 @@ def getInterfaces(parameters):
 def getOS(parameters):
     return platform.system()
 
+def getHostname(parameters):
+    return socket.gethostname()
+
 async def UpdateUsers(websocket, path):
+    try:
+        await websocket.recv()
+    except:
+        return
+    SendMCastSocket.sendto((0).to_bytes(1, 'big') + hostname.encode("utf8"), MULTICAST_GROUP)
     while True:
         msgBytes, address = ReceiveMCastSock.recvfrom(1024)
         print(msgBytes, address)
@@ -105,9 +114,6 @@ if __name__ == "__main__":
         mreq = struct.pack("4sL", group, socket.INADDR_ANY)
         ReceiveMCastSock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
 
-        #? Multicast Ping (Join)
-        SendMCastSocket.sendto((0).to_bytes(1, 'big') + hostname.encode("utf8"), MULTICAST_GROUP)
-
         #? Event Loops
         userUpdateEventLoop = asyncio.new_event_loop()
         resourceEventLoop = asyncio.new_event_loop()
@@ -120,8 +126,6 @@ if __name__ == "__main__":
         resourceThread = threading.Thread(target=resourceDaemon, daemon=True) #* When frontend requires a resource that it cannot access
         resourceThread.start()
 
-
-        
         eel.init('build')
         eel.start('index.html', port=3000, host="localhost", close_callback=handle_exit, mode="chrome", block=True)
     except Exception as err:

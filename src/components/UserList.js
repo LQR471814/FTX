@@ -5,6 +5,7 @@ import User from './User';
 import uniqid from 'uniqid';
 import _ from 'lodash';
 import { w3cwebsocket as WebSocketClient } from 'websocket';
+import PropTypes from 'prop-types';
 
 class UserList extends React.Component {
     constructor(props) {
@@ -15,6 +16,7 @@ class UserList extends React.Component {
         this.userUpdateClient = new WebSocketClient("ws://localhost:4001")
         this.userUpdateClient.onopen = () => {
             console.log("Connected to backend.")
+            this.userUpdateClient.send("Connected")
         }
         this.userUpdateClient.onmessage = (message) => {
             console.log(message)
@@ -31,11 +33,17 @@ class UserList extends React.Component {
             }
         }
     }
-
-    addUser(user) {
-        var newUsers = _.cloneDeep(this.state.users)
-        newUsers.push(user)
-        this.setState({users:newUsers})
+    
+    async addUser(user) {
+        console.log(user, this.props.hostname)
+        while (this.props.hostname === undefined) {await new Promise(r => setTimeout(r, 1))}
+        if (user.name === this.props.hostname.value) {
+            this.props.showSetupBanner(false)
+        } else {
+            var newUsers = _.cloneDeep(this.state.users)
+            newUsers.push(user)
+            this.setState({users:newUsers})
+        }
     }
 
     removeUser(user) {
@@ -56,6 +64,12 @@ class UserList extends React.Component {
             </div>
         );
     }
+}
+
+UserList.propTypes = {
+    hostname: PropTypes.object.isRequired,
+    os: PropTypes.object.isRequired,
+    showSetupBanner: PropTypes.func.isRequired
 }
 
 export default UserList;
