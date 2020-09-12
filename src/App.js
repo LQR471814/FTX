@@ -47,6 +47,7 @@ class App extends React.Component {
                     break;
                 case "getHostname":
                     this.hostname = {value: messageObj.response}
+                    this.forceUpdate()
                     break;
                 case "requireSetupWin":
                     this.showSetupBanner(messageObj.response)
