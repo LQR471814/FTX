@@ -41,13 +41,26 @@ async def resource(websocket, path):
             "getInterfaces": getInterfaces,
             "setInterfaces": setInterfaces,
             "getOS": getOS,
-            "getHostname": getHostname
+            "getHostname": getHostname,
+            "requireSetupWin": requireSetupWin
         }
         await websocket.send(json.dumps({"type":request["name"],"response":switch[request["name"]](request["parameters"])}))
 
+def requireSetupWin(parameters):
+    output = subprocess.check_output("""powershell.exe Get-NetRoute""", shell=True).decode("utf8")
+    lines = []
+    for line in output.split('\r\n'):
+        if "224.0.0.0" in line:
+            lines.append(line)
+    
+    for i in range(len(lines)):
+        if lines[i].split()[3] != '256':
+            return False #? Should not display SetupBanner
+    return True #? Should display SetupBanner
+    
 def setInterfaces(parameters):
     try:
-        subprocess.call([os.path.dirname(os.path.abspath(__file__)) + "\\" + "SetupMulticastWin.exe"])
+        return subprocess.check_output(os.path.dirname(os.path.abspath(__file__)) + "\\" + "SetupMulticastWin.exe -i " + str(parameters["interfaceID"])).decode("utf8")
     except Exception as err:
         return str(err)
 

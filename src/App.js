@@ -1,6 +1,5 @@
 import React from 'react';
 import SetupMulticastBannerWin from './components/SetupMulticastBannerWin';
-import SetupMulticastBannerOSX from './components/SetupMulticastBannerOSX';
 import MessageComponentContainer from './components/containers/MessageComponentContainer';
 import UserList from './components/UserList';
 import PendingTransfers from './components/PendingTransfers';
@@ -11,11 +10,11 @@ import EmptyBanner from './components/EmptyBanner';
 
 class App extends React.Component {
     constructor(props) {
-        super(props);
-
+        super(props)
+        
         this.state = {
             showChoiceNetworkInterfaces: false,
-            showSetupBanner: true
+            showSetupBanner: false
         }
         
         this.displayChoiceNetworkInterfaces = this.displayChoiceNetworkInterfaces.bind(this)
@@ -28,6 +27,7 @@ class App extends React.Component {
             console.log("Connected to resource.")
             this.resourceSocket.send(JSON.stringify({name: "getHostname", parameters: {}}))
             this.resourceSocket.send(JSON.stringify({name: "getOS", parameters: {}}))
+            this.resourceSocket.send(JSON.stringify({name: "requireSetupWin", parameters: {}}))
         }
         this.resourceSocket.onmessage = (message) => {
             var messageObj = JSON.parse(message.data);
@@ -43,14 +43,14 @@ class App extends React.Component {
                     this.os = {value: messageObj.response}
                     if (this.os.value === "Windows") {
                         this.setupBanner = SetupMulticastBannerWin
-                        this.forceUpdate()
-                    } else if (this.os === "Darwin") {
-                        this.setupBanner = SetupMulticastBannerOSX
-                        this.forceUpdate()
                     }
                     break;
                 case "getHostname":
                     this.hostname = {value: messageObj.response}
+                    break;
+                case "requireSetupWin":
+                    this.showSetupBanner(messageObj.response)
+                    break;
                 default:
                     break;
             }
@@ -66,6 +66,8 @@ class App extends React.Component {
     showSetupBanner(show) {
         if (show === false) {
             document.getElementById("AppGrid").style.gridTemplateRows = "auto";
+        } else {
+            document.getElementById("AppGrid").style.gridTemplateRows = "45px auto"
         }
         this.setState({showSetupBanner: show})
     }
@@ -73,7 +75,7 @@ class App extends React.Component {
     render() {
         return (
             <div style={{height: "100%"}}>
-                <div className="AppDiv" id="AppGrid">
+                <div className="AppDiv" id="AppGrid" style={{gridTemplateRows: "auto"}}>
                     {this.state.showSetupBanner && <this.setupBanner displayChoiceNetworkInterfaces={this.displayChoiceNetworkInterfaces} />}
                     <MessageComponentContainer />
                     <div className="Col" style={{overflow: "hidden"}}>
