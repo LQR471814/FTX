@@ -27,7 +27,6 @@ class App extends React.Component {
             console.log("Connected to resource.")
             this.resourceSocket.send(JSON.stringify({name: "getHostname", parameters: {}}))
             this.resourceSocket.send(JSON.stringify({name: "getOS", parameters: {}}))
-            this.resourceSocket.send(JSON.stringify({name: "requireSetupWin", parameters: {}}))
         }
         this.resourceSocket.onmessage = (message) => {
             var messageObj = JSON.parse(message.data);
@@ -43,6 +42,7 @@ class App extends React.Component {
                     this.os = {value: messageObj.response}
                     if (this.os.value === "Windows") {
                         this.setupBanner = SetupMulticastBannerWin
+                        this.resourceSocket.send(JSON.stringify({name: "requireSetupWin", parameters: {}}))
                     }
                     break;
                 case "getHostname":
