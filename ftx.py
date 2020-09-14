@@ -98,10 +98,10 @@ async def UpdateUsers(websocket, path):
     SendMCastSocket.sendto((0).to_bytes(1, 'big') + hostname.encode("utf8"), MULTICAST_GROUP)
     while True:
         msgBytes, address = ReceiveMCastSock.recvfrom(1024)
-        print(msgBytes, address)
         messageType = msgBytes[0]
         if messageType == 0:
             deviceName = msgBytes[1:].decode('utf8')
+            print(msgBytes, address)
             await websocket.send(json.dumps({"type":"addUser", "user":{"name":deviceName, "ip":address[0]}}))
 
 if __name__ == "__main__":

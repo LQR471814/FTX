@@ -23,6 +23,7 @@ class UserList extends React.Component {
             var messageObj = JSON.parse(message.data);
             switch (messageObj.type) {
                 case "addUser":
+                    console.log(messageObj)
                     this.addUser(messageObj.user)
                     break;
                 case "removeUser":

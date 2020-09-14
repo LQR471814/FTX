@@ -21,6 +21,7 @@ class App extends React.Component {
         this.showSetupBanner = this.showSetupBanner.bind(this)
 
         this.setupBanner = EmptyBanner
+        this.hostname = {value: undefined}
 
         this.resourceSocket = new WebSocketClient("ws://localhost:4000")
         this.resourceSocket.onopen = () => {
@@ -46,7 +47,7 @@ class App extends React.Component {
                     }
                     break;
                 case "getHostname":
-                    this.hostname = {value: messageObj.response}
+                    this.hostname.value = messageObj.response
                     this.forceUpdate()
                     break;
                 case "requireSetupWin":
