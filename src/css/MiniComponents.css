@@ -76,6 +76,8 @@
 
     border-radius: 5px;
     background-color: #5c5c5c;
+
+    transition: all 0.15s;
 }
 
 .User:hover {

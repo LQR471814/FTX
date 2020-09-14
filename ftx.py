@@ -47,6 +47,8 @@ async def resource(websocket, path):
         await websocket.send(json.dumps({"type":request["name"],"response":switch[request["name"]](request["parameters"])}))
 
 def requireSetupWin(parameters):
+    required = True
+    
     output = subprocess.check_output("""powershell.exe Get-NetRoute""", shell=True).decode("utf8")
     lines = []
     for line in output.split('\r\n'):
@@ -55,12 +57,21 @@ def requireSetupWin(parameters):
     
     for i in range(len(lines)):
         if lines[i].split()[3] != '256':
-            return False #? Should not display SetupBanner
-    return True #? Should display SetupBanner
+            required = False #? Should not display SetupBanner
+    
+    try:
+        subprocess.check_output("""powershell.exe Get-NetFirewallRule -DisplayName \"FTX\"""")
+        required = False
+    except Exception as err:
+        print(err)
+        required = True
+            
+    return required #? Should display SetupBanner
     
 def setInterfaces(parameters):
     try:
-        return subprocess.check_output(os.path.dirname(os.path.abspath(__file__)) + "\\" + "SetupMulticastWin.exe -i " + str(parameters["interfaceID"])).decode("utf8")
+        print(os.path.dirname(os.path.abspath(__file__)) + "\\" + "SetupMulticastWin.exe -i " + str(parameters["interfaceID"]) + " -p " + os.path.dirname(os.path.abspath(__file__)) + "\\" + "ftx.exe")
+        return subprocess.check_output(os.path.dirname(os.path.abspath(__file__)) + "\\" + "SetupMulticastWin.exe -i " + str(parameters["interfaceID"]) + " -p " + os.path.dirname(os.path.abspath(__file__)) + "\\" + "ftx.exe").decode("utf8")
     except Exception as err:
         return str(err)
 
