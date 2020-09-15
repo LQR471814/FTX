@@ -1,4 +1,5 @@
 import asyncio
+import concurrent.futures
 import json
 import os
 import platform
@@ -12,9 +13,11 @@ import time
 import eel
 import websockets
 
+
 @eel.expose
 def handle_exit(ar1, ar2):
     print("Quitting...")
+    ReceiveMCastSock.close()
     sys.exit(0)
 
 def userUpdateDaemon():
@@ -95,14 +98,17 @@ async def UpdateUsers(websocket, path):
         await websocket.recv()
     except:
         return
-    SendMCastSocket.sendto((0).to_bytes(1, 'big') + hostname.encode("utf8"), MULTICAST_GROUP)
-    while True:
-        msgBytes, address = ReceiveMCastSock.recvfrom(1024)
-        messageType = msgBytes[0]
-        if messageType == 0:
-            deviceName = msgBytes[1:].decode('utf8')
-            print(msgBytes, address)
-            await websocket.send(json.dumps({"type":"addUser", "user":{"name":deviceName, "ip":address[0]}}))
+    try:
+        SendMCastSocket.sendto((0).to_bytes(1, 'big') + hostname.encode("utf8"), MULTICAST_GROUP)
+        while True:
+            msgBytes, address = await userUpdateEventLoop.run_in_executor(executor, ReceiveMCastSock.recvfrom, 1024)
+            messageType = msgBytes[0]
+            if messageType == 0:
+                deviceName = msgBytes[1:].decode('utf8')
+                print(msgBytes, address)
+                await websocket.send(json.dumps({"type":"addUser", "user":{"name":deviceName, "ip":address[0]}}))
+    except Exception as err:
+        print(err)
 
 if __name__ == "__main__":
     try:
@@ -137,6 +143,8 @@ if __name__ == "__main__":
         group = socket.inet_aton(MULTICAST_GROUP[0])
         mreq = struct.pack("4sL", group, socket.INADDR_ANY)
         ReceiveMCastSock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=os.cpu_count())
 
         #? Event Loops
         userUpdateEventLoop = asyncio.new_event_loop()

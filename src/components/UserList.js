@@ -23,7 +23,6 @@ class UserList extends React.Component {
             var messageObj = JSON.parse(message.data);
             switch (messageObj.type) {
                 case "addUser":
-                    console.log(messageObj)
                     this.addUser(messageObj.user)
                     break;
                 case "removeUser":
@@ -36,7 +35,6 @@ class UserList extends React.Component {
     }
     
     async addUser(user) {
-        console.log(user, this.props.hostname)
         while (this.props.hostname === undefined) {await new Promise(r => setTimeout(r, 1))}
         if (user.name === this.props.hostname.value) {
             return
