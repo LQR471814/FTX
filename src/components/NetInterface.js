@@ -11,9 +11,9 @@ class NetInterface extends React.Component {
     constructor(props) {
         super(props)
 
-        if (this.props.interface.name.includes("Wi-Fi") || this.props.interface.name.includes("Wlan")) {
+        if (this.props.interface[1].includes("Wi-Fi") || this.props.interface[1].includes("Wlan")) {
             this.interfaceLogo = wifi
-        } else if (this.props.interface.name.includes("Local Area Connection") || this.props.interface.name.includes("LAN") || this.props.interface.name.includes("Ethernet")) {
+        } else if (this.props.interface[1].includes("Local Area Connection") || this.props.interface[1].includes("LAN") || this.props.interface[1].includes("Ethernet")) {
             this.interfaceLogo = ethernet
         } else {
             this.interfaceLogo = other
@@ -29,14 +29,14 @@ class NetInterface extends React.Component {
     chooseInterface() {
         document.getElementById("NetInterfaceChoiceContainer").className = "ChoiceContainer Close"
         document.getElementById("NetInterfaceChoiceContainer").style.columnGap = "140px"
-        this.props.resourceClient.send(JSON.stringify({name: "setInterfaces", parameters: {interfaceID: this.props.interface.id}}))
+        this.props.resourceClient.send(JSON.stringify({name: "setInterfaces", parameters: {InterfaceID: parseInt(this.props.interface[0])}}))
     }
-    
+
     render() {
         return (
             <div className="ChoiceDiv" onClick={this.chooseInterface}>
                 <this.interfaceLogo />
-                <p className="Tag">{this.props.interface.name}</p>
+                <p className="Tag">{this.props.interface[1]}</p>
             </div>
         );
     }

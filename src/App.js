@@ -11,19 +11,19 @@ import EmptyBanner from './components/EmptyBanner';
 class App extends React.Component {
     constructor(props) {
         super(props)
-        
+
         this.state = {
             showChoiceNetworkInterfaces: false,
             showSetupBanner: false
         }
-        
+
         this.displayChoiceNetworkInterfaces = this.displayChoiceNetworkInterfaces.bind(this)
         this.showSetupBanner = this.showSetupBanner.bind(this)
 
         this.setupBanner = EmptyBanner
         this.hostname = {value: undefined}
 
-        this.resourceSocket = new WebSocketClient("ws://localhost:4000")
+        this.resourceSocket = new WebSocketClient("ws://localhost:3000/resource")
         this.resourceSocket.onopen = () => {
             console.log("Connected to resource.")
             this.resourceSocket.send(JSON.stringify({name: "getHostname", parameters: {}}))
@@ -32,26 +32,26 @@ class App extends React.Component {
         this.resourceSocket.onmessage = (message) => {
             var messageObj = JSON.parse(message.data);
             console.log(messageObj)
-            switch (messageObj.type) {
+            switch (messageObj.MsgType) {
                 case "getInterfaces":
-                    this.NetInterfaceChoiceElement.current.setInterfaces(JSON.parse(messageObj.response))
+                    this.NetInterfaceChoiceElement.current.setInterfaces(messageObj.Response.GetInterfaces)
                     break;
                 case "setInterfaces":
-                    console.log(messageObj.response)
+                    console.log(messageObj.Response.SetInterfaces)
                     break;
                 case "getOS":
-                    this.os = {value: messageObj.response}
-                    if (this.os.value === "Windows") {
+                    this.os = {value: messageObj.Response.GetOS.toLowerCase()}
+                    if (this.os.value === "windows") {
                         this.setupBanner = SetupMulticastBannerWin
                         this.resourceSocket.send(JSON.stringify({name: "requireSetupWin", parameters: {}}))
                     }
                     break;
                 case "getHostname":
-                    this.hostname.value = messageObj.response
+                    this.hostname.value = messageObj.Response.GetHostname
                     this.forceUpdate()
                     break;
                 case "requireSetupWin":
-                    this.showSetupBanner(messageObj.response)
+                    this.showSetupBanner(messageObj.Response.RequireSetupWin)
                     break;
                 default:
                     break;

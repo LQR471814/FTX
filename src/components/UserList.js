@@ -13,7 +13,7 @@ class UserList extends React.Component {
 
         this.state = {users:[]}
 
-        this.userUpdateClient = new WebSocketClient("ws://localhost:4001")
+        this.userUpdateClient = new WebSocketClient("ws://localhost:3000/updateUsers")
         this.userUpdateClient.onopen = () => {
             console.log("Connected to backend.")
             this.userUpdateClient.send("Connected")
@@ -33,7 +33,7 @@ class UserList extends React.Component {
             }
         }
     }
-    
+
     async addUser(user) {
         while (this.props.hostname === undefined) {await new Promise(r => setTimeout(r, 1))}
         if (user.name === this.props.hostname.value) {
@@ -49,7 +49,7 @@ class UserList extends React.Component {
         newUsers.splice(newUsers.indexOf(user), 1)
         this.setState({users:newUsers})
     }
-    
+
     render() {
         return (
             <div className="Window" style={{height: "40%"}}>
