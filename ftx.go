@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	multicastGroup = "224.0.2.20:"
+	multicastGroup = "224.0.2.20:0"
 	buffer         = 1024
 )
 
@@ -64,8 +64,8 @@ var upgrader = websocket.Upgrader{}
 var multicastChannel = make(chan MulticastPacket)
 
 func main() {
-	ping(append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), multicastGroup)
 	go serveMulticastUDP(multicastGroup)
+	ping(append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), multicastGroup)
 
 	http.Handle("/", http.FileServer(http.Dir("./build")))
 	http.HandleFunc("/resource", resource)
@@ -74,24 +74,28 @@ func main() {
 }
 
 func ping(bytes []byte, address string) {
-	addr, err := net.ResolveUDPAddr("udp", address)
+	addr, err := net.ResolveUDPAddr("udp4", address)
 	if err != nil {
 		log.Fatal(err)
 	}
-	conn, err := net.DialUDP("udp", nil, addr)
+	conn, err := net.DialUDP("udp4", nil, addr)
 	conn.Write(bytes)
+	conn.Close()
 }
 
 func serveMulticastUDP(address string) {
-	addr, err := net.ResolveUDPAddr("udp", address)
+	addr, err := net.ResolveUDPAddr("udp4", address)
 	if err != nil {
 		log.Fatal(err)
 	}
-	listener, err := net.ListenMulticastUDP("udp", nil, addr)
-	listener.SetReadBuffer(buffer)
+	conn, err := net.ListenMulticastUDP("udp4", nil, addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	conn.SetReadBuffer(buffer)
 	for {
 		bytes := make([]byte, buffer)
-		_, src, err := listener.ReadFromUDP(bytes)
+		_, src, err := conn.ReadFromUDP(bytes)
 		if err != nil {
 			log.Fatal("READFROMUDP FAILED:", err)
 		}
