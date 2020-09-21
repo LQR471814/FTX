@@ -30,3 +30,6 @@ yarn-error.log*
 /tests
 
 /.vscode
+
+ftx.exe
+SetMulticastWin.exe

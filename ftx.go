@@ -64,6 +64,9 @@ var upgrader = websocket.Upgrader{}
 var multicastChannel = make(chan MulticastPacket)
 
 func main() {
+	ping(append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), multicastGroup)
+	go serveMulticastUDP(multicastGroup)
+
 	http.Handle("/", http.FileServer(http.Dir("./build")))
 	http.HandleFunc("/resource", resource)
 	http.HandleFunc("/updateUsers", updateUsers)
@@ -79,7 +82,7 @@ func ping(bytes []byte, address string) {
 	conn.Write(bytes)
 }
 
-func serveMulticastUDP(address string, handler func(*net.UDPAddr, int, []byte)) {
+func serveMulticastUDP(address string) {
 	addr, err := net.ResolveUDPAddr("udp", address)
 	if err != nil {
 		log.Fatal(err)
@@ -92,6 +95,7 @@ func serveMulticastUDP(address string, handler func(*net.UDPAddr, int, []byte)) 
 		if err != nil {
 			log.Fatal("READFROMUDP FAILED:", err)
 		}
+		fmt.Println(MulticastPacket{bytes, src})
 		multicastChannel <- MulticastPacket{bytes, src}
 	}
 }
