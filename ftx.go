@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -13,18 +14,21 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/net/ipv4"
+
 	"github.com/gorilla/websocket"
 )
 
 const (
-	multicastGroup = "224.0.2.20:0"
-	buffer         = 1024
+	buffer = 1024
 )
+
+var multicastGroup = net.IPv4(224, 0, 2, 20)
 
 //MulticastPacket contains information for a given multicast packet received
 type MulticastPacket struct {
 	content []byte
-	src     *net.UDPAddr
+	src     net.Addr
 }
 
 //UserResponse defines the information returned when user update occurs
@@ -49,7 +53,6 @@ type ResourceResponse struct {
 //ResponseContent defines the results returned to a front end resource request
 type ResponseContent struct {
 	GetInterfaces   [][2]string
-	SetInterfaces   []byte
 	GetOS           string
 	GetHostname     string
 	RequireSetupWin bool
@@ -60,12 +63,56 @@ type ResourceParameters struct {
 	InterfaceID int
 }
 
+//Settings define the program settings
+type Settings struct {
+	InterfaceID int
+}
+
+//Defaults restores Settings to defaults
+func (settings *Settings) Defaults() {
+	settings.InterfaceID = 1
+}
+
 var upgrader = websocket.Upgrader{}
 var multicastChannel = make(chan MulticastPacket)
 
 func main() {
-	go serveMulticastUDP(multicastGroup)
-	ping(append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), multicastGroup)
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
+	//Load settings
+	f, err := os.Create("settings.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	f.Close()
+
+	data, err := ioutil.ReadFile("settings.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	settings := &Settings{}
+	settings.Defaults()
+	err = json.Unmarshal(data, settings)
+
+	netInterface, err := net.InterfaceByIndex(settings.InterfaceID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	conn, err := net.ListenPacket("udp4", "0.0.0.0:0")
+	if err != nil {
+		log.Fatal(err)
+	}
+	packetConn := ipv4.NewPacketConn(conn)
+	if err := packetConn.JoinGroup(netInterface, &net.UDPAddr{IP: multicastGroup}); err != nil {
+		log.Fatal(err)
+	}
+	packetConn.SetMulticastInterface(netInterface)
+
+	go serveMulticastUDP(packetConn)
+	ping(append([]byte{0}, []byte(getHostname(ResourceParameters{}))...))
 
 	http.Handle("/", http.FileServer(http.Dir("./build")))
 	http.HandleFunc("/resource", resource)
@@ -73,8 +120,8 @@ func main() {
 	http.ListenAndServe(":3000", nil)
 }
 
-func ping(bytes []byte, address string) {
-	addr, err := net.ResolveUDPAddr("udp4", address)
+func ping(bytes []byte) {
+	addr, err := net.ResolveUDPAddr("udp4", multicastGroup.String()+":0")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,24 +130,21 @@ func ping(bytes []byte, address string) {
 	conn.Close()
 }
 
-func serveMulticastUDP(address string) {
-	addr, err := net.ResolveUDPAddr("udp4", address)
-	if err != nil {
-		log.Fatal(err)
-	}
-	conn, err := net.ListenMulticastUDP("udp4", nil, addr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	conn.SetReadBuffer(buffer)
+func serveMulticastUDP(packetConn *ipv4.PacketConn) {
+	bytes := make([]byte, buffer)
 	for {
-		bytes := make([]byte, buffer)
-		_, src, err := conn.ReadFromUDP(bytes)
+		_, cm, src, err := packetConn.ReadFrom(bytes)
 		if err != nil {
-			log.Fatal("READFROMUDP FAILED:", err)
+			log.Fatal(err)
 		}
-		fmt.Println(MulticastPacket{bytes, src})
-		multicastChannel <- MulticastPacket{bytes, src}
+		if cm.Dst.IsMulticast() {
+			if cm.Dst.Equal(multicastGroup) {
+				fmt.Println(MulticastPacket{bytes, src})
+				multicastChannel <- MulticastPacket{bytes, src}
+			} else {
+				continue
+			}
+		}
 	}
 }
 
@@ -126,7 +170,6 @@ func resource(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(string(message))
 
 		var getInterfacesResult [][2]string
-		var setInterfacesResult []byte
 		var getOSResult string
 		var getHostnameResult string
 		var requireSetupWinResult bool
@@ -135,7 +178,7 @@ func resource(w http.ResponseWriter, r *http.Request) {
 		case "getInterfaces":
 			getInterfacesResult = getInterfaces(request.Parameters)
 		case "setInterfaces":
-			setInterfacesResult = setInterfaces(request.Parameters)
+			setInterfaces(request.Parameters)
 		case "getOS":
 			getOSResult = getOS(request.Parameters)
 		case "getHostname":
@@ -144,7 +187,7 @@ func resource(w http.ResponseWriter, r *http.Request) {
 			requireSetupWinResult = requireSetupWin(request.Parameters)
 		}
 
-		response, err := json.Marshal(ResourceResponse{request.Name, ResponseContent{getInterfacesResult, setInterfacesResult, getOSResult, getHostnameResult, requireSetupWinResult}})
+		response, err := json.Marshal(ResourceResponse{request.Name, ResponseContent{getInterfacesResult, getOSResult, getHostnameResult, requireSetupWinResult}})
 		fmt.Println(string(response))
 		if err != nil {
 			log.Fatal("MARSHAL FAILED: ", err)
@@ -159,33 +202,28 @@ func resource(w http.ResponseWriter, r *http.Request) {
 }
 
 func getInterfaces(parameters ResourceParameters) [][2]string {
-	out, err := exec.Command("netsh", "interface", "ipv4", "show", "joins").Output()
+	interfaces, err := net.Interfaces()
 	if err != nil {
 		log.Fatal(err)
 	}
-	output := strings.Split(string(out), "\n")
-	interfaces := make([]string, 0)
-	for _, line := range output {
-		if strings.Contains(line, "Interface") {
-			interfaces = append(interfaces, line)
-		}
-	}
 	response := make([][2]string, len(interfaces))
-	for i, line := range interfaces {
-		lineInfo := strings.Split(line, ": ")
-		response[i] = [2]string{strings.ReplaceAll(lineInfo[0], "Interface ", ""), lineInfo[1]}
+	for i, itf := range interfaces {
+		response[i] = [2]string{strconv.Itoa(itf.Index), itf.Name}
 	}
 	return response
 }
 
-func setInterfaces(parameters ResourceParameters) []byte {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
+func setInterfaces(parameters ResourceParameters) {
+
+	if runtime.GOOS == "windows" {
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(dir+"\\"+"SetMulticastWin.exe", "--interface "+strconv.Itoa(parameters.InterfaceID), "--path "+dir+"\\"+"ftx.exe")
+		out, err := exec.Command(dir+"\\"+"SetMulticastWin.exe", "--interface "+strconv.Itoa(parameters.InterfaceID), "--path "+dir+"\\"+"ftx.exe").Output()
+		fmt.Println(out)
 	}
-	fmt.Println(dir+"\\"+"SetMulticastWin.exe", "--interface "+strconv.Itoa(parameters.InterfaceID), "--path "+dir+"\\"+"ftx.exe")
-	out, err := exec.Command(dir+"\\"+"SetMulticastWin.exe", "--interface "+strconv.Itoa(parameters.InterfaceID), "--path "+dir+"\\"+"ftx.exe").Output()
-	return out
 }
 
 func getOS(parameters ResourceParameters) string {
@@ -235,7 +273,7 @@ func updateUsers(w http.ResponseWriter, r *http.Request) {
 		messageType := msg.content[0]
 		if messageType == 0 {
 			userName := string(msg.content[1:])
-			res, err := json.Marshal(UserResponse{"addUser", userName, msg.src.IP.String()})
+			res, err := json.Marshal(UserResponse{"addUser", userName, msg.src.String()})
 			if err != nil {
 				log.Fatal("JSON MARSHAL FAILED: ", err)
 				return
