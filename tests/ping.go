@@ -16,7 +16,7 @@ func main() {
 }
 
 func ping(bytes []byte) {
-	addr, err := net.ResolveUDPAddr("udp4", multicastGroup.String()+":0")
+	addr, err := net.ResolveUDPAddr("udp4", multicastGroup.String()+":9999")
 	if err != nil {
 		log.Fatal(err)
 	}
