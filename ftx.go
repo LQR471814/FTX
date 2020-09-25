@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -71,13 +72,17 @@ type Settings struct {
 
 //Defaults restores Settings to defaults
 func (settings *Settings) Defaults() {
-	settings.InterfaceID = 1
+	settings.InterfaceID = 7
 }
 
 var upgrader = websocket.Upgrader{}
 var multicastChannel = make(chan MulticastPacket)
 
 func main() {
+	runtime.SetBlockProfileRate(1000000000)
+	go func() {
+		log.Println(http.ListenAndServe("0.0.0.0:6060", nil))
+	}()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	//Load settings
@@ -107,7 +112,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	conn, err := net.ListenPacket("udp4", "0.0.0.0:0")
+	conn, err := net.ListenPacket("udp4", "0.0.0.0:9999")
 	if err != nil {
 		log.Fatal(err)
 	}
