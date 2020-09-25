@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"golang.org/x/net/ipv4"
 
@@ -101,6 +102,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	_, err = syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	conn, err := net.ListenPacket("udp4", "0.0.0.0:0")
 	if err != nil {
 		log.Fatal(err)
@@ -137,6 +143,7 @@ func serveMulticastUDP(packetConn *ipv4.PacketConn) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println(cm, src)
 		if cm.Dst.IsMulticast() {
 			if cm.Dst.Equal(multicastGroup) {
 				fmt.Println(MulticastPacket{bytes, src})
