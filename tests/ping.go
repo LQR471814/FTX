@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+var multicastGroup = net.IPv4(224, 0, 2, 20)
+
 func main() {
 	for {
 		ping([]byte("Ping!"))
