@@ -150,6 +150,9 @@ func serveMulticastUDP(packetConn *ipv4.PacketConn) {
 			log.Fatal(err)
 		}
 		fmt.Println(cm, src)
+		if cm == nil {
+			continue
+		}
 		if cm.Dst.IsMulticast() {
 			if cm.Dst.Equal(multicastGroup) {
 				fmt.Println(MulticastPacket{bytes, src})
