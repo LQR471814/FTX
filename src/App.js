@@ -1,5 +1,5 @@
 import React from 'react';
-import SetupMulticastBannerWin from './components/SetupMulticastBannerWin';
+import SetupMulticastBanner from './components/SetupMulticastBanner';
 import MessageComponentContainer from './components/containers/MessageComponentContainer';
 import UserList from './components/UserList';
 import PendingTransfers from './components/PendingTransfers';
@@ -41,10 +41,8 @@ class App extends React.Component {
                     break;
                 case "getOS":
                     this.os = {value: messageObj.Response.GetOS.toLowerCase()}
-                    if (this.os.value === "windows") {
-                        this.setupBanner = SetupMulticastBannerWin
-                        this.resourceSocket.send(JSON.stringify({name: "requireSetupWin", parameters: {}}))
-                    }
+                    this.setupBanner = SetupMulticastBanner
+                    this.resourceSocket.send(JSON.stringify({name: "requireSetup", parameters: {}}))
                     break;
                 case "getHostname":
                     this.hostname.value = messageObj.Response.GetHostname

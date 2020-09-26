@@ -57,10 +57,10 @@ type ResourceResponse struct {
 
 //ResponseContent defines the results returned to a front end resource request
 type ResponseContent struct {
-	GetInterfaces   [][2]string
-	GetOS           string
-	GetHostname     string
-	RequireSetupWin bool
+	GetInterfaces [][2]string
+	GetOS         string
+	GetHostname   string
+	RequireSetup  bool
 }
 
 //ResourceParameters defines the parameters passed to a resource request
@@ -79,7 +79,7 @@ type Settings struct {
 //Defaults restores Settings to defaults
 func (settings *Settings) Defaults() {
 	settings.Mux.Lock()
-	settings.InterfaceID = 7
+	settings.InterfaceID = 1
 	settings.Default = true
 	settings.Mux.Unlock()
 }
@@ -118,34 +118,36 @@ func main() {
 	err = json.Unmarshal(data, settings)
 	fmt.Println(settings)
 
-	//? Setup Multicasting
-	netInterface, err := net.InterfaceByIndex(settings.InterfaceID)
-	if err != nil {
-		log.Fatal(err)
-	}
+	if settings.InterfaceID != 1 {
+		//? Setup Multicasting
+		netInterface, err := net.InterfaceByIndex(settings.InterfaceID)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	_, err = syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
-	if err != nil {
-		log.Fatal(err)
-	}
+		_, err = syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	conn, err := net.ListenPacket("udp4", "0.0.0.0:9999")
-	if err != nil {
-		log.Fatal(err)
-	}
-	packetConn := ipv4.NewPacketConn(conn)
-	if err := packetConn.JoinGroup(netInterface, &net.UDPAddr{IP: multicastGroup}); err != nil {
-		log.Fatal(err)
-	}
-	packetConn.SetMulticastInterface(netInterface)
+		conn, err := net.ListenPacket("udp4", "0.0.0.0:9999")
+		if err != nil {
+			log.Fatal(err)
+		}
+		packetConn := ipv4.NewPacketConn(conn)
+		if err := packetConn.JoinGroup(netInterface, &net.UDPAddr{IP: multicastGroup}); err != nil {
+			log.Fatal(err)
+		}
+		packetConn.SetMulticastInterface(netInterface)
 
-	packetConn.SetTOS(0x0)
-	packetConn.SetTTL(16)
-	packetConn.SetMulticastTTL(2)
+		packetConn.SetTOS(0x0)
+		packetConn.SetTTL(16)
+		packetConn.SetMulticastTTL(2)
 
-	//? Start Multicast
-	go serveMulticastUDP(ctx, packetConn)
-	ping(append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), packetConn)
+		//? Start Multicast
+		go serveMulticastUDP(ctx, packetConn)
+		ping(append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), packetConn)
+	}
 
 	//? Start frontend
 	http.Handle("/", http.FileServer(http.Dir("./build")))
@@ -238,7 +240,7 @@ func resource(w http.ResponseWriter, r *http.Request) {
 		var getInterfacesResult [][2]string
 		var getOSResult string
 		var getHostnameResult string
-		var requireSetupWinResult bool
+		var requireSetupResult bool
 
 		switch request.Name {
 		case "getInterfaces":
@@ -249,11 +251,11 @@ func resource(w http.ResponseWriter, r *http.Request) {
 			getOSResult = getOS(request.Parameters)
 		case "getHostname":
 			getHostnameResult = getHostname(request.Parameters)
-		case "requireSetupWin":
-			requireSetupWinResult = requireSetupWin(request.Parameters)
+		case "requireSetup":
+			requireSetupResult = requireSetup(request.Parameters)
 		}
 
-		response, err := json.Marshal(ResourceResponse{request.Name, ResponseContent{getInterfacesResult, getOSResult, getHostnameResult, requireSetupWinResult}})
+		response, err := json.Marshal(ResourceResponse{request.Name, ResponseContent{getInterfacesResult, getOSResult, getHostnameResult, requireSetupResult}})
 		fmt.Println(string(response))
 		if err != nil {
 			log.Fatal("MARSHAL FAILED: ", err)
@@ -311,26 +313,29 @@ func getHostname(parameters ResourceParameters) string {
 	return Name
 }
 
-func requireSetupWin(parameters ResourceParameters) bool {
+func requireSetup(parameters ResourceParameters) bool {
 	required := true
-	out, err := exec.Command("powershell.exe", "Get-NetRoute").Output()
-	lines := []string{}
-	for _, line := range strings.Split(string(out), "\r\n") {
-		if strings.Contains(line, "224.0.0.0") {
-			lines = append(lines, line)
-		}
-	}
-
-	for i := 0; i < len(lines); i++ {
-		if strings.Fields(lines[i])[3] != "256" {
-			required = false
-			break
-		}
-	}
-
-	err = exec.Command("powershell.exe", "Get-NetFirewallRule", "-DisplayName \"FTX\"").Run()
-	if err != nil {
+	if runtime.GOOS == "windows" {
 		required = true
+		out, err := exec.Command("powershell.exe", "Get-NetRoute").Output()
+		lines := []string{}
+		for _, line := range strings.Split(string(out), "\r\n") {
+			if strings.Contains(line, "224.0.0.0") {
+				lines = append(lines, line)
+			}
+		}
+
+		for i := 0; i < len(lines); i++ {
+			if strings.Fields(lines[i])[3] != "256" {
+				required = false
+				break
+			}
+		}
+
+		err = exec.Command("powershell.exe", "Get-NetFirewallRule", "-DisplayName \"FTX\"").Run()
+		if err != nil {
+			required = true
+		}
 	}
 
 	if settings.Default == true {

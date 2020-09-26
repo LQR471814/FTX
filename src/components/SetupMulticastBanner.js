@@ -3,13 +3,13 @@ import '../css/SetupMulticastBanner.css'
 import { ReactComponent as CloseIcon } from '../css/assets/close.svg';
 import PropTypes from 'prop-types';
 
-class SetupMulticastBannerWin extends React.Component {
+class SetupMulticastBanner extends React.Component {
     constructor(props) {
         super(props)
 
         this.onClickClose = this.onClickClose.bind(this);
         this.onClickSetup = this.onClickSetup.bind(this);
-        
+
         this.state = {display:"flex"}
     }
 
@@ -24,7 +24,7 @@ class SetupMulticastBannerWin extends React.Component {
 
         this.props.displayChoiceNetworkInterfaces(true)
     }
-    
+
     render() {
         return (
             <div className="BannerContainer" style={{display: this.state.display}}>
@@ -38,8 +38,8 @@ class SetupMulticastBannerWin extends React.Component {
     }
 }
 
-SetupMulticastBannerWin.propTypes = {
+SetupMulticastBanner.propTypes = {
     displayChoiceNetworkInterfaces: PropTypes.func.isRequired
 }
 
-export default SetupMulticastBannerWin;
+export default SetupMulticastBanner;
