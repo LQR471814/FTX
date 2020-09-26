@@ -25,7 +25,7 @@ const (
 	buffer = 1024
 )
 
-var multicastGroup = net.IPv4(224, 0, 2, 20)
+var multicastGroup = net.IPv4(224, 0, 0, 248)
 
 //MulticastPacket contains information for a given multicast packet received
 type MulticastPacket struct {
@@ -122,8 +122,12 @@ func main() {
 	}
 	packetConn.SetMulticastInterface(netInterface)
 
+	packetConn.SetTOS(0x0)
+	packetConn.SetTTL(16)
+	packetConn.SetMulticastTTL(2)
+
 	go serveMulticastUDP(packetConn)
-	ping(append([]byte{0}, []byte(getHostname(ResourceParameters{}))...))
+	ping(append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), packetConn)
 
 	http.Handle("/", http.FileServer(http.Dir("./build")))
 	http.HandleFunc("/resource", resource)
@@ -131,14 +135,11 @@ func main() {
 	http.ListenAndServe(":3000", nil)
 }
 
-func ping(bytes []byte) {
-	addr, err := net.ResolveUDPAddr("udp4", multicastGroup.String()+":0")
-	if err != nil {
+func ping(bytes []byte, packetConn *ipv4.PacketConn) {
+	dst := &net.UDPAddr{IP: multicastGroup, Port: 9999}
+	if _, err := packetConn.WriteTo(bytes, nil, dst); err != nil {
 		log.Fatal(err)
 	}
-	conn, err := net.DialUDP("udp4", nil, addr)
-	conn.Write(bytes)
-	conn.Close()
 }
 
 func serveMulticastUDP(packetConn *ipv4.PacketConn) {
