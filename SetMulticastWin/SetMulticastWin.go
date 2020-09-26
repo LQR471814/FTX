@@ -23,9 +23,15 @@ func main() {
 	flag.Parse()
 	if *idPtr != "" && *pathPtr != "" {
 		out, err := exec.Command("netsh", "interface", "ipv4", "set", "route", "224.0.0.0/4", "interface="+*idPtr, "siteprefixlength=0", "metric=1", "publish=yes", "store=persistent").Output()
-		fmt.Println(string(out), err)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(out))
 		out, err = exec.Command("netsh", "advfirewall", "firewall", "add", "rule", "name=\"FTX\"", "program="+*pathPtr, "protocol=udp", "dir=in", "enable=yes", "action=allow", "profile=Any").Output()
-		fmt.Println(string(out), err)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(string(out))
 	} else {
 		fmt.Println("Missing arguments!")
 	}
