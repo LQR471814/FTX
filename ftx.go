@@ -295,8 +295,8 @@ func setInterfaces(parameters ResourceParameters) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(dir+"\\"+"SetMulticastWin.exe", "--interface "+strconv.Itoa(parameters.InterfaceID), "--path "+dir+"\\"+"ftx.exe")
-		out, err := exec.Command(dir+"\\"+"SetMulticastWin.exe", "--interface "+strconv.Itoa(parameters.InterfaceID), "--path "+dir+"\\"+"ftx.exe").Output()
+		fmt.Println(dir+"\\"+"SetMulticast.exe", "--interface "+strconv.Itoa(parameters.InterfaceID), "--path "+dir+"\\"+"ftx.exe")
+		out, err := exec.Command(dir+"\\"+"SetMulticast.exe", "--interface "+strconv.Itoa(parameters.InterfaceID), "--path "+dir+"\\"+"ftx.exe").Output()
 		fmt.Println(out)
 	}
 }

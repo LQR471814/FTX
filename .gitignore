@@ -25,9 +25,6 @@ yarn-error.log*
 
 /__pycache__
 
-*.spec
-
 /.vscode
 
-ftx.exe
-SetMulticastWin.exe
+*.exe

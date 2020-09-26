@@ -6,7 +6,6 @@ import (
 	"net"
 	"os"
 	"os/exec"
-	"runtime"
 	"strconv"
 
 	"strings"
@@ -20,27 +19,23 @@ func main() {
 		rerunElevated()
 		return
 	}
-	if runtime.GOOS == "windows" {
-		interfaces, err := net.Interfaces()
-		for _, itf := range interfaces {
-			out, err := exec.Command("netsh", "interface", "ipv4", "set", "route", "224.0.0.0/4", "interface="+strconv.Itoa(itf.Index), "siteprefixlength=0", "metric=256", "publish=yes", "store=persistent").Output()
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println(string(out))
-		}
-		out, err := exec.Command("powershell.exe", "Remove-NetFirewallRule", "-DisplayName", "\"FTX\"").Output()
-		fmt.Println(string(out))
+	interfaces, err := net.Interfaces()
+	for _, itf := range interfaces {
+		out, err := exec.Command("netsh", "interface", "ipv4", "set", "route", "224.0.0.0/4", "interface="+strconv.Itoa(itf.Index), "siteprefixlength=0", "metric=256", "publish=yes", "store=persistent").Output()
 		if err != nil {
 			log.Fatal(err)
 		}
-		out, err = exec.Command("powershell.exe", "Remove-NetFirewallRule", "-DisplayName", "\"ftx.exe\"").Output()
 		fmt.Println(string(out))
-		if err != nil {
-			log.Fatal(err)
-		}
-	} else {
-		fmt.Println("Unrecognized OS!")
+	}
+	out, err := exec.Command("powershell.exe", "Remove-NetFirewallRule", "-DisplayName", "\"FTX\"").Output()
+	fmt.Println(string(out))
+	if err != nil {
+		log.Fatal(err)
+	}
+	out, err = exec.Command("powershell.exe", "Remove-NetFirewallRule", "-DisplayName", "\"ftx.exe\"").Output()
+	fmt.Println(string(out))
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 
