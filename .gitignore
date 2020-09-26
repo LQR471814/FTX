@@ -24,7 +24,7 @@ yarn-debug.log*
 yarn-error.log*
 
 /__pycache__
-
 /.vscode
 
 *.exe
+settings.json

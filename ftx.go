@@ -315,6 +315,12 @@ func getHostname(parameters ResourceParameters) string {
 
 func requireSetup(parameters ResourceParameters) bool {
 	required := true
+	if settings.Default == true {
+		required = true
+	} else {
+		required = false
+	}
+
 	if runtime.GOOS == "windows" {
 		required = true
 		out, err := exec.Command("powershell.exe", "Get-NetRoute").Output()
@@ -338,9 +344,6 @@ func requireSetup(parameters ResourceParameters) bool {
 		}
 	}
 
-	if settings.Default == true {
-		required = true
-	}
 	return required
 }
 
