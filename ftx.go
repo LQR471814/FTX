@@ -142,6 +142,7 @@ func main() {
 
 		go serveMulticastUDP(ctx, grpAddr, conn, mainState)
 		ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
+		defer ping(conn, []byte{1}, grpAddr)
 	}
 
 	//? Start frontend
@@ -188,8 +189,6 @@ serveLoop:
 			}
 			msgBytes := bytes.TrimRight(buf, "\x00")
 			if msgBytes != nil && len(msgBytes) != 0 { //? If the multicast received is not null or empty
-				fmt.Println(string(msgBytes), src)
-
 				messageType := msgBytes[0]
 				if messageType == 0 { //? On user joins multicast peers
 					userName := string(msgBytes[1:])
@@ -198,6 +197,7 @@ serveLoop:
 							continue serveLoop
 						}
 					}
+					fmt.Println(string(msgBytes), src)
 					ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
 					mainState.Mux.Lock()
 					mainState.MulticastPeers = append(mainState.MulticastPeers, &UserResponse{"addUser", userName, src.String()})
@@ -207,8 +207,18 @@ serveLoop:
 						log.Fatal("JSON MARSHAL FAILED: ", err)
 						return
 					}
-					for _, conn := range updateUserConns {
-						conn.WriteMessage(websocket.TextMessage, res)
+					for _, websocketConn := range updateUserConns {
+						websocketConn.WriteMessage(websocket.TextMessage, res)
+					}
+				}
+				if messageType == 2 { //? On user quit multicast peers
+					for i, user := range mainState.MulticastPeers {
+						if user.IP == src.String() {
+							mainState.Mux.Lock()
+							mainState.MulticastPeers = append(mainState.MulticastPeers[:i], mainState.MulticastPeers[:i+1]...)
+							mainState.Mux.Unlock()
+							break
+						}
 					}
 				}
 			}
