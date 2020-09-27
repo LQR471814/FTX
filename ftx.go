@@ -184,7 +184,7 @@ func keepAlive(ctx context.Context, grpAddr *net.UDPAddr, conn *net.UDPConn) {
 			break
 		default:
 			ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
-			time.Sleep(time.Second * 5)
+			time.Sleep(time.Second * 8)
 		}
 	}
 }
@@ -370,15 +370,15 @@ func getHostname(parameters ResourceParameters) string {
 }
 
 func requireSetup(parameters ResourceParameters) bool {
-	required := true
+	required := 0
 	if settings.Default == true {
-		required = true
+		required++
 	} else {
-		required = false
+		required--
 	}
 
 	if runtime.GOOS == "windows" {
-		required = true
+		required++
 		out, err := exec.Command("powershell.exe", "Get-NetRoute").Output()
 		lines := []string{}
 		for _, line := range strings.Split(string(out), "\r\n") {
@@ -389,16 +389,16 @@ func requireSetup(parameters ResourceParameters) bool {
 
 		for i := 0; i < len(lines); i++ {
 			if strings.Fields(lines[i])[3] != "256" {
-				required = false
+				required--
 				break
 			}
 		}
 
 		err = exec.Command("powershell.exe", "Get-NetFirewallRule", "-DisplayName \"FTX\"").Run()
 		if err != nil {
-			required = true
+			required++
 		}
 	}
 
-	return required
+	return (required > 0)
 }
