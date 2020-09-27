@@ -192,13 +192,13 @@ serveLoop:
 
 				messageType := msgBytes[0]
 				if messageType == 0 { //? On user joins multicast peers
-					ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
 					userName := string(msgBytes[1:])
 					for _, user := range mainState.MulticastPeers {
 						if user.Name == userName && user.IP == src.String() {
 							continue serveLoop
 						}
 					}
+					ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
 					mainState.Mux.Lock()
 					mainState.MulticastPeers = append(mainState.MulticastPeers, &UserResponse{"addUser", userName, src.String()})
 					mainState.Mux.Unlock()
