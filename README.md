@@ -1,6 +1,6 @@
 # FTX
 
-React.js Frontend + Eel backend File Transfer Client.
+React.js Frontend + Golang Backend = File Transfer and Messaging Program
 
 ## Building
 
@@ -10,10 +10,14 @@ React.js Frontend + Eel backend File Transfer Client.
 
 ### Main Application
 
-`py -m eel ftx.py build --add-data 'SetupMulticastWin.exe;.\\'`
+`go build`
 
-### `SetupMulticastWin.py`
+### `SetMulticast.go` (This is only required for Windows users)
 
-`py -m PyInstaller --onefile SetupMulticastWin.py`
+`cd SetMulticast`
+
+`go build`
 
 **NOTE: You must build the React Interface before the Main Application since they will be bundled together when building the Main Application**
+
+**WARNING: THIS APPLICATION IS IN NO MEANS SECURE, ANYBODY ON THE SAME NETWORK CAN SNIFF MESSAGES SENT TO PEERS**
