@@ -187,11 +187,12 @@ serveLoop:
 				log.Fatal(err)
 			}
 			msgBytes := bytes.TrimRight(buf, "\x00")
-			if msgBytes != nil && len(msgBytes) != 0 {
+			if msgBytes != nil && len(msgBytes) != 0 { //? If the multicast received is not null or empty
 				fmt.Println(string(msgBytes), src)
 
 				messageType := msgBytes[0]
-				if messageType == 0 {
+				if messageType == 0 { //? On user joins multicast peers
+					ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
 					userName := string(msgBytes[1:])
 					for _, user := range mainState.MulticastPeers {
 						if user.Name == userName && user.IP == src.String() {
