@@ -176,8 +176,9 @@ func serveMulticastUDP(ctx context.Context, grpAddr *net.UDPAddr, conn *net.UDPC
 				log.Fatal(err)
 			}
 			if src != nil {
-				fmt.Println(string(bytes), src)
+				continue
 			}
+			fmt.Println(string(bytes), src)
 
 			messageType := bytes[0]
 			if messageType == 0 {
