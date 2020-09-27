@@ -142,7 +142,7 @@ func main() {
 
 		go serveMulticastUDP(ctx, grpAddr, conn, mainState)
 		ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
-		defer ping(conn, append([]byte{1}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
+		defer ping(conn, append([]byte{2}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
 	}
 
 	//? Start frontend
