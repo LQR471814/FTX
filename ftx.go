@@ -202,6 +202,7 @@ serveLoop:
 					mainState.Mux.Lock()
 					mainState.MulticastPeers = append(mainState.MulticastPeers, &UserResponse{"addUser", userName, src.String()})
 					mainState.Mux.Unlock()
+					fmt.Println(mainState.MulticastPeers)
 					res, err := json.Marshal(UserResponse{"addUser", userName, src.String()})
 					if err != nil {
 						log.Fatal("JSON MARSHAL FAILED: ", err)
@@ -219,6 +220,7 @@ serveLoop:
 							mainState.MulticastPeers = append(mainState.MulticastPeers[:i], mainState.MulticastPeers[:i+1]...)
 							mainState.Mux.Unlock()
 
+							fmt.Println(mainState.MulticastPeers)
 							res, err := json.Marshal(UserResponse{"removeUser", userName, src.String()})
 							if err != nil {
 								log.Fatal("JSON MARSHAL FAILED: ", err)
