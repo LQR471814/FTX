@@ -142,7 +142,7 @@ func main() {
 
 		go serveMulticastUDP(ctx, grpAddr, conn, mainState)
 		ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
-		defer ping(conn, []byte{1}, grpAddr)
+		defer ping(conn, append([]byte{1}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
 	}
 
 	//? Start frontend
@@ -212,11 +212,21 @@ serveLoop:
 					}
 				}
 				if messageType == 2 { //? On user quit multicast peers
+					userName := string(msgBytes[1:])
 					for i, user := range mainState.MulticastPeers {
-						if user.IP == src.String() {
+						if user.IP == src.String() && user.Name == userName {
 							mainState.Mux.Lock()
 							mainState.MulticastPeers = append(mainState.MulticastPeers[:i], mainState.MulticastPeers[:i+1]...)
 							mainState.Mux.Unlock()
+
+							res, err := json.Marshal(UserResponse{"removeUser", userName, src.String()})
+							if err != nil {
+								log.Fatal("JSON MARSHAL FAILED: ", err)
+								return
+							}
+							for _, websocketConn := range updateUserConns {
+								websocketConn.WriteMessage(websocket.TextMessage, res)
+							}
 							break
 						}
 					}
