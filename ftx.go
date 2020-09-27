@@ -141,6 +141,7 @@ func main() {
 		}
 
 		go serveMulticastUDP(ctx, grpAddr, conn, mainState)
+		go keepAlive(ctx, grpAddr, conn)
 		ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
 		defer ping(conn, append([]byte{2}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
 	}
@@ -152,6 +153,7 @@ func main() {
 	server.ListenAndServe()
 }
 
+//! Miscellaneous
 func writeSettings() {
 	settings.Mux.Lock()
 	data, err := json.Marshal(settings)
@@ -167,10 +169,23 @@ func writeSettings() {
 	settings.Mux.Unlock()
 }
 
+//! Multicasting
 func ping(conn *net.UDPConn, buf []byte, grpAddr *net.UDPAddr) {
 	_, err := conn.WriteToUDP(buf, grpAddr)
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func keepAlive(ctx context.Context, grpAddr *net.UDPAddr, conn *net.UDPConn) {
+	for {
+		select {
+		case <-ctx.Done():
+			break
+		default:
+			ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
+			time.Sleep(time.Second * 5)
+		}
 	}
 }
 
@@ -211,6 +226,9 @@ serveLoop:
 						websocketConn.WriteMessage(websocket.TextMessage, res)
 					}
 				}
+				if messageType == 1 { //? If received keepalive
+					ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
+				}
 				if messageType == 2 { //? On user quit multicast peers
 					userName := string(msgBytes[1:])
 					for i, user := range mainState.MulticastPeers {
@@ -233,6 +251,23 @@ serveLoop:
 				}
 			}
 		}
+	}
+}
+
+//! Websocket Handlers
+func updateUsers(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Fatal("UPGRADE FAILED: ", err)
+		return
+	}
+	updateUserConns = append(updateUserConns, conn)
+	for _, user := range mainState.MulticastPeers {
+		res, err := json.Marshal(user)
+		if err != nil {
+			log.Fatal(err)
+		}
+		conn.WriteMessage(websocket.TextMessage, res)
 	}
 }
 
@@ -292,6 +327,7 @@ func resource(w http.ResponseWriter, r *http.Request) {
 	server.Shutdown(context.Background())
 }
 
+//! Resource Functions
 func getInterfaces(parameters ResourceParameters) [][2]string {
 	interfaces, err := net.Interfaces()
 	if err != nil {
@@ -365,20 +401,4 @@ func requireSetup(parameters ResourceParameters) bool {
 	}
 
 	return required
-}
-
-func updateUsers(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Fatal("UPGRADE FAILED: ", err)
-		return
-	}
-	updateUserConns = append(updateUserConns, conn)
-	for _, user := range mainState.MulticastPeers {
-		res, err := json.Marshal(user)
-		if err != nil {
-			log.Fatal(err)
-		}
-		conn.WriteMessage(websocket.TextMessage, res)
-	}
 }
