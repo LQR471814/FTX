@@ -19,14 +19,16 @@ class UserList extends React.Component {
             this.userUpdateClient.send("Connected")
         }
         this.userUpdateClient.onmessage = (message) => {
-            console.log(message)
             var messageObj = JSON.parse(message.data);
-            switch (messageObj.type) {
+            console.log(messageObj)
+            switch (messageObj.MsgType) {
                 case "addUser":
-                    this.addUser(messageObj.user)
+                    if (!(this.state.users.some((user) => {return (user.name === messageObj.Name) && (user.ip === messageObj.IP)}))) {
+                        this.addUser({name: messageObj.Name, ip: messageObj.IP})
+                    }
                     break;
                 case "removeUser":
-                    this.removeUser(messageObj.user)
+                    this.removeUser({name: messageObj.Name, ip: messageObj.IP})
                     break;
                 default:
                     break;

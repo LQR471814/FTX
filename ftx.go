@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -73,6 +74,11 @@ type Settings struct {
 	File        *os.File
 }
 
+type state struct {
+	MulticastPeers []*UserResponse
+	Mux            sync.Mutex
+}
+
 //Defaults restores Settings to defaults
 func (settings *Settings) Defaults() {
 	settings.Mux.Lock()
@@ -86,6 +92,7 @@ var multicastChannel = make(chan MulticastPacket)
 var settings = &Settings{}
 var server = &http.Server{Addr: ":3000", Handler: nil}
 var updateUserConns = []*websocket.Conn{}
+var mainState = &state{}
 
 func main() {
 	ctx, _ := context.WithCancel(context.Background())
@@ -115,6 +122,9 @@ func main() {
 	err = json.Unmarshal(data, settings)
 	fmt.Println(settings)
 
+	//? Initialize state
+	mainState.MulticastPeers = []*UserResponse{}
+
 	if settings.InterfaceID != 1 {
 		//? Setup Multicasting
 		netInterface, err := net.InterfaceByIndex(settings.InterfaceID)
@@ -130,7 +140,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		go serveMulticastUDP(ctx, grpAddr, conn)
+		go serveMulticastUDP(ctx, grpAddr, conn, mainState)
 		ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
 	}
 
@@ -156,40 +166,49 @@ func writeSettings() {
 	settings.Mux.Unlock()
 }
 
-func ping(conn *net.UDPConn, bytes []byte, grpAddr *net.UDPAddr) {
-	_, err := conn.WriteToUDP(bytes, grpAddr)
+func ping(conn *net.UDPConn, buf []byte, grpAddr *net.UDPAddr) {
+	_, err := conn.WriteToUDP(buf, grpAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func serveMulticastUDP(ctx context.Context, grpAddr *net.UDPAddr, conn *net.UDPConn) {
-	bytes := make([]byte, buffer)
+func serveMulticastUDP(ctx context.Context, grpAddr *net.UDPAddr, conn *net.UDPConn, mainState *state) {
+serveLoop:
 	for {
 		select {
 		case <-ctx.Done():
 			break
 		default:
+			buf := make([]byte, buffer)
 			conn.SetReadDeadline(time.Now().Add(1 * time.Second))
-			_, src, err := conn.ReadFromUDP(bytes)
+			_, src, err := conn.ReadFromUDP(buf)
 			if err != nil && !strings.Contains(err.Error(), "i/o timeout") {
 				log.Fatal(err)
 			}
-			if src != nil || strings.Contains(err.Error(), "i/o timeout") {
-				continue
-			}
-			fmt.Println(string(bytes), src)
+			msgBytes := bytes.TrimRight(buf, "\x00")
+			if msgBytes != nil && len(msgBytes) != 0 {
+				fmt.Println(string(msgBytes), src)
 
-			messageType := bytes[0]
-			if messageType == 0 {
-				userName := string(bytes[1:])
-				res, err := json.Marshal(UserResponse{"addUser", userName, src.String()})
-				if err != nil {
-					log.Fatal("JSON MARSHAL FAILED: ", err)
-					return
-				}
-				for _, conn := range updateUserConns {
-					conn.WriteMessage(websocket.TextMessage, res)
+				messageType := msgBytes[0]
+				if messageType == 0 {
+					userName := string(msgBytes[1:])
+					for _, user := range mainState.MulticastPeers {
+						if user.Name == userName && user.IP == src.String() {
+							continue serveLoop
+						}
+					}
+					mainState.Mux.Lock()
+					mainState.MulticastPeers = append(mainState.MulticastPeers, &UserResponse{"addUser", userName, src.String()})
+					mainState.Mux.Unlock()
+					res, err := json.Marshal(UserResponse{"addUser", userName, src.String()})
+					if err != nil {
+						log.Fatal("JSON MARSHAL FAILED: ", err)
+						return
+					}
+					for _, conn := range updateUserConns {
+						conn.WriteMessage(websocket.TextMessage, res)
+					}
 				}
 			}
 		}
@@ -334,4 +353,11 @@ func updateUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	updateUserConns = append(updateUserConns, conn)
+	for _, user := range mainState.MulticastPeers {
+		res, err := json.Marshal(user)
+		if err != nil {
+			log.Fatal(err)
+		}
+		conn.WriteMessage(websocket.TextMessage, res)
+	}
 }
