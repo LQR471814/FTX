@@ -175,7 +175,7 @@ func serveMulticastUDP(ctx context.Context, grpAddr *net.UDPAddr, conn *net.UDPC
 			if err != nil && !strings.Contains(err.Error(), "i/o timeout") {
 				log.Fatal(err)
 			}
-			if src != nil {
+			if src != nil || strings.Contains(err.Error(), "i/o timeout") {
 				continue
 			}
 			fmt.Println(string(bytes), src)
