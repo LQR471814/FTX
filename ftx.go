@@ -16,10 +16,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
-
-	"golang.org/x/net/ipv4"
 
 	"github.com/gorilla/websocket"
 )
@@ -28,7 +25,7 @@ const (
 	buffer = 1024
 )
 
-var multicastGroup = net.IPv4(224, 0, 0, 248)
+var multicastGroup = "224.0.0.248:5001"
 
 //MulticastPacket contains information for a given multicast packet received
 type MulticastPacket struct {
@@ -125,28 +122,16 @@ func main() {
 			log.Fatal(err)
 		}
 
-		_, err = syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		conn, err := net.ListenPacket("udp4", "0.0.0.0:9999")
-		if err != nil {
-			log.Fatal(err)
-		}
-		packetConn := ipv4.NewPacketConn(conn)
-		if err := packetConn.JoinGroup(netInterface, &net.UDPAddr{IP: multicastGroup}); err != nil {
-			log.Fatal(err)
-		}
-		packetConn.SetMulticastInterface(netInterface)
-
-		packetConn.SetTOS(0x0)
-		packetConn.SetTTL(16)
-		packetConn.SetMulticastTTL(2)
+		grpAddr, err := net.ResolveUDPAddr("udp", multicastGroup)
 
 		//? Start Multicast
-		go serveMulticastUDP(ctx, packetConn)
-		ping(append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), packetConn)
+		conn, err := net.ListenMulticastUDP("udp4", netInterface, grpAddr)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		go serveMulticastUDP(ctx, grpAddr, conn)
+		ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
 	}
 
 	//? Start frontend
@@ -171,45 +156,39 @@ func writeSettings() {
 	settings.Mux.Unlock()
 }
 
-func ping(bytes []byte, packetConn *ipv4.PacketConn) {
-	dst := &net.UDPAddr{IP: multicastGroup, Port: 9999}
-	if _, err := packetConn.WriteTo(bytes, nil, dst); err != nil {
+func ping(conn *net.UDPConn, bytes []byte, grpAddr *net.UDPAddr) {
+	_, err := conn.WriteToUDP(bytes, grpAddr)
+	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func serveMulticastUDP(ctx context.Context, packetConn *ipv4.PacketConn) {
+func serveMulticastUDP(ctx context.Context, grpAddr *net.UDPAddr, conn *net.UDPConn) {
 	bytes := make([]byte, buffer)
 	for {
 		select {
 		case <-ctx.Done():
 			break
 		default:
-			packetConn.SetReadDeadline(time.Now().Add(1 * time.Second))
-			_, cm, src, err := packetConn.ReadFrom(bytes)
+			conn.SetReadDeadline(time.Now().Add(1 * time.Second))
+			_, src, err := conn.ReadFromUDP(bytes)
 			if err != nil && !strings.Contains(err.Error(), "i/o timeout") {
 				log.Fatal(err)
 			}
-			if cm == nil {
-				continue
+			if src != nil {
+				fmt.Println(string(bytes), src)
 			}
-			if cm.Dst.IsMulticast() {
-				if cm.Dst.Equal(multicastGroup) {
-					fmt.Println(MulticastPacket{bytes, src})
-					messageType := bytes[0]
-					if messageType == 0 {
-						userName := string(bytes[1:])
-						res, err := json.Marshal(UserResponse{"addUser", userName, src.String()})
-						if err != nil {
-							log.Fatal("JSON MARSHAL FAILED: ", err)
-							return
-						}
-						for _, conn := range updateUserConns {
-							conn.WriteMessage(websocket.TextMessage, res)
-						}
-					}
-				} else {
-					continue
+
+			messageType := bytes[0]
+			if messageType == 0 {
+				userName := string(bytes[1:])
+				res, err := json.Marshal(UserResponse{"addUser", userName, src.String()})
+				if err != nil {
+					log.Fatal("JSON MARSHAL FAILED: ", err)
+					return
+				}
+				for _, conn := range updateUserConns {
+					conn.WriteMessage(websocket.TextMessage, res)
 				}
 			}
 		}
