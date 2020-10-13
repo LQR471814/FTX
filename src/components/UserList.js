@@ -11,7 +11,9 @@ class UserList extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = {users:[]}
+        this.state = {users:[
+            {name: "reeeee", ip: "127.0.0.1"}
+        ]}
 
         this.userUpdateClient = new WebSocketClient("ws://localhost:3000/updateUsers")
         this.userUpdateClient.onopen = () => {
@@ -58,7 +60,7 @@ class UserList extends React.Component {
                 <p className="Title">User List</p>
                 <div className="ComponentContainer">
                     {this.state.users.map((user)=>{
-                        return <User key={uniqid()} name={user.name} ip={user.ip} />
+                        return <User key={uniqid()} name={user.name} ip={user.ip} commChoice={this.props.commChoice} />
                     })}
                 </div>
             </div>
@@ -67,7 +69,8 @@ class UserList extends React.Component {
 }
 
 UserList.propTypes = {
-    hostname: PropTypes.object.isRequired
+    hostname: PropTypes.object.isRequired,
+    commChoice: PropTypes.object.isRequired
 }
 
 export default UserList;

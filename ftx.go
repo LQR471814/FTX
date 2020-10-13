@@ -23,10 +23,9 @@ import (
 )
 
 const (
-	buffer = 1024
+	buffer         = 1024
+	multicastGroup = "224.0.0.248:5001"
 )
-
-var multicastGroup = "224.0.0.248:5001"
 
 //MulticastPacket contains information for a given multicast packet received
 type MulticastPacket struct {
@@ -63,7 +62,9 @@ type ResponseContent struct {
 
 //ResourceParameters defines the parameters passed to a resource request
 type ResourceParameters struct {
-	InterfaceID int
+	InterfaceID        int
+	MessageDestination string
+	Message            string
 }
 
 //Settings define the program settings
@@ -88,11 +89,11 @@ func (settings *Settings) Defaults() {
 }
 
 var upgrader = websocket.Upgrader{}
-var multicastChannel = make(chan MulticastPacket)
 var settings = &Settings{}
 var server = &http.Server{Addr: ":3000", Handler: nil}
 var updateUserConns = []*websocket.Conn{}
 var mainState = &state{}
+var multicastConn = &net.UDPConn{}
 
 func main() {
 	ctx, _ := context.WithCancel(context.Background())
@@ -133,17 +134,20 @@ func main() {
 		}
 
 		grpAddr, err := net.ResolveUDPAddr("udp", multicastGroup)
-
-		//? Start Multicast
-		conn, err := net.ListenMulticastUDP("udp4", netInterface, grpAddr)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		go serveMulticastUDP(ctx, grpAddr, conn, mainState)
-		go keepAlive(ctx, grpAddr, conn)
-		ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
-		defer ping(conn, append([]byte{2}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
+		//? Start Multicast
+		multicastConn, err = net.ListenMulticastUDP("udp4", netInterface, grpAddr)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		go serveMulticastUDP(ctx, grpAddr, mainState)
+		go keepAlive(ctx, grpAddr)
+		ping(append([]byte{0}, []byte(getHostname())...))
+		defer ping(append([]byte{2}, []byte(getHostname())...))
 	}
 
 	//? Start frontend
@@ -153,7 +157,7 @@ func main() {
 	server.ListenAndServe()
 }
 
-//! Miscellaneous
+//* Miscellaneous
 func writeSettings() {
 	settings.Mux.Lock()
 	data, err := json.Marshal(settings)
@@ -169,27 +173,34 @@ func writeSettings() {
 	settings.Mux.Unlock()
 }
 
-//! Multicasting
-func ping(conn *net.UDPConn, buf []byte, grpAddr *net.UDPAddr) {
-	_, err := conn.WriteToUDP(buf, grpAddr)
+//* Multicasting
+func ping(buf []byte) {
+	group, err := net.ResolveUDPAddr("udp", multicastGroup)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = multicastConn.WriteToUDP(buf, group)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func keepAlive(ctx context.Context, grpAddr *net.UDPAddr, conn *net.UDPConn) {
+func keepAlive(ctx context.Context, grpAddr *net.UDPAddr) {
 	for {
 		select {
 		case <-ctx.Done():
 			break
 		default:
-			ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
+			mainState.Mux.Lock()
+			mainState.MulticastPeers = []*UserResponse{}
+			mainState.Mux.Unlock()
+			ping(append([]byte{0}, []byte(getHostname())...))
 			time.Sleep(time.Second * 8)
 		}
 	}
 }
 
-func serveMulticastUDP(ctx context.Context, grpAddr *net.UDPAddr, conn *net.UDPConn, mainState *state) {
+func serveMulticastUDP(ctx context.Context, grpAddr *net.UDPAddr, mainState *state) {
 serveLoop:
 	for {
 		select {
@@ -197,8 +208,8 @@ serveLoop:
 			break
 		default:
 			buf := make([]byte, buffer)
-			conn.SetReadDeadline(time.Now().Add(1 * time.Second))
-			_, src, err := conn.ReadFromUDP(buf)
+			multicastConn.SetReadDeadline(time.Now().Add(1 * time.Second))
+			_, src, err := multicastConn.ReadFromUDP(buf)
 			if err != nil && !strings.Contains(err.Error(), "i/o timeout") {
 				log.Fatal(err)
 			}
@@ -213,7 +224,7 @@ serveLoop:
 						}
 					}
 					fmt.Println(string(msgBytes), src)
-					ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
+					ping(append([]byte{0}, []byte(getHostname())...))
 					mainState.Mux.Lock()
 					mainState.MulticastPeers = append(mainState.MulticastPeers, &UserResponse{"addUser", userName, src.String()})
 					mainState.Mux.Unlock()
@@ -227,7 +238,7 @@ serveLoop:
 					}
 				}
 				if messageType == 1 { //? If received keepalive
-					ping(conn, append([]byte{0}, []byte(getHostname(ResourceParameters{}))...), grpAddr)
+					ping(append([]byte{0}, []byte(getHostname())...))
 				}
 				if messageType == 2 { //? On user quit multicast peers
 					userName := string(msgBytes[1:])
@@ -249,12 +260,20 @@ serveLoop:
 						}
 					}
 				}
+				if messageType == 3 { //? On message received
+					messageParams := bytes.Split(msgBytes[1:], []byte{0})
+					destination := string(messageParams[0])
+					if destination == getHostname() {
+						from := string(messageParams[1])
+						message := string(messageParams[2])
+					}
+				}
 			}
 		}
 	}
 }
 
-//! Websocket Handlers
+//* Websocket Handlers
 func updateUsers(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -299,15 +318,17 @@ func resource(w http.ResponseWriter, r *http.Request) {
 
 		switch request.Name {
 		case "getInterfaces":
-			getInterfacesResult = getInterfaces(request.Parameters)
+			getInterfacesResult = getInterfaces()
 		case "setInterfaces":
 			setInterfaces(request.Parameters)
 		case "getOS":
-			getOSResult = getOS(request.Parameters)
+			getOSResult = runtime.GOOS
 		case "getHostname":
-			getHostnameResult = getHostname(request.Parameters)
+			getHostnameResult = getHostname()
 		case "requireSetup":
-			requireSetupResult = requireSetup(request.Parameters)
+			requireSetupResult = requireSetup()
+		case "sendMessage":
+			ping(append(append(append([]byte{3}, []byte(request.Parameters.MessageDestination)...), append([]byte{0}, []byte(getHostname())...)...), append([]byte{0}, []byte(request.Parameters.Message)...)...))
 		}
 
 		response, err := json.Marshal(ResourceResponse{request.Name, ResponseContent{getInterfacesResult, getOSResult, getHostnameResult, requireSetupResult}})
@@ -327,8 +348,8 @@ func resource(w http.ResponseWriter, r *http.Request) {
 	server.Shutdown(context.Background())
 }
 
-//! Resource Functions
-func getInterfaces(parameters ResourceParameters) [][2]string {
+//* Resource Functions
+func getInterfaces() [][2]string {
 	interfaces, err := net.Interfaces()
 	if err != nil {
 		log.Fatal(err)
@@ -357,11 +378,7 @@ func setInterfaces(parameters ResourceParameters) {
 	}
 }
 
-func getOS(parameters ResourceParameters) string {
-	return runtime.GOOS
-}
-
-func getHostname(parameters ResourceParameters) string {
+func getHostname() string {
 	Name, err := os.Hostname()
 	if err != nil {
 		log.Fatal(err)
@@ -369,16 +386,13 @@ func getHostname(parameters ResourceParameters) string {
 	return Name
 }
 
-func requireSetup(parameters ResourceParameters) bool {
-	required := 0
+func requireSetup() bool {
+	required := 1
 	if settings.Default == true {
-		required++
-	} else {
-		required--
+		required *= 0
 	}
 
 	if runtime.GOOS == "windows" {
-		required++
 		out, err := exec.Command("powershell.exe", "Get-NetRoute").Output()
 		lines := []string{}
 		for _, line := range strings.Split(string(out), "\r\n") {
@@ -389,16 +403,16 @@ func requireSetup(parameters ResourceParameters) bool {
 
 		for i := 0; i < len(lines); i++ {
 			if strings.Fields(lines[i])[3] != "256" {
-				required--
+				required *= 0
 				break
 			}
 		}
 
 		err = exec.Command("powershell.exe", "Get-NetFirewallRule", "-DisplayName \"FTX\"").Run()
 		if err != nil {
-			required++
+			required *= 0
 		}
 	}
 
-	return (required > 0)
+	return (required == 0)
 }

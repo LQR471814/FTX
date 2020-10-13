@@ -14,14 +14,14 @@ class NetInterfaceChoice extends React.Component {
         }
 
         this.setInterfaces = this.setInterfaces.bind(this)
-        
+
         this.props.resourceClient.send(JSON.stringify({name: "getInterfaces", parameters: {}}))
     }
 
     componentDidUpdate() {
         document.getElementById("NetInterfaceChoiceContainer").style.columnGap = "70px"
     }
-    
+
     setInterfaces(interfaces) {
         this.setState({interfaces: interfaces})
         document.getElementById("AppGrid").style.transition = "none"

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import '../css/MiniComponents.css';
 import '../css/ChoiceOverlay.css';
 import '../css/Choice.css';
-import { ReactComponent as other } from '../css/assets/netinterfaces/other.svg'
+import { ReactComponent as other } from '../css/assets/other.svg'
 import { ReactComponent as wifi } from '../css/assets/netinterfaces/wifi.svg'
 import { ReactComponent as ethernet } from '../css/assets/netinterfaces/ethernet.svg'
 

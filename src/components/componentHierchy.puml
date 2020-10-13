@@ -1,0 +1,63 @@
+@startuml Component Hierchy
+
+Index --|> App
+
+note left
+Solid arrow = component inheritence
+Dot arrow = pass prop
+Square arrow = ref to
+end note
+
+App --|> Windows
+
+App --# MessageWindow
+App --# NetworkInterfaceChoice
+App --# CommChoice
+
+App --* SetupMulticastBanner: displayChoiceNetworkInterfaces (func)
+App --* MessageWindow: groups (array)
+App --* UserList: hostname (string)
+App --* UserList: commChoice (ref)
+
+App --* CommChoice: resourceClient (websocket)
+App --* CommChoice: addToGroup (func)
+
+App --* NetworkInterfaceChoice: resourceClient (websocket)
+NetworkInterfaceChoice --* NetworkInterface: interface (object)
+NetworkInterfaceChoice --* NetworkInterface: resourceClient (websocket)
+
+Windows --|> MessageWindow
+MessageWindow --|> MessageComponent
+
+MessageComponent --|> MessageList
+MessageWindow --# MessageComponent
+MessageWindow --* MessageComponent: groups (array)
+MessageComponent --* MessageList: messages (array)
+MessageComponent --* MessageList: user (string)
+MessageComponent --# MessageList
+
+MessageList --|> Message
+MessageList --* Message: text (string)
+MessageList --* Message: author (string)
+MessageList --|> ReplyBox
+
+Windows --|> UserList
+
+UserList --|> User
+UserList --* User: commChoice (ref)
+UserList --* User: name (string)
+UserList --* User: ip (string)
+
+Windows --|> PendingTransfers
+Windows --|> TransferStatus
+Windows --|> SetupMulticastBanner
+
+App --|> CommChoice
+App --|> NetworkInterfaceChoice
+NetworkInterfaceChoice --|> NetworkInterface
+
+CommChoice --|> Comm
+CommChoice --* Comm: commType (int)
+CommChoice --* Comm: callbackChoice (func)
+
+@enduml

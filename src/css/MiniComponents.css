@@ -20,52 +20,111 @@
 
 .ComponentContainer {
     display: block;
-    
+
     overflow-y:scroll;
-    
-    padding: 7.5px;
+
+    padding: 15px;
 
     height: 100%;
-    
+
     background-color: #5c5c5c;
     border-radius: 5px;
 }
 
-.Message {
+.MessageList {
+    margin: 0px 0px 10px 0px;
+}
+
+.MessageGroupUser {
+    font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
     margin: 5px;
+    font-size: 34px;
+    user-select: none;
+}
+
+.MessageGroupCollapsible {
+    background-color: #42424277;
+    border-radius: 10px;
+    padding: 5px;
+    width: 100%;
+    transition: all 0.1s ease-in-out;
+}
+
+.MessageGroupCollapsible:hover {
+    background-color: #6161619a;
+    cursor: pointer;
+    border: 2px solid rgb(37, 37, 37);
+}
+
+.MessageGroupCollapsible:active {
+    background-color: #9c9c9c9a;
+    cursor: pointer;
+    border: 2px solid rgb(80, 80, 80);
+}
+
+.MessageGroupContainer {
+    background: none;
+    padding: 5px;
+
+    transition: all 0.2s ease-in-out;
+    width: 100%;
+
+    overflow: hidden;
+    max-height: 0px;
+}
+
+.Message {
+    border-radius: 5px;
+
+    padding: 7.5px 10px 7.5px 10px;
+
+    margin: 10px;
+
+    background-color: #41414170;
+    box-shadow: 5px 5px 10px #272727;
 }
 
 .MessageContent {
-    font-family: "PTMono-Regular", Arial, Helvetica, sans-serif;;
+    font-family: "OpenSans", Arial, Helvetica, sans-serif;;
+    font-size: 16px;
     color: #c7c7c7;
+}
+.MessageAuthor {
+    font-family: "OpenSansBold", Arial, Helvetica, sans-serif;;
+    font-size: 12px;
+    color: #dadada;
 }
 
 .SubmitButton {
     transform:scale(1);
     font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
     font-size: 12px;
-    display:inline-block;
+    display:block;
 
-    margin: 5px 5px 5px 5px;
-    box-sizing: border-box;
+    overflow: hidden;
+
+    max-width: 0px;
+
+    /* margin: 0px 5px 0px 5px;
+    padding: 10px 5px 10px 5px; */
     border-radius:5px;
     box-shadow: none;
 
     color:#ffffff;
-    border: 1px solid #45bbff;
+    /* border: 1px solid #45bbff; */
     background-color: #45bbff;
 
-    transition: all 0.15s;
+    transition-property: all;
+    transition-duration: 0.15s;
     outline:none;
 }
 
 .SubmitButton:hover{
-    transform:scale(1.05);
     cursor:pointer;
     box-shadow: 1px 1px 5px 1px #1d1d1d;
 }
 
-.Activated {
+.SubmitButton:active{
     border: 1px solid #ffffff;
     background-color: #96fa60;
 }
@@ -74,8 +133,11 @@
     margin: 2px;
     padding: 8px;
 
-    border-radius: 5px;
+    border-radius: 10px;
     background-color: #5c5c5c;
+
+    box-sizing: border-box;
+    width: 100%;
 
     transition: all 0.15s;
 }
@@ -83,6 +145,13 @@
 .User:hover {
     background-color: #727272;
     cursor: pointer;
+    border: 2px solid rgb(51, 51, 51);
+}
+
+.User:active {
+    background-color: #838383;
+    cursor: pointer;
+    border: 2px solid rgb(73, 73, 73);
 }
 
 .UserName {
@@ -111,5 +180,5 @@
 /* Handle */
 ::-webkit-scrollbar-thumb {
     border-radius: 5px;
-    background: #4b4b4b;
+    background: #8b8b8b;
 }

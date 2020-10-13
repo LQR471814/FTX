@@ -1,3 +1,4 @@
+//? This component acts as a SINGULAR message
 import React from 'react';
 import '../css/MiniComponents.css';
 import PropTypes from 'prop-types';
@@ -6,7 +7,8 @@ class Message extends React.Component {
     render() {
         return (
             <div className="Message">
-                <p className="MessageContent">{this.props.author}: {this.props.text}</p>
+                <p className="MessageAuthor">{this.props.author}</p>
+                <p className="MessageContent">{this.props.text}</p>
             </div>
         );
     }
