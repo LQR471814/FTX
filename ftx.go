@@ -179,6 +179,7 @@ func ping(buf []byte) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(buf, group)
 	_, err = multicastConn.WriteToUDP(buf, group)
 	if err != nil {
 		log.Fatal(err)
@@ -261,12 +262,12 @@ serveLoop:
 					}
 				}
 				if messageType == 3 { //? On message received
-					messageParams := bytes.Split(msgBytes[1:], []byte{0})
-					destination := string(messageParams[0])
-					if destination == getHostname() {
-						from := string(messageParams[1])
-						message := string(messageParams[2])
-					}
+					// messageParams := bytes.Split(msgBytes[1:], []byte{0})
+					// destination := string(messageParams[0])
+					// if destination == getHostname() {
+					// 	from := string(messageParams[1])
+					// 	message := string(messageParams[2])
+					// }
 				}
 			}
 		}

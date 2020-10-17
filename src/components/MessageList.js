@@ -32,7 +32,7 @@ class MessageList extends React.Component {
         this.onCollapseFinish = this.onCollapseFinish.bind(this)
         this.onChange = this.onChange.bind(this)
         this.onSubmit = this.onSubmit.bind(this)
-        this.onKeyDown = this.onKeyDown.bind(this)
+        this.onSubmitMessage = this.onSubmitMessage.bind(this)
         this.onButtonTransitionEnd = this.onButtonTransitionEnd.bind(this)
         this.showButton = this.showButton.bind(this)
         this.submit = this.submit.bind(this)
@@ -97,7 +97,7 @@ class MessageList extends React.Component {
         }
     }
 
-    onKeyDown(e) {
+    onSubmitMessage(e) {
         if (e.key === "Enter") {
             document.getElementById(this.state.submitButtonID).style.backgroundColor = "#96fa60"
             document.getElementById(this.state.submitButtonID).style.border = "1px solid #ffffff"
@@ -119,6 +119,8 @@ class MessageList extends React.Component {
         document.getElementById(this.state.submitButtonID).className = "SubmitButton Activated"
         this.setState({msgIn:""})
         document.getElementById(this.state.msgInFieldID).value = ""
+
+        this.props.submitMessage(this.state.msgIn, this.props.user)
     }
 
     onButtonTransitionEnd(e) {
@@ -143,7 +145,7 @@ class MessageList extends React.Component {
                     <div className="Message">
                         <p className="MessageAuthor" id={this.state.inputFieldID}>Reply</p>
                         <div style={{margin: "10px 5px 5px 5px", display: "flex", overflow: "hidden"}}>
-                            <input tabIndex="-1" className="InputField" ref={this.inputFieldRef} id={this.state.msgInFieldID} placeholder="Message" onChange={this.onChange} onKeyDown={this.onKeyDown} />
+                            <input tabIndex="-1" className="InputField" ref={this.inputFieldRef} id={this.state.msgInFieldID} placeholder="Message" onChange={this.onChange} onKeyDown={this.onSubmitMessage} />
                             <div className={this.state.submitStyle} id={this.state.submitButtonID} onClick={this.onSubmit} onTransitionEnd={this.onButtonTransitionEnd} style={{display: "block"}}>
                                 <svg height="12px" width="30px" viewBox="75 0 150 200" transform="rotate(90 0 0)" style={{fill: "#4d4d4d"}}>
                                     <path d="M150 0 L75 200 L225 200 Z"></path>
@@ -160,7 +162,8 @@ class MessageList extends React.Component {
 MessageList.propTypes = {
     defaultCollapsed: PropTypes.bool.isRequired,
     messages: PropTypes.array.isRequired,
-    user: PropTypes.string.isRequired
+    user: PropTypes.string.isRequired,
+    submitMessage: PropTypes.func.isRequired
 }
 
 export default MessageList;

@@ -122,6 +122,7 @@ class App extends React.Component {
         this.addToGroup = this.addToGroup.bind(this)
         this.setCurrentTargetUser = this.setCurrentTargetUser.bind(this)
         this.onCommChosen = this.onCommChosen.bind(this)
+        this.replyMessage = this.replyMessage.bind(this)
 
         this.setupBanner = EmptyBanner
         this.hostname = {value: undefined}
@@ -158,6 +159,10 @@ class App extends React.Component {
                     break;
             }
         }
+    }
+
+    replyMessage(message, destHost) {
+        this.resourceSocket.send(JSON.stringify({name: "sendMessage", parameters: {MessageDestination: destHost, Message: message}}))
     }
 
     getMessageGroupFromUser(user) {
@@ -214,13 +219,14 @@ class App extends React.Component {
             <div style={{height: "100vh", width: "100vw", overflow: "hidden"}}>
                 <div className="AppDiv" id="AppGrid" style={{gridTemplateRows: "auto"}}>
                     {this.state.showSetupBanner && <this.setupBanner displayChoiceNetworkInterfaces={this.displayChoiceNetworkInterfaces} />}
-                    <MessageWindow ref={this.MessageWindowRef} groups={this.state.groups} />
+                    <MessageWindow ref={this.MessageWindowRef} groups={this.state.groups} submitMessage={this.replyMessage} />
                     <div className="Col" style={{overflow: "hidden"}}>
                         <UserList hostname={this.hostname} displayCommChoice={this.displayChoiceComm} setCurrentTargetUser={this.setCurrentTargetUser} />
                         <PendingTransfers />
                         <TransferStatus />
                     </div>
                 </div>
+
                 <ChoicesContainer show={this.state.showCommChoice} icons={[MessageIcon, FileIcon]} items={[0, 1]} columns={2} chosenCallback={this.onCommChosen} labelLogic={ (item) => {
                         var result = {label: "", icon: OtherIcon}
                         if (item === 0) {
@@ -231,7 +237,7 @@ class App extends React.Component {
                             result.icon = FileIcon
                         }
                         return result
-                    } } /> //? CommChoice
+                    } } /> {/* CommChoice */}
                 <ChoicesContainer show={this.state.showChoiceNetworkInterfaces} icons={[WifiIcon, EthernetIcon, OtherIcon]} items={this.state.netInterfaces} columns={6} chosenCallback={this.chooseInterface} labelLogic={ (item) => {
                         var result = {label: "", icon: OtherIcon}
                         if (item[1].includes("Wi-Fi") || item[1].includes("Wlan")) {
@@ -240,7 +246,7 @@ class App extends React.Component {
                             this.interfaceLogo = EthernetIcon
                         }
                         return result
-                    } } /> //? NetInterfaceChoice
+                    } } /> {/* NetInterfaceChoice */}
             </div>
         )
     }
