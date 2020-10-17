@@ -60,7 +60,7 @@ class UserList extends React.Component {
                 <p className="Title">User List</p>
                 <div className="ComponentContainer">
                     {this.state.users.map((user)=>{
-                        return <User key={uniqid()} name={user.name} ip={user.ip} commChoice={this.props.commChoice} />
+                        return <User key={uniqid()} name={user.name} ip={user.ip} displayCommChoice={this.props.displayCommChoice} setCurrentTargetUser={this.props.setCurrentTargetUser} />
                     })}
                 </div>
             </div>
@@ -70,7 +70,8 @@ class UserList extends React.Component {
 
 UserList.propTypes = {
     hostname: PropTypes.object.isRequired,
-    commChoice: PropTypes.object.isRequired
+    displayCommChoice: PropTypes.func.isRequired,
+    setCurrentTargetUser: PropTypes.func.isRequired
 }
 
 export default UserList;

@@ -28,7 +28,9 @@
     top: 45%;
     transform: translate(-50%, -50%);
 
-    transition: 0.25s all ease-in-out;
+    transition-duration: 0.25s;
+    transition-timing-function: ease-in-out;
+    transition-property: all;
 }
 
 .Info {

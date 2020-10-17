@@ -10,7 +10,8 @@ class User extends React.Component {
     }
 
     onClick() {
-        this.props.commChoice.current.show({name: this.props.name, ip: this.props.ip})
+        this.props.setCurrentTargetUser(this.props.name)
+        this.props.displayCommChoice(true)
     }
 
     render() {
@@ -24,7 +25,8 @@ class User extends React.Component {
 }
 
 User.propTypes = {
-    commChoice: PropTypes.object.isRequired,
+    displayCommChoice: PropTypes.func.isRequired,
+    setCurrentTargetUser: PropTypes.func.isRequired,
     name: PropTypes.string.isRequired,
     ip: PropTypes.string.isRequired
 }

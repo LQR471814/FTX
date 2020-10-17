@@ -28,10 +28,6 @@ class MessageWindow extends React.Component {
         this.MessageComponentRef = React.createRef()
     }
 
-    sendCollapse(collapse) {
-        this.MessageComponentRef.current.sendCollapse(collapse)
-    }
-
     sendFocus(focus, user) {
         this.MessageComponentRef.current.sendFocus(focus, user)
     }

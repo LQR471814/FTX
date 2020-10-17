@@ -1,4 +1,4 @@
-@startuml Component Hierchy
+@startuml LEGACY Component Hierchy
 
 Index --|> App
 
