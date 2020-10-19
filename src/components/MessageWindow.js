@@ -45,7 +45,7 @@ class MessageWindow extends React.Component {
 }
 
 MessageWindow.propTypes = {
-    groups: PropTypes.array.isRequired,
+    groups: PropTypes.object.isRequired,
     submitMessage: PropTypes.func.isRequired
 }
 

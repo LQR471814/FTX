@@ -22,9 +22,8 @@ class App extends React.Component {
             showChoiceNetworkInterfaces: false,
             showCommChoice: false,
             showSetupBanner: false,
-            groups: [
-                {
-                    user: "BOOO",
+            groups: {
+                "BOOO":{
                     defaultCollapsed: true,
                     messages: [
                         {
@@ -41,8 +40,7 @@ class App extends React.Component {
                         }
                     ]
                 },
-                {
-                    user: "BOOOA",
+                "BOOOA":{
                     defaultCollapsed: true,
                     messages: [
                         {
@@ -51,8 +49,7 @@ class App extends React.Component {
                         }
                     ]
                 },
-                {
-                    user: "BOOOC",
+                "BOOOC":{
                     defaultCollapsed: true,
                     messages: [
                         {
@@ -81,8 +78,7 @@ class App extends React.Component {
                         }
                     ]
                 },
-                {
-                    user: "BOOOD",
+                "BOOOD":{
                     defaultCollapsed: true,
                     messages: [
                         {
@@ -111,7 +107,7 @@ class App extends React.Component {
                         }
                     ]
                 }
-            ],
+            },
             netInterfaces: [],
             currentTargetUser: undefined
         }
@@ -123,15 +119,24 @@ class App extends React.Component {
         this.setCurrentTargetUser = this.setCurrentTargetUser.bind(this)
         this.onCommChosen = this.onCommChosen.bind(this)
         this.replyMessage = this.replyMessage.bind(this)
+        this.chooseInterface = this.chooseInterface.bind(this)
+        this.onRecvMessage = this.onRecvMessage.bind(this)
 
         this.setupBanner = EmptyBanner
         this.hostname = {value: undefined}
+
+        this.recvMsgSocket = new WebSocketClient("ws://localhost:3000/recvMessage")
+        this.recvMsgSocket.onopen = () => {
+            console.log("Connected to message out.")
+        }
+        this.recvMsgSocket.onmessage = this.onRecvMessage
 
         this.resourceSocket = new WebSocketClient("ws://localhost:3000/resource")
         this.resourceSocket.onopen = () => {
             console.log("Connected to resource.")
             this.resourceSocket.send(JSON.stringify({name: "getHostname", parameters: {}}))
             this.resourceSocket.send(JSON.stringify({name: "getOS", parameters: {}}))
+            this.resourceSocket.send(JSON.stringify({name: "requireSetup", parameters: {}}))
         }
         this.resourceSocket.onmessage = (message) => {
             var messageObj = JSON.parse(message.data);
@@ -142,8 +147,6 @@ class App extends React.Component {
                     break;
                 case "getOS":
                     this.os = {value: messageObj.Response.GetOS.toLowerCase()}
-                    this.setupBanner = SetupMulticastBanner
-                    this.resourceSocket.send(JSON.stringify({name: "requireSetup", parameters: {}}))
                     break;
                 case "getHostname":
                     this.hostname.value = messageObj.Response.GetHostname
@@ -151,7 +154,7 @@ class App extends React.Component {
                     break;
                 case "requireSetup":
                     if (messageObj.Response.RequireSetup === true) {
-                        this.props.resourceClient.send(JSON.stringify({name: "getInterfaces", parameters: {}}))
+                        this.resourceSocket.send(JSON.stringify({name: "getInterfaces", parameters: {}}))
                     }
                     this.showSetupBanner(messageObj.Response.RequireSetup)
                     break;
@@ -161,17 +164,20 @@ class App extends React.Component {
         }
     }
 
-    replyMessage(message, destHost) {
-        this.resourceSocket.send(JSON.stringify({name: "sendMessage", parameters: {MessageDestination: destHost, Message: message}}))
+    onRecvMessage(message, user) {
+        if (this.state.groups[user] !== undefined) {
+            var newGroups = _.cloneDeep(this.state.groups)
+            newGroups[user].messages.push({content: message, author: user})
+            this.setState({groups: newGroups})
+        } else {
+            var newGroups = _.cloneDeep(this.state.groups)
+            newGroups[user] = {defaultCollapsed: false, messages: [{content: message, author: user}]}
+            this.setState({groups: newGroups})
+        }
     }
 
-    getMessageGroupFromUser(user) {
-        return this.state.groups.map((group) => {
-            if (group.user === user) {
-                return group
-            }
-            return undefined
-        })
+    replyMessage(message, destHost) {
+        this.resourceSocket.send(JSON.stringify({name: "sendMessage", parameters: {MessageDestination: destHost, Message: message}}))
     }
 
     setCurrentTargetUser(user) {
@@ -187,8 +193,7 @@ class App extends React.Component {
 
     addToGroup(messages, user, opened) {
         var newGroups = _.cloneDeep(this.state.groups)
-        var newGrp = {user: user, defaultCollapsed: !opened, messages: messages}
-        newGroups.push(newGrp)
+        newGroups[user] = {defaultCollapsed: !opened, messages: messages}
 
         this.setState({groups: newGroups})
     }
@@ -202,6 +207,7 @@ class App extends React.Component {
     }
 
     showSetupBanner(show) {
+        this.setupBanner = SetupMulticastBanner
         if (show === false) {
             document.getElementById("AppGrid").style.gridTemplateRows = "auto";
         } else {
@@ -211,7 +217,7 @@ class App extends React.Component {
     }
 
     chooseInterface(intf) {
-        this.resourceSocket.send(JSON.stringify({name: "setInterfaces", parameters: {InterfaceID: parseInt(intf[0])}}))
+        this.resourceSocket.send(JSON.stringify({name: "setInterfaces", parameters: {InterfaceID: parseInt(intf)}}))
     }
 
     render() {
@@ -227,7 +233,7 @@ class App extends React.Component {
                     </div>
                 </div>
 
-                <ChoicesContainer show={this.state.showCommChoice} icons={[MessageIcon, FileIcon]} items={[0, 1]} columns={2} chosenCallback={this.onCommChosen} labelLogic={ (item) => {
+                <ChoicesContainer show={this.state.showCommChoice} mainLabel="Choose what to send" icons={[MessageIcon, FileIcon]} items={[0, 1]} columns={2} chosenCallback={this.onCommChosen} labelLogic={ (item) => {
                         var result = {label: "", icon: OtherIcon}
                         if (item === 0) {
                             result.label = "Message"
@@ -238,14 +244,14 @@ class App extends React.Component {
                         }
                         return result
                     } } /> {/* CommChoice */}
-                <ChoicesContainer show={this.state.showChoiceNetworkInterfaces} icons={[WifiIcon, EthernetIcon, OtherIcon]} items={this.state.netInterfaces} columns={6} chosenCallback={this.chooseInterface} labelLogic={ (item) => {
-                        var result = {label: "", icon: OtherIcon}
-                        if (item[1].includes("Wi-Fi") || item[1].includes("Wlan")) {
-                            this.interfaceLogo = WifiIcon
-                        } else if (item[1].includes("Local Area Connection") || item[1].includes("LAN") || item[1].includes("Ethernet")) {
-                            this.interfaceLogo = EthernetIcon
-                        }
-                        return result
+                <ChoicesContainer show={this.state.showChoiceNetworkInterfaces} mainLabel="Choose a network interface to receive multicast" icons={[WifiIcon, EthernetIcon, OtherIcon]} items={this.state.netInterfaces} columns={6} chosenCallback={this.chooseInterface} labelLogic={ (item) => {
+                    var result = {label: item[1], icon: OtherIcon, identifier: item[0]}
+                    if (item[1].includes("Wi-Fi") || item[1].includes("Wlan")) {
+                        result.icon = WifiIcon
+                    } else if (item.includes("Local Area Connection") || item[1].includes("LAN") || item[1].includes("Ethernet")) {
+                        result.icon = EthernetIcon
+                    }
+                    return result
                     } } /> {/* NetInterfaceChoice */}
             </div>
         )

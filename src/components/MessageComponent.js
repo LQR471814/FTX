@@ -25,16 +25,14 @@ class MessageComponent extends React.Component {
     render() {
         return (
             <div className="ComponentContainer" style={{overflowY: "scroll"}}>
-                { this.props.groups.map((group) => {
-                    return <MessageList key={group.user} defaultCollapsed={group.defaultCollapsed} messages={group.messages} user={group.user} submitMessage={this.props.submitMessage} />
-                }) }
+                {Object.keys(this.props.groups).map((key) => {return <MessageList key={key} defaultCollapsed={this.props.groups[key].defaultCollapsed} messages={this.props.groups[key].messages} user={key} submitMessage={this.props.submitMessage} />})}
             </div>
         );
     }
 }
 
 MessageComponent.propTypes = {
-    groups: PropTypes.array.isRequired,
+    groups: PropTypes.object.isRequired,
     submitMessage: PropTypes.func.isRequired
 }
 

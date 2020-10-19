@@ -40,6 +40,12 @@ type UserResponse struct {
 	IP      string
 }
 
+//MessageResponse defines the information sent when message is received
+type MessageResponse struct {
+	User    string
+	Message string
+}
+
 //ResourceRequest defines the information given by a front end resource request
 type ResourceRequest struct {
 	Name       string
@@ -92,6 +98,7 @@ var upgrader = websocket.Upgrader{}
 var settings = &Settings{}
 var server = &http.Server{Addr: ":3000", Handler: nil}
 var updateUserConns = []*websocket.Conn{}
+var recvMessageConns = []*websocket.Conn{}
 var mainState = &state{}
 var multicastConn = &net.UDPConn{}
 
@@ -154,6 +161,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("./build")))
 	http.HandleFunc("/resource", resource)
 	http.HandleFunc("/updateUsers", updateUsers)
+	http.HandleFunc("/recvMessage", recvMessage)
 	server.ListenAndServe()
 }
 
@@ -179,7 +187,6 @@ func ping(buf []byte) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(buf, group)
 	_, err = multicastConn.WriteToUDP(buf, group)
 	if err != nil {
 		log.Fatal(err)
@@ -262,12 +269,20 @@ serveLoop:
 					}
 				}
 				if messageType == 3 { //? On message received
-					// messageParams := bytes.Split(msgBytes[1:], []byte{0})
-					// destination := string(messageParams[0])
-					// if destination == getHostname() {
-					// 	from := string(messageParams[1])
-					// 	message := string(messageParams[2])
-					// }
+					messageParams := bytes.Split(msgBytes[1:], []byte{0})
+					destination := string(messageParams[0])
+					if destination == getHostname() {
+						from := string(messageParams[1])
+						message := string(messageParams[2])
+						res, err := json.Marshal(MessageResponse{from, message})
+						if err != nil {
+							log.Fatal("JSON MARSHAL FAILED: ", err)
+							return
+						}
+						for _, websocketConn := range recvMessageConns {
+							websocketConn.WriteMessage(websocket.TextMessage, res)
+						}
+					}
 				}
 			}
 		}
@@ -291,6 +306,15 @@ func updateUsers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func recvMessage(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Fatal("UPGRADE FAILED: ", err)
+		return
+	}
+	recvMessageConns = append(recvMessageConns, conn)
+}
+
 func resource(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -306,7 +330,6 @@ func resource(w http.ResponseWriter, r *http.Request) {
 
 		request := ResourceRequest{}
 		err = json.Unmarshal(message, &request)
-		fmt.Println(string(message))
 		if err != nil {
 			log.Fatal("JSON UNMARSHAL FAILED: ", err)
 		}
@@ -389,7 +412,7 @@ func getHostname() string {
 
 func requireSetup() bool {
 	required := 1
-	if settings.Default == true {
+	if settings.Default == false {
 		required *= 0
 	}
 
@@ -415,5 +438,5 @@ func requireSetup() bool {
 		}
 	}
 
-	return (required == 0)
+	return (required == 1)
 }
