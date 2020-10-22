@@ -37,7 +37,7 @@ class MessageWindow extends React.Component {
             <div className="Col" style={{overflow: "hidden"}}>
                 <div className="Window" style={{height: "100%", overflow: "hidden"}}>
                     <p className="Title">Messages</p>
-                    <MessageComponent groups={this.props.groups} ref={this.MessageComponentRef} submitMessage={this.props.submitMessage} />
+                    <MessageComponent groups={this.props.groups} ref={this.MessageComponentRef} submitMessage={this.props.submitMessage} setCollapsed={this.props.setCollapsed} />
                 </div>
             </div>
         );
@@ -46,7 +46,8 @@ class MessageWindow extends React.Component {
 
 MessageWindow.propTypes = {
     groups: PropTypes.object.isRequired,
-    submitMessage: PropTypes.func.isRequired
+    submitMessage: PropTypes.func.isRequired,
+    setCollapsed: PropTypes.func.isRequired
 }
 
 export default MessageWindow;

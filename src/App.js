@@ -24,7 +24,7 @@ class App extends React.Component {
             showSetupBanner: false,
             groups: {
                 "BOOO":{
-                    defaultCollapsed: true,
+                    collapsed: 1,
                     messages: [
                         {
                             content: "ABCDEFG",
@@ -41,7 +41,7 @@ class App extends React.Component {
                     ]
                 },
                 "BOOOA":{
-                    defaultCollapsed: true,
+                    collapsed: 1,
                     messages: [
                         {
                             content: "ABCDEFG",
@@ -50,7 +50,7 @@ class App extends React.Component {
                     ]
                 },
                 "BOOOC":{
-                    defaultCollapsed: true,
+                    collapsed: 1,
                     messages: [
                         {
                             content: "ABCDEFG",
@@ -79,7 +79,7 @@ class App extends React.Component {
                     ]
                 },
                 "BOOOD":{
-                    defaultCollapsed: true,
+                    collapsed: 1,
                     messages: [
                         {
                             content: "ABCDEFG",
@@ -121,6 +121,7 @@ class App extends React.Component {
         this.replyMessage = this.replyMessage.bind(this)
         this.chooseInterface = this.chooseInterface.bind(this)
         this.onRecvMessage = this.onRecvMessage.bind(this)
+        this.setCollapsed = this.setCollapsed.bind(this)
 
         this.setupBanner = EmptyBanner
         this.hostname = {value: undefined}
@@ -129,7 +130,10 @@ class App extends React.Component {
         this.recvMsgSocket.onopen = () => {
             console.log("Connected to message out.")
         }
-        this.recvMsgSocket.onmessage = this.onRecvMessage
+        this.recvMsgSocket.onmessage = (message) => {
+            var messageObj = JSON.parse(message.data);
+            this.onRecvMessage(messageObj.Message, messageObj.User)
+        }
 
         this.resourceSocket = new WebSocketClient("ws://localhost:3000/resource")
         this.resourceSocket.onopen = () => {
@@ -164,16 +168,21 @@ class App extends React.Component {
         }
     }
 
+    setCollapsed(user, opened) {
+        var newGroups = _.cloneDeep(this.state.groups)
+        newGroups[user].collapsed = opened
+        this.setState({groups: newGroups})
+    }
+
     onRecvMessage(message, user) {
-        if (this.state.groups[user] !== undefined) {
-            var newGroups = _.cloneDeep(this.state.groups)
+        var newGroups = _.cloneDeep(this.state.groups)
+        if (newGroups[user] !== undefined) {
             newGroups[user].messages.push({content: message, author: user})
-            this.setState({groups: newGroups})
         } else {
-            var newGroups = _.cloneDeep(this.state.groups)
-            newGroups[user] = {defaultCollapsed: false, messages: [{content: message, author: user}]}
-            this.setState({groups: newGroups})
+            newGroups[user] = {collapsed: false, messages: [{content: message, author: user}]}
         }
+        console.log(newGroups)
+        this.setState({groups: newGroups})
     }
 
     replyMessage(message, destHost) {
@@ -187,15 +196,19 @@ class App extends React.Component {
     onCommChosen(type) {
         this.setState({showCommChoice: false})
         if (type === "Message") {
-            this.addToGroup([], this.state.currentTargetUser, true)
+            this.addToGroup([], this.state.currentTargetUser, -1)
         }
     }
 
     addToGroup(messages, user, opened) {
         var newGroups = _.cloneDeep(this.state.groups)
-        newGroups[user] = {defaultCollapsed: !opened, messages: messages}
+        if (newGroups[user] === undefined) {
+            newGroups[user] = {collapsed: opened, messages: messages}
 
-        this.setState({groups: newGroups})
+            this.setState({groups: newGroups})
+        } else {
+            this.setCollapsed(user, -1)
+        }
     }
 
     displayChoiceNetworkInterfaces(show) {
@@ -225,7 +238,7 @@ class App extends React.Component {
             <div style={{height: "100vh", width: "100vw", overflow: "hidden"}}>
                 <div className="AppDiv" id="AppGrid" style={{gridTemplateRows: "auto"}}>
                     {this.state.showSetupBanner && <this.setupBanner displayChoiceNetworkInterfaces={this.displayChoiceNetworkInterfaces} />}
-                    <MessageWindow ref={this.MessageWindowRef} groups={this.state.groups} submitMessage={this.replyMessage} />
+                    <MessageWindow ref={this.MessageWindowRef} groups={this.state.groups} submitMessage={this.replyMessage} setCollapsed={this.setCollapsed} />
                     <div className="Col" style={{overflow: "hidden"}}>
                         <UserList hostname={this.hostname} displayCommChoice={this.displayChoiceComm} setCurrentTargetUser={this.setCurrentTargetUser} />
                         <PendingTransfers />

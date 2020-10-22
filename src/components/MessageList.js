@@ -22,12 +22,6 @@ class MessageList extends React.Component {
             submitStyle:"SubmitButton"
         }
 
-        if (this.props.defaultCollapsed === true) {
-            this.released = -1
-        } else {
-            this.released = 1
-        }
-
         this.onToggleCollapse = this.onToggleCollapse.bind(this)
         this.onCollapseFinish = this.onCollapseFinish.bind(this)
         this.onChange = this.onChange.bind(this)
@@ -36,18 +30,17 @@ class MessageList extends React.Component {
         this.onButtonTransitionEnd = this.onButtonTransitionEnd.bind(this)
         this.showButton = this.showButton.bind(this)
         this.submit = this.submit.bind(this)
-        this.collapse = this.collapse.bind(this)
+        this.release = this.release.bind(this)
 
         this.inputFieldRef = React.createRef()
     }
 
     componentDidMount() {
-        if (this.props.defaultCollapsed === true) {
-            this.released = -1
-        } else {
-            this.released = 1
-        }
-        this.collapse(this.released)
+        this.release(this.props.collapsed)
+    }
+
+    componentDidUpdate() {
+        this.release(this.props.collapsed)
     }
 
     onChange(e) {
@@ -73,20 +66,19 @@ class MessageList extends React.Component {
     }
 
     onToggleCollapse(e) {
-        this.released *= -1
-        this.collapse(this.released)
+        this.props.setCollapsed(this.props.user, this.props.collapsed * -1)
     }
 
-    async collapse(released) {
-        if (released > 0) {
+    release(released) {
+        if (released < 0) {
             document.getElementById(this.state.groupContainerID).style.background = "linear-gradient(180deg, rgba(40,40,40,0.6979166666666667) 0%, rgba(255,255,255,0) 35%)"
             document.getElementById(this.state.groupContainerID).style.maxHeight = document.getElementById(this.state.groupContainerID).scrollHeight.toString() + "px"
             document.getElementById(this.state.groupContainerID).style.height = "auto"
             document.getElementById(this.state.messageGroupCollapsibleID).style.borderRadius = "10px 10px 0px 0px"
             this.inputFieldRef.current.focus()
         } else {
-            document.getElementById(this.state.groupContainerID).style.maxHeight = "0px"
             this.inputFieldRef.current.blur()
+            document.getElementById(this.state.groupContainerID).style.maxHeight = "0px"
         }
     }
 
@@ -160,10 +152,11 @@ class MessageList extends React.Component {
 }
 
 MessageList.propTypes = {
-    defaultCollapsed: PropTypes.bool.isRequired,
+    collapsed: PropTypes.number.isRequired,
     messages: PropTypes.array.isRequired,
     user: PropTypes.string.isRequired,
-    submitMessage: PropTypes.func.isRequired
+    submitMessage: PropTypes.func.isRequired,
+    setCollapsed: PropTypes.func.isRequired
 }
 
 export default MessageList;

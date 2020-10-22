@@ -22,10 +22,19 @@ import MessageList from './MessageList';
 import PropTypes from 'prop-types';
 
 class MessageComponent extends React.Component {
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+        this.prevScroll = document.getElementById("MessageGroupsContainer").scrollTop
+        return null;
+    }
+
+    componentDidUpdate() {
+        document.getElementById("MessageGroupsContainer").scrollTop = this.prevScroll
+    }
+
     render() {
         return (
-            <div className="ComponentContainer" style={{overflowY: "scroll"}}>
-                {Object.keys(this.props.groups).map((key) => {return <MessageList key={key} defaultCollapsed={this.props.groups[key].defaultCollapsed} messages={this.props.groups[key].messages} user={key} submitMessage={this.props.submitMessage} />})}
+            <div className="ComponentContainer" id="MessageGroupsContainer" style={{overflowY: "scroll"}}>
+                {Object.keys(this.props.groups).map((key) => {return <MessageList key={key} collapsed={this.props.groups[key].collapsed} messages={this.props.groups[key].messages} user={key} submitMessage={this.props.submitMessage} setCollapsed={this.props.setCollapsed} />})}
             </div>
         );
     }
@@ -33,7 +42,8 @@ class MessageComponent extends React.Component {
 
 MessageComponent.propTypes = {
     groups: PropTypes.object.isRequired,
-    submitMessage: PropTypes.func.isRequired
+    submitMessage: PropTypes.func.isRequired,
+    setCollapsed: PropTypes.func.isRequired
 }
 
 export default MessageComponent;
