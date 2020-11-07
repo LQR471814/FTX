@@ -186,6 +186,9 @@ class App extends React.Component {
     }
 
     replyMessage(message, destHost) {
+        var newGroups = _.cloneDeep(this.state.groups)
+        newGroups[destHost].messages.push({content: message, author: "You"})
+        this.setState({groups: newGroups})
         this.resourceSocket.send(JSON.stringify({name: "sendMessage", parameters: {MessageDestination: destHost, Message: message}}))
     }
 
