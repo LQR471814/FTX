@@ -179,7 +179,7 @@ class App extends React.Component {
         if (newGroups[user] !== undefined) {
             newGroups[user].messages.push({content: message, author: user})
         } else {
-            newGroups[user] = {collapsed: false, messages: [{content: message, author: user}]}
+            newGroups[user] = {collapsed: -1, messages: [{content: message, author: user}]}
         }
         console.log(newGroups)
         this.setState({groups: newGroups})
