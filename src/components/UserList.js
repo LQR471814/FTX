@@ -11,9 +11,9 @@ class UserList extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = {users:[
-            {name: "reeeee", ip: "127.0.0.1"}
-        ]}
+        this.state = {
+            users:[]
+        }
 
         this.userUpdateClient = new WebSocketClient("ws://localhost:3000/updateUsers")
         this.userUpdateClient.onopen = () => {
