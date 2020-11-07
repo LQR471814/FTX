@@ -411,9 +411,12 @@ func getHostname() string {
 }
 
 func requireSetup() bool {
-	required := 1
+	checksTotal := 0
+	checksFulfilled := 0
+
+	checksTotal++
 	if settings.Default == false {
-		required *= 0
+		checksFulfilled++
 	}
 
 	if runtime.GOOS == "windows" {
@@ -425,18 +428,20 @@ func requireSetup() bool {
 			}
 		}
 
+		checksTotal++
 		for i := 0; i < len(lines); i++ {
 			if strings.Fields(lines[i])[3] != "256" {
-				required *= 0
+				checksFulfilled++
 				break
 			}
 		}
 
+		checksTotal++
 		err = exec.Command("powershell.exe", "Get-NetFirewallRule", "-DisplayName \"FTX\"").Run()
-		if err != nil {
-			required *= 0
+		if err == nil {
+			checksFulfilled++
 		}
 	}
 
-	return (required == 1)
+	return (checksTotal != checksFulfilled)
 }
