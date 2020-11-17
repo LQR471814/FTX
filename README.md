@@ -1,4 +1,4 @@
-## FTX
+# FTX
 
 React.js Frontend + Golang Backend = File Transfer and Messaging Program
 
