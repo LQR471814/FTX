@@ -2,17 +2,17 @@
 
 React.js Frontend + Golang Backend = File Transfer and Messaging Program
 
-## Building
+### Building
 
-### React Interface
+#### React Interface
 
 `npm run build`
 
-### Main Application
+#### Main Application
 
 `go build`
 
-### `SetMulticast.go` (This is only required for Windows users)
+#### `SetMulticast.go` (This is only required for Windows users)
 
 `cd SetMulticast`
 
