@@ -1,1 +1,15 @@
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132.61 180"><defs><style>.cls-1{fill:#bdbdbd;}</style></defs><path class="cls-1" d="M306,297l62.63,62.31V437H276V297h30m8.26-20H268a12,12,0,0,0-12,12V445a12,12,0,0,0,12,12H376.61a12,12,0,0,0,12-12V351l-74.37-74Z" transform="translate(-256 -277)"/><path class="cls-1" d="M383.53,277H343a5,5,0,0,0-3.55,8.52l39.92,40.34a4.9,4.9,0,0,0,3.52,1.49,5,5,0,0,0,5-4.94l.61-40.33a5,5,0,0,0-5-5.08Z" transform="translate(-256 -277)"/></svg>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132.61 180">
+    <defs>
+        <style>
+            .cls-1 {
+                fill: #bdbdbd;
+            }
+        </style>
+    </defs>
+    <path class="cls-1"
+        d="M306,297l62.63,62.31V437H276V297h30m8.26-20H268a12,12,0,0,0-12,12V445a12,12,0,0,0,12,12H376.61a12,12,0,0,0,12-12V351l-74.37-74Z"
+        transform="translate(-256 -277)" />
+    <path class="cls-1"
+        d="M383.53,277H343a5,5,0,0,0-3.55,8.52l39.92,40.34a4.9,4.9,0,0,0,3.52,1.49,5,5,0,0,0,5-4.94l.61-40.33a5,5,0,0,0-5-5.08Z"
+        transform="translate(-256 -277)" />
+</svg>

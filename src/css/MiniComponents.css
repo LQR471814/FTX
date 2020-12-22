@@ -1,184 +1,184 @@
 @font-face {
-    font-family: "OpenSansBold";
-    src: url('OpenSans/opensans-bold-webfont.woff2') format('woff2'),
-         url('OpenSans/opensans-bold-webfont.woff') format('woff');
-    font-weight: normal;
+  font-family: "OpenSansBold";
+  src: url("OpenSans/opensans-bold-webfont.woff2") format("woff2"),
+    url("OpenSans/opensans-bold-webfont.woff") format("woff");
+  font-weight: normal;
 }
 
 @font-face {
-    font-family: "OpenSans";
-    src: url('OpenSans/opensans-regular-webfont.woff2') format('woff2'),
-         url('OpenSans/opensans-regular-webfont.woff') format('woff');
-    font-weight: normal;
+  font-family: "OpenSans";
+  src: url("OpenSans/opensans-regular-webfont.woff2") format("woff2"),
+    url("OpenSans/opensans-regular-webfont.woff") format("woff");
+  font-weight: normal;
 }
 
 @font-face {
-    font-family: "PTMono-Regular";
-    src: url('PTMono/PTMono-Regular.woff') format('woff');
-    font-weight: normal;
+  font-family: "PTMono-Regular";
+  src: url("PTMono/PTMono-Regular.woff") format("woff");
+  font-weight: normal;
 }
 
 .ComponentContainer {
-    display: block;
+  display: block;
 
-    overflow-y:scroll;
+  overflow-y: scroll;
 
-    padding: 15px;
+  padding: 15px;
 
-    height: 100%;
+  height: 100%;
 
-    background-color: #5c5c5c;
-    border-radius: 5px;
+  background-color: #5c5c5c;
+  border-radius: 5px;
 }
 
 .MessageList {
-    margin: 0px 0px 10px 0px;
+  margin: 0px 0px 10px 0px;
 }
 
 .MessageGroupUser {
-    font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
-    margin: 5px;
-    font-size: 34px;
-    user-select: none;
+  font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+  margin: 5px;
+  font-size: 34px;
+  user-select: none;
 }
 
 .MessageGroupCollapsible {
-    background-color: #42424277;
-    border-radius: 10px;
-    padding: 5px;
-    width: 100%;
-    transition: all 0.1s ease-in-out;
+  background-color: #42424277;
+  border-radius: 10px;
+  padding: 5px;
+  width: 100%;
+  transition: all 0.1s ease-in-out;
 }
 
 .MessageGroupCollapsible:hover {
-    background-color: #6161619a;
-    cursor: pointer;
-    border: 2px solid rgb(37, 37, 37);
+  background-color: #6161619a;
+  cursor: pointer;
+  border: 2px solid rgb(37, 37, 37);
 }
 
 .MessageGroupCollapsible:active {
-    background-color: #9c9c9c9a;
-    cursor: pointer;
-    border: 2px solid rgb(80, 80, 80);
+  background-color: #9c9c9c9a;
+  cursor: pointer;
+  border: 2px solid rgb(80, 80, 80);
 }
 
 .MessageGroupContainer {
-    background: none;
-    padding: 5px;
+  background: none;
+  padding: 5px;
 
-    transition: all 0.2s ease-in-out;
-    width: 100%;
+  transition: all 0.2s ease-in-out;
+  width: 100%;
 
-    overflow: hidden;
-    max-height: 0px;
+  overflow: hidden;
+  max-height: 0px;
 }
 
 .Message {
-    border-radius: 5px;
+  border-radius: 5px;
 
-    padding: 7.5px 10px 7.5px 10px;
+  padding: 7.5px 10px 7.5px 10px;
 
-    margin: 10px;
+  margin: 10px;
 
-    background-color: #41414170;
-    box-shadow: 5px 5px 10px #272727;
+  background-color: #41414170;
+  box-shadow: 5px 5px 10px #272727;
 }
 
 .MessageContent {
-    font-family: "OpenSans", Arial, Helvetica, sans-serif;;
-    font-size: 16px;
-    color: #c7c7c7;
+  font-family: "OpenSans", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: #c7c7c7;
 }
 .MessageAuthor {
-    font-family: "OpenSansBold", Arial, Helvetica, sans-serif;;
-    font-size: 12px;
-    color: #dadada;
+  font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: #dadada;
 }
 
 .SubmitButton {
-    transform:scale(1);
-    font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
-    font-size: 12px;
-    display:block;
+  transform: scale(1);
+  font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  display: block;
 
-    overflow: hidden;
+  overflow: hidden;
 
-    max-width: 0px;
+  max-width: 0px;
 
-    /* margin: 0px 5px 0px 5px;
+  /* margin: 0px 5px 0px 5px;
     padding: 10px 5px 10px 5px; */
-    border-radius:5px;
-    box-shadow: none;
+  border-radius: 5px;
+  box-shadow: none;
 
-    color:#ffffff;
-    /* border: 1px solid #45bbff; */
-    background-color: #45bbff;
+  color: #ffffff;
+  /* border: 1px solid #45bbff; */
+  background-color: #45bbff;
 
-    transition-property: all;
-    transition-duration: 0.15s;
-    outline:none;
+  transition-property: all;
+  transition-duration: 0.15s;
+  outline: none;
 }
 
-.SubmitButton:hover{
-    cursor:pointer;
-    box-shadow: 1px 1px 5px 1px #1d1d1d;
+.SubmitButton:hover {
+  cursor: pointer;
+  box-shadow: 1px 1px 5px 1px #1d1d1d;
 }
 
-.SubmitButton:active{
-    border: 1px solid #ffffff;
-    background-color: #96fa60;
+.SubmitButton:active {
+  border: 1px solid #ffffff;
+  background-color: #96fa60;
 }
 
 .User {
-    margin: 2px;
-    padding: 8px;
+  margin: 2px;
+  padding: 8px;
 
-    border-radius: 10px;
-    background-color: #5c5c5c;
+  border-radius: 10px;
+  background-color: #5c5c5c;
 
-    box-sizing: border-box;
-    width: 100%;
+  box-sizing: border-box;
+  width: 100%;
 
-    transition: all 0.15s;
+  transition: all 0.15s;
 }
 
 .User:hover {
-    background-color: #727272;
-    cursor: pointer;
-    border: 2px solid rgb(51, 51, 51);
+  background-color: #727272;
+  cursor: pointer;
+  border: 2px solid rgb(51, 51, 51);
 }
 
 .User:active {
-    background-color: #838383;
-    cursor: pointer;
-    border: 2px solid rgb(73, 73, 73);
+  background-color: #838383;
+  cursor: pointer;
+  border: 2px solid rgb(73, 73, 73);
 }
 
 .UserName {
-    font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
-    color: #dadada;
-    margin: 1px;
+  font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+  color: #dadada;
+  margin: 1px;
 }
 
 .Ip {
-    font-family: "PTMono-Regular", 'Times New Roman', Times, serif;
-    color: #c5c5c5;
-    margin: 1px;
+  font-family: "PTMono-Regular", "Times New Roman", Times, serif;
+  color: #c5c5c5;
+  margin: 1px;
 }
 
 /* width */
 ::-webkit-scrollbar {
-    width: 8px;
+  width: 8px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-    border-radius: 5px;
-    background: #5c5c5c;
+  border-radius: 5px;
+  background: #5c5c5c;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    border-radius: 5px;
-    background: #8b8b8b;
+  border-radius: 5px;
+  background: #8b8b8b;
 }
