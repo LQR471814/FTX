@@ -36,7 +36,7 @@ class ChoicesContainer extends React.Component {
       await new Promise((r) => setTimeout(r, 10));
 
       this.choiceDivRef.current.style.opacity = "100%";
-      this.choiceDivRef.current.style.width = "90%";
+      this.choiceDivRef.current.style.width = "75%";
       this.applyDefault = false;
     }
   }
@@ -45,7 +45,7 @@ class ChoicesContainer extends React.Component {
     document.getElementById("AppGrid").style.transition = "all 0.25s";
     document.getElementById("AppGrid").style.filter = "none";
 
-    this.choiceDivRef.current.style.columnGap = "150px";
+    this.choiceDivRef.current.style.width = "100%";
     this.choiceDivRef.current.style.opacity = "50%";
 
     await new Promise((r) =>
