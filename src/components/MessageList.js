@@ -6,18 +6,20 @@ import "../css/MiniComponents.css";
 import "../css/RootStyle.css";
 import PropTypes from "prop-types";
 import Message from "./Message";
-import _ from "lodash";
 
 class MessageList extends React.Component {
   constructor(props) {
     super(props);
 
+    this.groupContainerRef = React.createRef();
+    this.messageGroupCollapsibleRef = React.createRef();
+    this.msgInFieldRef = React.createRef();
+    this.submitButtonRef = React.createRef();
+    this.inputFieldRef = React.createRef();
+
+    this.currentKey = 0;
+
     this.state = {
-      groupContainerID: _.uniqueId("groupContainer"),
-      messageGroupCollapsibleID: _.uniqueId("messageGroupCollapsible"),
-      msgInFieldID: _.uniqueId("msgInField"),
-      submitButtonID: _.uniqueId("submitButton"),
-      inputFieldID: _.uniqueId("inputField"),
       msgIn: "",
       submitStyle: "SubmitButton",
     };
@@ -31,6 +33,7 @@ class MessageList extends React.Component {
     this.showButton = this.showButton.bind(this);
     this.submit = this.submit.bind(this);
     this.release = this.release.bind(this);
+    this.uniqueKey = this.uniqueKey.bind(this);
 
     this.inputFieldRef = React.createRef();
   }
@@ -41,6 +44,11 @@ class MessageList extends React.Component {
 
   componentDidUpdate() {
     this.release(this.props.collapsed);
+  }
+
+  uniqueKey(prefix) {
+    this.currentKey++;
+    return prefix + this.currentKey.toString();
   }
 
   onChange(e) {
@@ -54,19 +62,15 @@ class MessageList extends React.Component {
 
   showButton(show) {
     if (show === true) {
-      document.getElementById(this.state.submitButtonID).style.margin =
-        "0px 5px 0px 5px";
-      document.getElementById(this.state.submitButtonID).style.padding =
-        "10px 5px 10px 5px";
-      document.getElementById(this.state.submitButtonID).style.maxWidth =
-        document
-          .getElementById(this.state.submitButtonID)
-          .scrollWidth.toString() + "px";
+      this.submitButtonRef.current.style.margin = "0px 5px 0px 5px";
+      this.submitButtonRef.current.style.padding = "10px 5px 10px 5px";
+      this.submitButtonRef.current.style.maxWidth =
+        this.submitButtonRef.current.scrollWidth.toString() + "px";
     } else {
-      document.getElementById(this.state.submitButtonID).style.padding = "";
-      document.getElementById(this.state.submitButtonID).style.margin = "";
-      document.getElementById(this.state.submitButtonID).style.border = "";
-      document.getElementById(this.state.submitButtonID).style.maxWidth = "0px";
+      this.submitButtonRef.current.style.padding = "";
+      this.submitButtonRef.current.style.margin = "";
+      this.submitButtonRef.current.style.border = "";
+      this.submitButtonRef.current.style.maxWidth = "0px";
     }
   }
 
@@ -76,44 +80,31 @@ class MessageList extends React.Component {
 
   release(released) {
     if (released < 0) {
-      document.getElementById(this.state.groupContainerID).style.background =
+      this.groupContainerRef.current.style.background =
         "linear-gradient(180deg, rgba(40,40,40,0.6979166666666667) 0%, rgba(255,255,255,0) 35%)";
-      document.getElementById(this.state.groupContainerID).style.maxHeight =
-        document
-          .getElementById(this.state.groupContainerID)
-          .scrollHeight.toString() + "px";
-      document.getElementById(this.state.groupContainerID).style.height =
-        "auto";
-      document.getElementById(
-        this.state.messageGroupCollapsibleID
-      ).style.borderRadius = "10px 10px 0px 0px";
+      this.groupContainerRef.current.style.maxHeight =
+        this.groupContainerRef.current.scrollHeight.toString() + "px";
+      this.groupContainerRef.current.style.height = "auto";
+      this.messageGroupCollapsibleRef.current.style.borderRadius =
+        "10px 10px 0px 0px";
       this.inputFieldRef.current.focus();
     } else {
       this.inputFieldRef.current.blur();
-      document.getElementById(this.state.groupContainerID).style.maxHeight =
-        "0px";
+      this.groupContainerRef.current.style.maxHeight = "0px";
     }
   }
 
   onCollapseFinish(e) {
-    if (
-      document.getElementById(this.state.groupContainerID).style.maxHeight ===
-      "0px"
-    ) {
-      document.getElementById(this.state.groupContainerID).style.background =
-        "none";
-      document.getElementById(
-        this.state.messageGroupCollapsibleID
-      ).style.borderRadius = "10px";
+    if (this.groupContainerRef.current.style.maxHeight === "0px") {
+      this.groupContainerRef.current.style.background = "none";
+      this.messageGroupCollapsibleRef.style.borderRadius = "10px";
     }
   }
 
   onSubmitMessage(e) {
     if (e.key === "Enter") {
-      document.getElementById(this.state.submitButtonID).style.backgroundColor =
-        "#96fa60";
-      document.getElementById(this.state.submitButtonID).style.border =
-        "1px solid #ffffff";
+      this.submitButtonRef.current.style.backgroundColor = "#96fa60";
+      this.submitButtonRef.current.style.border = "1px solid #ffffff";
       this.submit();
     }
   }
@@ -126,28 +117,21 @@ class MessageList extends React.Component {
     if (this.state.msgIn === "") {
       return;
     } else if (this.state.submitStyle === "SubmitButton Activated") {
-      document.getElementById(this.state.submitButtonID).className =
-        "SubmitButton";
+      this.submitButtonRef.current.className = "SubmitButton";
       return;
     }
-    document.getElementById(this.state.submitButtonID).className =
-      "SubmitButton Activated";
+    this.submitButtonRef.current.className = "SubmitButton Activated";
     this.setState({ msgIn: "" });
-    document.getElementById(this.state.msgInFieldID).value = "";
+    this.msgInFieldRef.current.value = "";
 
     this.props.submitMessage(this.state.msgIn, this.props.user);
   }
 
   onButtonTransitionEnd(e) {
-    if (
-      document.getElementById(this.state.submitButtonID).className ===
-      "SubmitButton Activated"
-    ) {
-      document.getElementById(this.state.submitButtonID).style.backgroundColor =
-        "";
-      document.getElementById(this.state.submitButtonID).style.border = "";
-      document.getElementById(this.state.submitButtonID).className =
-        "SubmitButton";
+    if (this.submitButtonRef.current.className === "SubmitButton Activated") {
+      this.submitButtonRef.current.style.backgroundColor = "";
+      this.submitButtonRef.current.style.border = "";
+      this.submitButtonRef.current.className = "SubmitButton";
       this.showButton(false);
     }
   }
@@ -157,29 +141,25 @@ class MessageList extends React.Component {
       <div className="MessageList">
         <div
           className="MessageGroupCollapsible"
-          id={this.state.messageGroupCollapsibleID}
           onClick={this.onToggleCollapse}
         >
           <span className="MessageGroupUser">{this.props.user}</span>
         </div>
         <div
           className="MessageGroupContainer"
-          id={this.state.groupContainerID}
           onTransitionEnd={this.onCollapseFinish}
         >
           {this.props.messages.map((message) => {
             return (
               <Message
-                key={_.uniqueId("key")}
+                key={this.uniqueKey("Message_")}
                 text={message.content}
                 author={message.author}
               />
             );
           })}
           <div className="Message">
-            <p className="MessageAuthor" id={this.state.inputFieldID}>
-              Reply
-            </p>
+            <p className="MessageAuthor">Reply</p>
             <div
               style={{
                 margin: "10px 5px 5px 5px",
@@ -191,14 +171,12 @@ class MessageList extends React.Component {
                 tabIndex="-1"
                 className="InputField"
                 ref={this.inputFieldRef}
-                id={this.state.msgInFieldID}
                 placeholder="Message"
                 onChange={this.onChange}
                 onKeyDown={this.onSubmitMessage}
               />
               <div
                 className={this.state.submitStyle}
-                id={this.state.submitButtonID}
                 onClick={this.onSubmit}
                 onTransitionEnd={this.onButtonTransitionEnd}
                 style={{ display: "block" }}

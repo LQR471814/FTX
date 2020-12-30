@@ -3,18 +3,23 @@ import PropTypes from "prop-types";
 import "../css/MiniComponents.css";
 import "../css/ChoiceOverlay.css";
 import Choice from "./Choice";
-import _ from "lodash";
 
 class ChoicesContainer extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      choiceDivID: _.uniqueId("choiceDiv"),
-      overlayDivID: _.uniqueId("overlayDiv"),
-    };
+    this.choiceDivRef = React.createRef();
+    this.overlayDivRef = React.createRef();
+
+    this.currentKey = 0;
 
     this.closeChoice = this.closeChoice.bind(this);
+    this.uniqueKey = this.uniqueKey.bind(this);
+  }
+
+  uniqueKey(prefix) {
+    this.currentKey++;
+    return prefix + this.currentKey.toString();
   }
 
   async componentDidUpdate() {
@@ -22,14 +27,16 @@ class ChoicesContainer extends React.Component {
       document.getElementById("AppGrid").style.transition = "none";
       document.getElementById("AppGrid").style.filter = "blur(4px)";
 
-      document.getElementById(this.state.choiceDivID).style.opacity = "50%";
-      document.getElementById(this.state.choiceDivID).style.columnGap = "0vw";
+      this.choiceDivRef.current.style.opacity = "50%";
+      this.choiceDivRef.current.style.width = "50%";
 
-      document.getElementById(this.state.choiceDivID).style.display = "grid";
-      document.getElementById(this.state.overlayDivID).style.display = "block";
-      await new Promise((r) => setTimeout(r, 1000));
-      document.getElementById(this.state.choiceDivID).style.opacity = "100%";
-      document.getElementById(this.state.choiceDivID).style.columnGap = "10vw";
+      this.choiceDivRef.current.style.display = "grid";
+      this.overlayDivRef.current.style.display = "block";
+
+      await new Promise((r) => setTimeout(r, 10));
+
+      this.choiceDivRef.current.style.opacity = "100%";
+      this.choiceDivRef.current.style.width = "90%";
       this.applyDefault = false;
     }
   }
@@ -38,23 +45,23 @@ class ChoicesContainer extends React.Component {
     document.getElementById("AppGrid").style.transition = "all 0.25s";
     document.getElementById("AppGrid").style.filter = "none";
 
-    document.getElementById(this.state.choiceDivID).style.columnGap = "150px";
-    document.getElementById(this.state.choiceDivID).style.opacity = "50%";
+    this.choiceDivRef.current.style.columnGap = "150px";
+    this.choiceDivRef.current.style.opacity = "50%";
 
     await new Promise((r) =>
       setTimeout(
         r,
         parseFloat(
-          window.getComputedStyle(
-            document.getElementById(this.state.choiceDivID)
-          )["transitionDuration"],
+          window.getComputedStyle(this.choiceDivRef.current)[
+            "transitionDuration"
+          ],
           10
         ) * 1000
       )
     );
 
-    document.getElementById(this.state.choiceDivID).style.display = "none";
-    document.getElementById(this.state.overlayDivID).style.display = "none";
+    this.choiceDivRef.current.style.display = "none";
+    this.overlayDivRef.current.style.display = "none";
 
     this.props.chosenCallback(identifier);
   }
@@ -62,7 +69,7 @@ class ChoicesContainer extends React.Component {
   render() {
     return (
       <div
-        id={this.state.overlayDivID}
+        ref={this.overlayDivRef}
         style={{
           height: "100vh",
           width: "100vw",
@@ -71,13 +78,13 @@ class ChoicesContainer extends React.Component {
           top: "50%",
           transform: "translate(-50%, -50%)",
           display: "none",
-          justifyContent: "center"
+          justifyContent: "center",
         }}
       >
         <p className="Info">{this.props.mainLabel}</p>
         <div
           className="ChoiceContainer"
-          id={this.state.choiceDivID}
+          ref={this.choiceDivRef}
           style={{
             gridTemplateColumns:
               "repeat(" + this.props.columns.toString() + ", 1fr)",
@@ -88,7 +95,7 @@ class ChoicesContainer extends React.Component {
             var itemLabels = this.props.labelLogic(arrayItem);
             return (
               <Choice
-                key={_.uniqueId("key_")}
+                key={this.uniqueKey(this.props.componentId + "_Choice_")}
                 label={itemLabels.label}
                 icon={itemLabels.icon}
                 closeCallback={this.closeChoice}
@@ -110,6 +117,7 @@ ChoicesContainer.propTypes = {
   chosenCallback: PropTypes.func.isRequired, //? This callback function should make sure that whatever gets passed to shown is false after being called
   columns: PropTypes.number.isRequired,
   show: PropTypes.bool.isRequired,
+  componentID: PropTypes.string.isRequired, //? Used to discern keys of child "Choice" components in different "ChoiceContainer"s
 };
 
 export default ChoicesContainer;

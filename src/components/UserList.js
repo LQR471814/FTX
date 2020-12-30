@@ -14,6 +14,8 @@ class UserList extends React.Component {
       users: [],
     };
 
+    this.currentKey = 0;
+
     this.userUpdateClient = new WebSocketClient(
       "ws://localhost:3000/updateUsers"
     );
@@ -41,6 +43,13 @@ class UserList extends React.Component {
           break;
       }
     };
+
+    this.uniqueKey = this.uniqueKey.bind(this);
+  }
+
+  uniqueKey(prefix) {
+    this.currentKey++;
+    return prefix + this.currentKey.toString();
   }
 
   async addUser(user) {
@@ -69,7 +78,7 @@ class UserList extends React.Component {
           {this.state.users.map((user) => {
             return (
               <User
-                key={_.uniqueId("key")}
+                key={this.uniqueKey("User_")}
                 name={user.name}
                 ip={user.ip}
                 displayCommChoice={this.props.displayCommChoice}

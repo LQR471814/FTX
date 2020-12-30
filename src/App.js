@@ -46,6 +46,8 @@ class App extends React.Component {
       currentTargetUser: undefined,
     };
 
+    this.currentChoiceKey = 0;
+
     this.displayChoiceNetworkInterfaces = this.displayChoiceNetworkInterfaces.bind(
       this
     );
@@ -58,6 +60,7 @@ class App extends React.Component {
     this.chooseInterface = this.chooseInterface.bind(this);
     this.onRecvMessage = this.onRecvMessage.bind(this);
     this.setCollapsed = this.setCollapsed.bind(this);
+    this.uniqueChoiceKey = this.uniqueChoiceKey.bind(this);
 
     this.setupBanner = EmptyBanner;
     this.hostname = { value: undefined };
@@ -110,6 +113,11 @@ class App extends React.Component {
           break;
       }
     };
+  }
+
+  uniqueChoiceKey(prefix) {
+    this.currentChoiceKey++;
+    return prefix + this.currentChoiceKey.toString();
   }
 
   componentDidMount() {
@@ -246,6 +254,7 @@ class App extends React.Component {
             }
             return result;
           }}
+          componentID={this.uniqueChoiceKey("ChoiceContainer_")}
         />{" "}
         {/* CommChoice */}
         <ChoicesContainer
@@ -272,6 +281,7 @@ class App extends React.Component {
             }
             return result;
           }}
+          componentID={this.uniqueChoiceKey("ChoiceContainer_")}
         />{" "}
         {/* NetInterfaceChoice */}
       </div>

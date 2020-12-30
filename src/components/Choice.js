@@ -5,6 +5,26 @@ import "../css/ChoiceOverlay.css";
 import "../css/Choice.css";
 
 class Choice extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.iconRef = React.createRef();
+    this.tagRef = React.createRef();
+
+    this.textFactor = 0.015;
+    this.iconFactor = 0.1;
+
+    this.updateChoiceSizes = this.updateChoiceSizes.bind(this);
+  }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.updateChoiceSizes);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateChoiceSizes);
+  }
+
   render() {
     return (
       <div
@@ -19,13 +39,41 @@ class Choice extends React.Component {
         }}
       >
         <this.props.icon
+          ref={this.iconRef}
           style={{
-            width: "calc((10vh + 10vw) / 2)",
-            height: "calc((10vh + 10vw) / 2)",
+            width: Math.round(
+              Math.min(window.innerWidth, window.innerHeight) * this.iconFactor
+            ),
+            height: Math.round(
+              Math.min(window.innerWidth, window.innerHeight) * this.iconFactor
+            ),
           }}
         />
-        <p className="Tag">{this.props.label}</p>
+        <p
+          className="Tag"
+          ref={this.tagRef}
+          style={{
+            fontSize: Math.round(
+              Math.min(window.innerWidth, window.innerHeight) * this.textFactor
+            ),
+          }}
+        >
+          {this.props.label}
+        </p>
       </div>
+    );
+  }
+
+  updateChoiceSizes() {
+    var calc = Math.round(
+      Math.min(window.innerWidth, window.innerHeight) * this.iconFactor
+    );
+
+    this.iconRef.current.style.width = calc;
+    this.iconRef.current.style.height = calc;
+
+    this.tagRef.current.style.fontSize = Math.round(
+      Math.min(window.innerWidth, window.innerHeight) * this.textFactor
     );
   }
 }
