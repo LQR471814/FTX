@@ -42,6 +42,15 @@ class App extends React.Component {
         [1, "asjdofjasjdofj"],
         [1, "Wi-Fi"],
         [1, "Ethernet"],
+        [1, "asjdofjasjdofj"],
+        [1, "Wi-Fi"],
+        [1, "Ethernet"],
+        [1, "asjdofjasjdofj"],
+        [1, "Wi-Fi"],
+        [1, "Ethernet"],
+        [1, "asjdofjasjdofj"],
+        [1, "Wi-Fi"],
+        [1, "Ethernet"],
       ],
       currentTargetUser: undefined,
     };
@@ -121,6 +130,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
+    //? DEBUG
     this.showSetupBanner(true);
   }
 
@@ -197,12 +207,14 @@ class App extends React.Component {
   }
 
   chooseInterface(intf) {
-    this.resourceSocket.send(
-      JSON.stringify({
-        name: "setInterfaces",
-        parameters: { InterfaceID: parseInt(intf) },
-      })
-    );
+    if (intf !== undefined) {
+      this.resourceSocket.send(
+        JSON.stringify({
+          name: "setInterfaces",
+          parameters: { InterfaceID: parseInt(intf) },
+        })
+      );
+    }
   }
 
   render() {
@@ -264,6 +276,7 @@ class App extends React.Component {
           items={this.state.netInterfaces}
           columns={6}
           chosenCallback={this.chooseInterface}
+          // chosenCallback={() => {}}
           labelLogic={(item) => {
             var result = {
               label: item[1],

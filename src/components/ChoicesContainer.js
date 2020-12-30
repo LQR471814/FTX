@@ -10,11 +10,15 @@ class ChoicesContainer extends React.Component {
 
     this.choiceDivRef = React.createRef();
     this.overlayDivRef = React.createRef();
+    this.closeButtonRef = React.createRef();
 
     this.currentKey = 0;
+    this.cancelButtonFactor = 0.03;
 
     this.closeChoice = this.closeChoice.bind(this);
     this.uniqueKey = this.uniqueKey.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onCloseClicked = this.onCloseClicked.bind(this);
   }
 
   uniqueKey(prefix) {
@@ -22,8 +26,24 @@ class ChoicesContainer extends React.Component {
     return prefix + this.currentKey.toString();
   }
 
+  onKeyDown(e) {
+    if (e.code === "Escape") {
+      var evObj = document.createEvent("Events");
+      evObj.initEvent("click", true, false);
+
+      this.closeButtonRef.current.dispatchEvent(evObj);
+    }
+  }
+
+  onCloseClicked() {
+    this.closeButtonRef.current.className += " Active";
+    this.closeChoice(undefined);
+  }
+
   async componentDidUpdate() {
     if (this.props.show === true) {
+      document.addEventListener("keydown", this.onKeyDown);
+
       document.getElementById("AppGrid").style.transition = "none";
       document.getElementById("AppGrid").style.filter = "blur(4px)";
 
@@ -63,24 +83,14 @@ class ChoicesContainer extends React.Component {
     this.choiceDivRef.current.style.display = "none";
     this.overlayDivRef.current.style.display = "none";
 
+    document.removeEventListener("keydown", this.onKeyDown);
+
     this.props.chosenCallback(identifier);
   }
 
   render() {
     return (
-      <div
-        ref={this.overlayDivRef}
-        style={{
-          height: "100vh",
-          width: "100vw",
-          position: "fixed",
-          left: "50%",
-          top: "50%",
-          transform: "translate(-50%, -50%)",
-          display: "none",
-          justifyContent: "center",
-        }}
-      >
+      <div className="OverlayDiv" ref={this.overlayDivRef}>
         <p className="Info">{this.props.mainLabel}</p>
         <div
           className="ChoiceContainer"
@@ -103,6 +113,40 @@ class ChoicesContainer extends React.Component {
               />
             );
           })}
+        </div>
+        <div
+          className="CancelButton"
+          ref={this.closeButtonRef}
+          style={{
+            width: Math.round(
+              Math.min(window.innerWidth, window.innerHeight) *
+                this.cancelButtonFactor
+            ),
+            height: Math.round(
+              Math.min(window.innerWidth, window.innerHeight) *
+                this.cancelButtonFactor
+            ),
+            padding: Math.round(
+              Math.min(window.innerWidth, window.innerHeight) * 0.0125
+            ),
+          }}
+          onClick={this.onCloseClicked}
+          onTransitionEnd={(e) => {
+            if (e.target.className === "CancelButton Active") {
+              e.target.className = "CancelButton";
+            }
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="-0.1988677978515625 -0.006744384765625 128.79347229003906 128.74560546875"
+          >
+            <path
+              className="cls-1"
+              d="M311.07,420.94l48.09-48.08a9.53,9.53,0,0,0,0-13.43h0a9.52,9.52,0,0,0-13.44,0l-48.08,48.08-48.09-48.08a9.51,9.51,0,0,0-13.43,0h0a9.51,9.51,0,0,0,0,13.43l48.08,48.08L236.12,469a9.5,9.5,0,1,0,13.43,13.43l48.09-48.08,48.08,48.08A9.5,9.5,0,1,0,359.16,469Z"
+              transform="translate(-233.35 -356.66)"
+            ></path>
+          </svg>
         </div>
       </div>
     );
