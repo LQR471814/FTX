@@ -21,37 +21,9 @@ class App extends React.Component {
     this.state = {
       showChoiceNetworkInterfaces: false,
       showCommChoice: false,
-      showSetupBanner: true,
+      showSetupBanner: false,
       groups: {},
-      netInterfaces: [
-        [1, "asjdofjasjdofj"],
-        [1, "Wi-Fi"],
-        [1, "Ethernet"],
-        [1, "asjdofjasjdofj"],
-        [1, "Wi-Fi"],
-        [1, "Ethernet"],
-        [1, "asjdofjasjdofj"],
-        [1, "Wi-Fi"],
-        [1, "Ethernet"],
-        [1, "asjdofjasjdofj"],
-        [1, "Wi-Fi"],
-        [1, "Ethernet"],
-        [1, "asjdofjasjdofj"],
-        [1, "Wi-Fi"],
-        [1, "Ethernet"],
-        [1, "asjdofjasjdofj"],
-        [1, "Wi-Fi"],
-        [1, "Ethernet"],
-        [1, "asjdofjasjdofj"],
-        [1, "Wi-Fi"],
-        [1, "Ethernet"],
-        [1, "asjdofjasjdofj"],
-        [1, "Wi-Fi"],
-        [1, "Ethernet"],
-        [1, "asjdofjasjdofj"],
-        [1, "Wi-Fi"],
-        [1, "Ethernet"],
-      ],
+      netInterfaces: [],
       currentTargetUser: undefined,
     };
 
@@ -127,11 +99,6 @@ class App extends React.Component {
   uniqueChoiceKey(prefix) {
     this.currentChoiceKey++;
     return prefix + this.currentChoiceKey.toString();
-  }
-
-  componentDidMount() {
-    //? DEBUG
-    this.showSetupBanner(true);
   }
 
   setCollapsed(user, opened) {
