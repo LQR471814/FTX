@@ -17,7 +17,7 @@
 
 import React from "react";
 import "../css/Window.css";
-import "../css/RootStyle.css";
+import "../css/Root.css";
 import MessageComponent from "./MessageComponent";
 import PropTypes from "prop-types";
 

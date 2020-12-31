@@ -1,12 +1,11 @@
 import React from "react";
-import SetupMulticastBanner from "./components/SetupMulticastBanner";
+import Banner from "./components/Banner";
 import MessageWindow from "./components/MessageWindow";
 import UserList from "./components/UserList";
 import PendingTransfers from "./components/PendingTransfers";
 import TransferStatus from "./components/TransferStatus";
 import ChoicesContainer from "./components/ChoicesContainer";
 import { w3cwebsocket as WebSocketClient } from "websocket";
-import EmptyBanner from "./components/EmptyBanner";
 import { ReactComponent as OtherIcon } from "./css/assets/other.svg";
 import { ReactComponent as WifiIcon } from "./css/assets/netinterfaces/wifi.svg";
 import { ReactComponent as EthernetIcon } from "./css/assets/netinterfaces/ethernet.svg";
@@ -21,9 +20,15 @@ class App extends React.Component {
     this.state = {
       showChoiceNetworkInterfaces: false,
       showCommChoice: false,
-      showSetupBanner: false,
+      showBanner: false,
       groups: {},
-      netInterfaces: [],
+      banner: {
+        text: "Make sure multicast peer discovery is working on your device",
+        buttonText: "Setup",
+        backgroundColor: "#ff9100",
+        textColor: "#ffffff",
+      },
+      netInterfaces: [[1, "adsdjfoad"]],
       currentTargetUser: undefined,
     };
 
@@ -33,7 +38,6 @@ class App extends React.Component {
       this
     );
     this.displayChoiceComm = this.displayChoiceComm.bind(this);
-    this.showSetupBanner = this.showSetupBanner.bind(this);
     this.addToGroup = this.addToGroup.bind(this);
     this.setCurrentTargetUser = this.setCurrentTargetUser.bind(this);
     this.onCommChosen = this.onCommChosen.bind(this);
@@ -43,7 +47,6 @@ class App extends React.Component {
     this.setCollapsed = this.setCollapsed.bind(this);
     this.uniqueChoiceKey = this.uniqueChoiceKey.bind(this);
 
-    this.setupBanner = EmptyBanner;
     this.hostname = { value: undefined };
 
     this.recvMsgSocket = new WebSocketClient("ws://localhost:3000/recvMessage");
@@ -88,12 +91,17 @@ class App extends React.Component {
               JSON.stringify({ name: "getInterfaces", parameters: {} })
             );
           }
-          this.showSetupBanner(messageObj.Response.RequireSetup);
+          this.showBanner(messageObj.Response.RequireSetup);
           break;
         default:
           break;
       }
     };
+  }
+
+  componentDidMount() {
+    //? DEBUG
+    this.setState({ showBanner: true });
   }
 
   uniqueChoiceKey(prefix) {
@@ -163,42 +171,39 @@ class App extends React.Component {
     this.setState({ showCommChoice: show });
   }
 
-  showSetupBanner(show) {
-    this.setupBanner = SetupMulticastBanner;
-    if (show === false) {
-      document.getElementById("AppGrid").style.gridTemplateRows = "auto";
-    } else {
-      document.getElementById("AppGrid").style.gridTemplateRows = "45px auto";
-    }
-    this.setState({ showSetupBanner: show });
-  }
-
   chooseInterface(intf) {
     if (intf !== undefined) {
-      this.resourceSocket.send(
-        JSON.stringify({
-          name: "setInterfaces",
-          parameters: { InterfaceID: parseInt(intf) },
-        })
-      );
+      // this.resourceSocket.send(
+      //   JSON.stringify({
+      //     name: "setInterfaces",
+      //     parameters: { InterfaceID: parseInt(intf) },
+      //   })
+      // );
+
+      this.setState({
+        showBanner: false,
+        showChoiceNetworkInterfaces: false,
+      });
     }
   }
 
   render() {
     return (
       <div style={{ height: "100vh", width: "100vw", overflow: "hidden" }}>
-        <div
-          className="AppDiv"
-          id="AppGrid"
-          style={{ gridTemplateRows: "auto" }}
-        >
-          {this.state.showSetupBanner && (
-            <this.setupBanner
-              displayChoiceNetworkInterfaces={
-                this.displayChoiceNetworkInterfaces
-              }
-            />
-          )}
+        <div className="AppDiv" id="AppGrid">
+          <Banner
+            show={this.state.showBanner}
+            callback={() => {
+              this.setState({ showChoiceNetworkInterfaces: true });
+            }}
+            closedCallback={() => {
+              this.setState({ showBanner: false });
+            }}
+            text={this.state.banner.text}
+            buttonText={this.state.banner.buttonText}
+            backgroundColor={this.state.banner.backgroundColor}
+            textColor={this.state.banner.textColor}
+          />
           <MessageWindow
             ref={this.MessageWindowRef}
             groups={this.state.groups}

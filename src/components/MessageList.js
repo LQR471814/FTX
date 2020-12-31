@@ -3,7 +3,7 @@
 import React from "react";
 import "../css/Window.css";
 import "../css/MiniComponents.css";
-import "../css/RootStyle.css";
+import "../css/Root.css";
 import PropTypes from "prop-types";
 import Message from "./Message";
 

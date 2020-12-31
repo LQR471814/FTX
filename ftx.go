@@ -1,3 +1,6 @@
+//TODO: Add ipv4 addresses to network interface names for more clarity when choosing network interfaces
+//TODO: It can help to use the "net.to4()" function call to determine whether a network is ipv4 or ipv6 to filter out ipv6 addresses
+
 package main
 
 import (
