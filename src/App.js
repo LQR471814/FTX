@@ -28,7 +28,7 @@ class App extends React.Component {
         backgroundColor: "#ff9100",
         textColor: "#ffffff",
       },
-      netInterfaces: [[1, "adsdjfoad"]],
+      netInterfaces: [],
       currentTargetUser: undefined,
     };
 
@@ -91,17 +91,12 @@ class App extends React.Component {
               JSON.stringify({ name: "getInterfaces", parameters: {} })
             );
           }
-          this.showBanner(messageObj.Response.RequireSetup);
+          this.setState({ showBanner: messageObj.Response.RequireSetup });
           break;
         default:
           break;
       }
     };
-  }
-
-  componentDidMount() {
-    //? DEBUG
-    this.setState({ showBanner: true });
   }
 
   uniqueChoiceKey(prefix) {
@@ -173,12 +168,12 @@ class App extends React.Component {
 
   chooseInterface(intf) {
     if (intf !== undefined) {
-      // this.resourceSocket.send(
-      //   JSON.stringify({
-      //     name: "setInterfaces",
-      //     parameters: { InterfaceID: parseInt(intf) },
-      //   })
-      // );
+      this.resourceSocket.send(
+        JSON.stringify({
+          name: "setInterfaces",
+          parameters: { InterfaceID: parseInt(intf) },
+        })
+      );
 
       this.setState({
         showBanner: false,
@@ -251,7 +246,7 @@ class App extends React.Component {
           // chosenCallback={() => {}}
           labelLogic={(item) => {
             var result = {
-              label: item[1],
+              label: `${item[1]} [${item[2]}]`,
               icon: OtherIcon,
               identifier: item[0],
             };

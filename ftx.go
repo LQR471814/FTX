@@ -1,6 +1,3 @@
-//TODO: Add ipv4 addresses to network interface names for more clarity when choosing network interfaces
-//TODO: It can help to use the "net.to4()" function call to determine whether a network is ipv4 or ipv6 to filter out ipv6 addresses
-
 package main
 
 import (
@@ -63,7 +60,7 @@ type ResourceResponse struct {
 
 //ResponseContent defines the results returned to a front end resource request
 type ResponseContent struct {
-	GetInterfaces [][2]string
+	GetInterfaces [][3]string
 	GetOS         string
 	GetHostname   string
 	RequireSetup  bool
@@ -338,7 +335,7 @@ func resource(w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Println(string(message))
 
-		var getInterfacesResult [][2]string
+		var getInterfacesResult [][3]string
 		var getOSResult string
 		var getHostnameResult string
 		var requireSetupResult bool
@@ -376,16 +373,33 @@ func resource(w http.ResponseWriter, r *http.Request) {
 }
 
 //* Resource Functions
-func getInterfaces() [][2]string {
+func getInterfaces() [][3]string {
 	interfaces, err := net.Interfaces()
 	if err != nil {
 		log.Fatal(err)
 	}
-	response := make([][2]string, len(interfaces))
+	response := make([][3]string, len(interfaces))
 	for i, itf := range interfaces {
-		response[i] = [2]string{strconv.Itoa(itf.Index), itf.Name}
+		a, _ := itf.Addrs()
+		addr4 := getIpv4(a)
+		addrResult := ""
+		if addr4 == nil {
+			addrResult = ""
+		} else {
+			addrResult = addr4.String()
+		}
+		response[i] = [3]string{strconv.Itoa(itf.Index), itf.Name, addrResult}
 	}
 	return response
+}
+
+func getIpv4(Addrs []net.Addr) net.Addr {
+	for _, addr := range Addrs {
+		if strings.Count(addr.String(), ":") < 2 {
+			return addr
+		}
+	}
+	return nil
 }
 
 func setInterfaces(parameters ResourceParameters) {
