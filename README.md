@@ -1,18 +1,18 @@
-# FTX
+<h1 align="center">FTX</h1>
 
-React.js Frontend + Golang Backend = File Transfer and Messaging Program
+<p align="center">React.js Frontend + Golang Backend = File Transfer and Messaging Program</p>
 
-### Building
+## Building
 
-#### React Interface
+### Interface
 
 `npm run build`
 
-#### Main Application
+### Backend
 
 `go build`
 
-#### `SetMulticast.go` (This is only required for Windows users)
+### Multicast Setup Utility (This is only required for Windows users)
 
 `cd SetMulticast`
 
