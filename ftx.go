@@ -172,7 +172,7 @@ func main() {
 
 	//? Start frontend
 	http.Handle("/", LimitHandler{http.FileServer(http.Dir("./build"))})
-	// http.Handle("/", http.FileServer(http.Dir("./build")))
+	http.HandleFunc("/sendFile", sendFile)
 	http.HandleFunc("/resource", resource)
 	http.HandleFunc("/updateUsers", updateUsers)
 	http.HandleFunc("/recvMessage", recvMessage)
@@ -300,6 +300,20 @@ serveLoop:
 				}
 			}
 		}
+	}
+}
+
+//* Normal Handlers
+func sendFile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+	if r.Method == "POST" {
+		r.ParseForm()
+		fmt.Println(r.Form)
+	} else {
+		w.Write([]byte("Only POST requests are supported!"))
 	}
 }
 

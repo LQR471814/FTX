@@ -15,24 +15,27 @@
 //  ]
 //}
 
-import React from "react";
-import "../css/Window.css";
-import "../css/Root.css";
-import MessageList from "./MessageList";
-import PropTypes from "prop-types";
+import React from "react"
+import "../css/Window.css"
+import "../css/Root.css"
+import MessageList from "./MessageList"
 
-class MessageComponent extends React.Component {
-  getSnapshotBeforeUpdate(prevProps, prevState) {
-    this.prevScroll = document.getElementById(
-      "MessageGroupsContainer"
-    ).scrollTop;
-    return null;
+interface IProps {
+  groups: Record<string, IUserMessages>
+  submitMessage: Function,
+  setCollapsed: Function
+}
+
+class MessageComponent extends React.Component<IProps> {
+  private prevScroll = 0
+
+  getSnapshotBeforeUpdate() {
+    this.prevScroll = document.getElementById("MessageGroupsContainer")!.scrollTop
+    return null
   }
 
   componentDidUpdate() {
-    document.getElementById(
-      "MessageGroupsContainer"
-    ).scrollTop = this.prevScroll;
+    document.getElementById("MessageGroupsContainer")!.scrollTop = this.prevScroll
   }
 
   render() {
@@ -52,17 +55,11 @@ class MessageComponent extends React.Component {
               submitMessage={this.props.submitMessage}
               setCollapsed={this.props.setCollapsed}
             />
-          );
+          )
         })}
       </div>
-    );
+    )
   }
 }
 
-MessageComponent.propTypes = {
-  groups: PropTypes.object.isRequired,
-  submitMessage: PropTypes.func.isRequired,
-  setCollapsed: PropTypes.func.isRequired,
-};
-
-export default MessageComponent;
+export default MessageComponent

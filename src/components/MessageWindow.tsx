@@ -15,23 +15,18 @@
 //  ]
 //}
 
-import React from "react";
-import "../css/Window.css";
-import "../css/Root.css";
-import MessageComponent from "./MessageComponent";
-import PropTypes from "prop-types";
+import React from "react"
+import "../css/Window.css"
+import "../css/Root.css"
+import MessageComponent from "./MessageComponent"
 
-class MessageWindow extends React.Component {
-  constructor(props) {
-    super(props);
+interface IProps {
+  groups: Record<string, IUserMessages>,
+  submitMessage: Function,
+  setCollapsed: Function
+}
 
-    this.MessageComponentRef = React.createRef();
-  }
-
-  sendFocus(focus, user) {
-    this.MessageComponentRef.current.sendFocus(focus, user);
-  }
-
+class MessageWindow extends React.Component<IProps> {
   render() {
     return (
       <div className="Col" style={{ overflow: "hidden" }}>
@@ -39,20 +34,13 @@ class MessageWindow extends React.Component {
           <p className="Title">Messages</p>
           <MessageComponent
             groups={this.props.groups}
-            ref={this.MessageComponentRef}
             submitMessage={this.props.submitMessage}
             setCollapsed={this.props.setCollapsed}
           />
         </div>
       </div>
-    );
+    )
   }
 }
 
-MessageWindow.propTypes = {
-  groups: PropTypes.object.isRequired,
-  submitMessage: PropTypes.func.isRequired,
-  setCollapsed: PropTypes.func.isRequired,
-};
-
-export default MessageWindow;
+export default MessageWindow

@@ -26,5 +26,7 @@ yarn-error.log*
 /__pycache__
 /.vscode
 
+# Workspace IDE stuff
 *.exe
 settings.json
+.eslintcache

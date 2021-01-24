@@ -1,5 +1,5 @@
-import React from "react";
-import "../css/Window.css";
+import React from "react"
+import "../css/Window.css"
 
 class TransferStatus extends React.Component {
   render() {
@@ -7,8 +7,8 @@ class TransferStatus extends React.Component {
       <div className="Window" style={{ height: "30%" }}>
         <p className="Title">Transfer Status</p>
       </div>
-    );
+    )
   }
 }
 
-export default TransferStatus;
+export default TransferStatus
