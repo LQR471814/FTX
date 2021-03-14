@@ -1,16 +1,15 @@
 import React from "react"
-import Banner from "./components/Banner"
-import MessageWindow from "./components/MessageWindow"
-import UserList from "./components/UserList"
-import PendingTransfers from "./components/PendingTransfers"
-import TransferStatus from "./components/TransferStatus"
-import ChoicesContainer from "./components/ChoicesContainer"
+import Banner from "components/Banner/Banner"
+import Window from "components/Window/Window"
+import MessageComponent from "components/MessagePanel/MessageComponent"
+import UserList from "components/UserList/UserList"
+import ChoicesContainer from "components/Choice/ChoicesContainer"
 
-import { ReactComponent as OtherIcon } from "./css/assets/other.svg"
-import { ReactComponent as WifiIcon } from "./css/assets/netinterfaces/wifi.svg"
-import { ReactComponent as EthernetIcon } from "./css/assets/netinterfaces/ethernet.svg"
-import { ReactComponent as FileIcon } from "./css/assets/file.svg"
-import { ReactComponent as MessageIcon } from "./css/assets/message.svg"
+import { ReactComponent as OtherIcon } from "styling/assets/other.svg"
+import { ReactComponent as WifiIcon } from "styling/assets/interfaceLogos/wifi.svg"
+import { ReactComponent as EthernetIcon } from "styling/assets/interfaceLogos/ethernet.svg"
+import { ReactComponent as FileIcon } from "styling/assets/file.svg"
+import { ReactComponent as MessageIcon } from "styling/assets/message.svg"
 
 import { w3cwebsocket as WebSocketClient } from "websocket"
 import _ from "lodash"
@@ -29,13 +28,13 @@ interface IState {
     textColor: string
   },
   netInterfaces: Array<object>,
-  currentTargetUser: string
 }
 
 class App extends React.Component<IProps, IState> {
+  currentTargetUser: string
   currentChoiceKey: number
-  hostname: { value: string }
-  os: { value: string }
+  hostname: string
+  os: string
 
   recvMsgSocket: WebSocketClient
   resourceSocket: WebSocketClient
@@ -55,7 +54,6 @@ class App extends React.Component<IProps, IState> {
         textColor: "#ffffff",
       },
       netInterfaces: [],
-      currentTargetUser: "",
     }
 
     this.displayChoiceNetworkInterfaces = this.displayChoiceNetworkInterfaces.bind(
@@ -73,8 +71,9 @@ class App extends React.Component<IProps, IState> {
 
     //? Initialize variables
     this.currentChoiceKey = 0
-    this.hostname = { value: "" }
-    this.os = { value: "" }
+    this.hostname = ""
+    this.os = ""
+    this.currentTargetUser = ""
 
     //? Initialize Websocket Connections
     this.recvMsgSocket = new WebSocketClient("ws://localhost:3000/recvMessage")
@@ -91,6 +90,7 @@ class App extends React.Component<IProps, IState> {
     this.resourceSocket = new WebSocketClient("ws://localhost:3000/resource")
     this.resourceSocket.onopen = () => {
       console.log("Connected to resource.")
+
       this.resourceSocket.send(
         JSON.stringify({ name: "getHostname", parameters: {} })
       )
@@ -101,6 +101,7 @@ class App extends React.Component<IProps, IState> {
         JSON.stringify({ name: "requireSetup", parameters: {} })
       )
     }
+
     this.resourceSocket.onmessage = (message) => {
       if (typeof message.data === "string") {
         var messageObj = JSON.parse(message.data)
@@ -109,13 +110,16 @@ class App extends React.Component<IProps, IState> {
           case "getInterfaces":
             this.setState({ netInterfaces: messageObj.Response.GetInterfaces })
             break
+
           case "getOS":
-            this.os = { value: messageObj.Response.GetOS.toLowerCase() }
+            this.os = messageObj.Response.GetOS.toLowerCase()
             break
+
           case "getHostname":
-            this.hostname.value = messageObj.Response.GetHostname
+            this.hostname = messageObj.Response.GetHostname
             this.forceUpdate()
             break
+
           case "requireSetup":
             if (messageObj.Response.RequireSetup === true) {
               this.resourceSocket.send(
@@ -124,6 +128,7 @@ class App extends React.Component<IProps, IState> {
             }
             this.setState({ showBanner: messageObj.Response.RequireSetup })
             break
+
           default:
             break
         }
@@ -169,13 +174,13 @@ class App extends React.Component<IProps, IState> {
   }
 
   setCurrentTargetUser(user: string) {
-    this.setState({ currentTargetUser: user })
+    this.currentTargetUser = user
   }
 
   onCommChosen(type: string) {
     this.setState({ showCommChoice: false })
     if (type === "Message") {
-      this.addToGroup([], this.state.currentTargetUser, -1)
+      this.addToGroup([], this.currentTargetUser, -1)
     }
   }
 
@@ -216,6 +221,7 @@ class App extends React.Component<IProps, IState> {
 
   render() {
     return (
+
       <div style={{ height: "100vh", width: "100vw", overflow: "hidden" }}>
         <div className="AppDiv" id="AppGrid">
           <Banner
@@ -231,21 +237,38 @@ class App extends React.Component<IProps, IState> {
             backgroundColor={this.state.banner.backgroundColor}
             textColor={this.state.banner.textColor}
           />
-          <MessageWindow
-            groups={this.state.groups}
-            submitMessage={this.replyMessage}
-            setCollapsed={this.setCollapsed}
-          />
+
           <div className="Col" style={{ overflow: "hidden" }}>
-            <UserList
-              hostname={this.hostname}
-              displayCommChoice={this.displayChoiceComm}
-              setCurrentTargetUser={this.setCurrentTargetUser}
-            />
-            <PendingTransfers />
-            <TransferStatus />
+            <Window height="100%" title="Messages">
+              <MessageComponent
+                groups={this.state.groups}
+                submitMessage={this.replyMessage}
+                setCollapsed={this.setCollapsed}
+              />
+            </Window>
           </div>
+
+          <div className="Col" style={{ overflow: "hidden" }}>
+            <Window height="40%" title="User List">
+              <UserList
+                hostname={this.hostname}
+                displayCommChoice={this.displayChoiceComm}
+                setCurrentTargetUser={this.setCurrentTargetUser}
+              />
+            </Window>
+            <Window height="30%" title="Pending Transfers"></Window>
+            <Window height="30%" title="Transfer Status"></Window>
+          </div>
+
         </div>
+
+        {/* <div className="UploadFileArea">
+          <form>
+            <p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>
+            <input type="file" id="fileElem" multiple accept="image/*" />
+            <label className="button" for="fileElem">Select some files</label>
+          </form>
+        </div> */}
         <ChoicesContainer
           show={this.state.showCommChoice}
           mainLabel="Choose what to send"
@@ -265,8 +288,9 @@ class App extends React.Component<IProps, IState> {
             return result
           }}
           componentID={this.uniqueChoiceKey("ChoiceContainer_")}
-        />{" "}
+        />
         {/* CommChoice */}
+
         <ChoicesContainer
           show={this.state.showChoiceNetworkInterfaces}
           mainLabel="Choose a network interface to receive multicast"
@@ -293,8 +317,9 @@ class App extends React.Component<IProps, IState> {
             return result
           }}
           componentID={this.uniqueChoiceKey("ChoiceContainer_")}
-        />{" "}
+        />
         {/* NetInterfaceChoice */}
+
       </div>
     )
   }

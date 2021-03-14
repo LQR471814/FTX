@@ -1,7 +1,6 @@
 import React from "react"
-import "../css/MiniComponents.css"
-import "../css/ChoiceOverlay.css"
-import "../css/Choice.css"
+import "./css/ChoiceOverlay.css"
+import "./css/Choice.css"
 
 interface IProps {
   icon: any,

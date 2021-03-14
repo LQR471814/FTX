@@ -1,0 +1,112 @@
+@font-face {
+  font-family: "OpenSansBold";
+  src: url("styling/fonts/OpenSans/opensans-bold-webfont.woff2") format("woff2"),
+    url("styling/fonts/OpenSans/opensans-bold-webfont.woff") format("woff");
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "PTMono-Regular";
+  src: url("styling/fonts/PTMono/PTMono-Regular.woff") format("woff");
+  font-weight: normal;
+}
+
+.MessageList {
+  margin: 0px 0px 10px 0px;
+}
+
+.MessageGroupUser {
+  font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+  color: var(--lighter-highlight);
+  margin: 5px;
+  font-size: 34px;
+  user-select: none;
+}
+
+.MessageGroupCollapsible {
+  background-color: #42424277;
+  border-radius: 10px;
+  padding: 5px;
+  width: 100%;
+  transition: all 0.1s ease-in-out;
+}
+
+.MessageGroupCollapsible:hover {
+  background-color: #6161619a;
+  cursor: pointer;
+  border: 2px solid var(--darker-shadow);
+}
+
+.MessageGroupCollapsible:active {
+  background-color: #9c9c9c9a;
+  cursor: pointer;
+  border: 2px solid rgb(80, 80, 80);
+}
+
+.MessageGroupContainer {
+  background: none;
+  padding: 5px;
+
+  transition: all 0.2s ease-in-out;
+  width: 100%;
+
+  overflow: hidden;
+  max-height: 0px;
+}
+
+.Message {
+  border-radius: 5px;
+
+  padding: 7.5px 10px 7.5px 10px;
+
+  margin: 10px;
+
+  background-color: #41414170;
+  box-shadow: 5px 5px 10px #272727;
+}
+
+.MessageContent {
+  font-family: "OpenSans", Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  color: var(--lighter-highlight);
+}
+
+.MessageAuthor {
+  font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  color: var(--active-neutral);
+}
+
+.SubmitButton {
+  font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  display: block;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+
+  /* margin: 0px 5px 0px 5px;
+    padding: 10px 5px 10px 5px; */
+  border-radius: 5px;
+  box-shadow: none;
+
+  color: #ffffff;
+  border: none;
+  background-color: #45bbff;
+
+  transition: all ease-in-out 0.15s;
+
+  outline: none;
+  width: 0px;
+}
+
+.SubmitButton:hover {
+  cursor: pointer;
+  border: 2px solid var(--lighter-highlight);
+}
+
+.SubmitButton:active {
+  border: 2.5px solid #ffffff;
+  background-color: #96fa60;
+}

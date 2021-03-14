@@ -1,6 +1,6 @@
 import React from "react"
-import "../css/Banner.css"
-import { ReactComponent as CloseIcon } from "../css/assets/close.svg"
+import "./css/Banner.css"
+import { ReactComponent as CloseIcon } from "styling/assets/close.svg"
 
 interface IProps {
   show: boolean,

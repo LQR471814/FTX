@@ -1,6 +1,6 @@
 //? This component acts as a SINGULAR message
 import React from "react"
-import "../css/MiniComponents.css"
+import "./css/MessagePanel.css"
 
 interface IProps {
   text: string,

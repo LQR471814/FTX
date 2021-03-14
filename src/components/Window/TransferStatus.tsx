@@ -1,5 +1,6 @@
 import React from "react"
-import "../css/Window.css"
+import "styling/Widget.css"
+import "styling/Window.css"
 
 class TransferStatus extends React.Component {
   render() {

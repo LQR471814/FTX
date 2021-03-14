@@ -1,10 +1,12 @@
 //? This component acts as a SINGLE message group containing a reply box and a bunch of messages
 
 import React from "react"
-import "../css/Window.css"
-import "../css/MiniComponents.css"
-import "../css/Root.css"
+import "styling/Widget.css"
+import "styling/Root.css"
+import "./css/MessagePanel.css"
+
 import Message from "./Message"
+import { executeTransitionOffset } from "lib/TransitionHelper"
 
 interface IProps {
   collapsed: number,
@@ -15,8 +17,7 @@ interface IProps {
 }
 
 interface IState {
-  msgIn: string,
-  submitStyle: string
+  msgIn: string
 }
 
 class MessageList extends React.Component<IProps, IState> {
@@ -31,8 +32,7 @@ class MessageList extends React.Component<IProps, IState> {
     super(props)
 
     this.state = {
-      msgIn: "",
-      submitStyle: "SubmitButton",
+      msgIn: ""
     }
 
     this.inputFieldRef = React.createRef()
@@ -62,16 +62,27 @@ class MessageList extends React.Component<IProps, IState> {
 
   showButton = (show: boolean) => {
     if (show === true) {
-      this.submitButtonRef.current!.style.margin = "0px 5px 0px 5px"
-      this.submitButtonRef.current!.style.padding = "10px 5px 10px 5px"
-      this.submitButtonRef.current!.style.maxWidth =
-        this.submitButtonRef.current!.scrollWidth.toString() + "px"
-    } else {
-      this.submitButtonRef.current!.style.padding = ""
-      this.submitButtonRef.current!.style.margin = ""
-      this.submitButtonRef.current!.style.border = ""
-      this.submitButtonRef.current!.style.maxWidth = "0px"
+      Object.assign(this.submitButtonRef.current!.style, {
+        margin: "0px 5px 0px 5px",
+        padding: "10px 5px 10px 5px",
+      })
+      executeTransitionOffset(this.submitButtonRef.current!, () => {
+        this.submitButtonRef.current!.style.width = "40px"
+      }, -100)
+      // this.submitButtonRef.current!.style.width = this.submitButtonRef.current!.scrollWidth.toString() + "px"
+      return
     }
+
+    Object.assign(this.submitButtonRef.current!.style, {
+      width: "0px",
+    })
+    executeTransitionOffset(this.submitButtonRef.current!, () => {
+      Object.assign(this.submitButtonRef.current!.style, {
+        margin: "0px",
+        padding: "0px",
+      })
+    }, -100)
+    // this.submitButtonRef.current!.style.width = "0px"
   }
 
   onToggleCollapse = () => {
@@ -116,7 +127,7 @@ class MessageList extends React.Component<IProps, IState> {
   submit = () => {
     if (this.state.msgIn === "") {
       return
-    } else if (this.state.submitStyle === "SubmitButton Activated") {
+    } else if (this.submitButtonRef.current!.className === "SubmitButton Activated") {
       this.submitButtonRef.current!.className = "SubmitButton"
       return
     }
@@ -145,6 +156,7 @@ class MessageList extends React.Component<IProps, IState> {
         >
           <span className="MessageGroupUser">{this.props.user}</span>
         </div>
+
         <div
           className="MessageGroupContainer"
           onTransitionEnd={this.onCollapseFinish}
@@ -159,6 +171,7 @@ class MessageList extends React.Component<IProps, IState> {
               />
             )
           })}
+
           <div className="Message">
             <p className="MessageAuthor">Reply</p>
             <div
@@ -168,6 +181,7 @@ class MessageList extends React.Component<IProps, IState> {
                 overflow: "hidden",
               }}
             >
+
               <input
                 tabIndex={-1}
                 className="InputField"
@@ -176,13 +190,14 @@ class MessageList extends React.Component<IProps, IState> {
                 onChange={this.onChange}
                 onKeyDown={this.onSubmitMessage}
               />
+
               <div
-                className={this.state.submitStyle}
+                className="SubmitButton"
                 onClick={this.onSubmit}
                 ref={this.submitButtonRef}
                 onTransitionEnd={this.onButtonTransitionEnd}
-                style={{ display: "block" }}
               >
+
                 <svg
                   height="12px"
                   width="30px"
@@ -192,6 +207,7 @@ class MessageList extends React.Component<IProps, IState> {
                 >
                   <path d="M150 0 L75 200 L225 200 Z"></path>
                 </svg>
+
               </div>
             </div>
           </div>

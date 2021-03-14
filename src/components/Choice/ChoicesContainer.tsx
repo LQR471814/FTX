@@ -1,6 +1,5 @@
 import React from "react"
-import "../css/MiniComponents.css"
-import "../css/ChoiceOverlay.css"
+import "./css/ChoiceOverlay.css"
 import Choice from "./Choice"
 
 interface IProps {
@@ -100,7 +99,7 @@ class ChoicesContainer extends React.Component<IProps> {
             var itemLabels = this.props.labelLogic(arrayItem)
             return (
               <Choice
-                key={this.uniqueKey(this.props.componentID + "_Choice_")}
+                key={this.uniqueKey(`${this.props.componentID}_Choice_`)}
                 label={itemLabels.label}
                 icon={itemLabels.icon}
                 closeCallback={this.closeChoice}

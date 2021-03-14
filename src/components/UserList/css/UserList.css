@@ -1,0 +1,75 @@
+/* User */
+.User {
+  margin: 2px;
+  padding: 8px;
+
+  border-radius: 10px;
+  background-color: #5c5c5c;
+
+  box-sizing: border-box;
+  width: 100%;
+
+  transition: all 0.15s;
+}
+
+.User:hover {
+  background-color: var(--lighter-neutral);
+  cursor: pointer;
+  border: 2px solid var(--lighter-highlight);
+}
+
+.User:active {
+  background-color: var(--active-neutral);
+  cursor: pointer;
+  border: 2px solid var(--lightest-highlight);
+}
+
+/* Misc */
+.UserName {
+  font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+  color: var(--lightest-highlight);
+  margin: 1px;
+}
+
+.Ip {
+  font-family: "PTMono-Regular", "Times New Roman", Times, serif;
+  color: var(--lighter-highlight);
+  margin: 0px;
+}
+
+/* .UserList {
+  -webkit-mask-image: linear-gradient(to top, transparent, black),
+    linear-gradient(to left, transparent 17px, black 17px);
+  -webkit-mask-size: 100% 20000px;
+  -webkit-mask-position: left bottom;
+  transition: mask-position 0.3s, -webkit-mask-position 0.3s;
+}
+
+.UserList:hover {
+  mask-position: left top;
+  -webkit-mask-position: left top;
+} */
+
+/* Width */
+::-webkit-scrollbar {
+  width: 20px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #5c5c5c;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #7e7e7e;
+
+  background-clip: content-box;
+  border: 7px solid transparent;
+}
+
+/* ::-webkit-scrollbar-button {
+  height: 6px;
+  background: rgba(255, 255, 255, 0);
+} */

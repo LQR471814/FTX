@@ -1,12 +1,14 @@
 import React from "react"
-import "../css/Window.css"
-import "../css/MiniComponents.css"
+import "styling/Widget.css"
+import "styling/Window.css"
+import "./css/UserList.css"
+
 import User from "./User"
 import _ from "lodash"
 import { w3cwebsocket as WebSocketClient } from "websocket"
 
 interface IProps {
-  hostname: { value: string },
+  hostname: string,
   displayCommChoice: Function,
   setCurrentTargetUser: Function
 }
@@ -37,6 +39,7 @@ class UserList extends React.Component<IProps, IState> {
       console.log("Connected to backend.")
       this.userUpdateClient.send("Connected")
     }
+
     this.userUpdateClient.onmessage = (message) => {
       if (typeof message.data === "string") {
         var messageObj = JSON.parse(message.data)
@@ -72,7 +75,7 @@ class UserList extends React.Component<IProps, IState> {
     while (this.props.hostname === undefined) {
       await new Promise((r) => setTimeout(r, 1))
     }
-    if (user.name === this.props.hostname.value) {
+    if (user.name === this.props.hostname) {
       return
     }
     var newUsers = _.cloneDeep(this.state.users)
@@ -88,21 +91,18 @@ class UserList extends React.Component<IProps, IState> {
 
   render() {
     return (
-      <div className="Window" style={{ height: "40%" }}>
-        <p className="Title">User List</p>
-        <div className="ComponentContainer">
-          {this.state.users.map((user) => {
-            return (
-              <User
-                key={this.uniqueKey("User_")}
-                name={user.name}
-                ip={user.ip}
-                displayCommChoice={this.props.displayCommChoice}
-                setCurrentTargetUser={this.props.setCurrentTargetUser}
-              />
-            )
-          })}
-        </div>
+      <div className="ComponentContainer UserList">
+        {this.state.users.map((user) => {
+          return (
+            <User
+              key={this.uniqueKey("User_")}
+              name={user.name}
+              ip={user.ip}
+              displayCommChoice={this.props.displayCommChoice}
+              setCurrentTargetUser={this.props.setCurrentTargetUser}
+            />
+          )
+        })}
       </div>
     )
   }

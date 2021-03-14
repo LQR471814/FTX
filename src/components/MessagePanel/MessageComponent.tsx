@@ -16,8 +16,9 @@
 //}
 
 import React from "react"
-import "../css/Window.css"
-import "../css/Root.css"
+import "styling/Widget.css"
+import "styling/Root.css"
+
 import MessageList from "./MessageList"
 
 interface IProps {
