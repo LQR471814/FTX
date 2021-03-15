@@ -5,14 +5,14 @@ declare module "*.svg" { //? Fix svg imports
     export default src;
 }
 
-interface IUserMessages {
-    collapsed: number,
-    messages: Array<IMessage>,
+interface IMessageGroup {
+  messages: IMessage[]
+  collapsed: number
 }
 
 interface IMessage {
-    content: string,
-    author: string
+  content: string
+  author: string
 }
 
 type INetInterface = [string, string, string]; //? ID, Name, IP

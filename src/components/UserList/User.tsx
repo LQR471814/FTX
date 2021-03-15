@@ -16,7 +16,6 @@ export default function User(props: IProps) {
     props.setCurrentTargetUser(props.name)
 
     executeTransitionOffset(userRef.current!, () => {
-      console.log("it worked")
       props.displayCommChoice(true)
     }, -10)
   }

@@ -1,6 +1,6 @@
 //? This component acts as a SINGLE message group containing a reply box and a bunch of messages
 
-import React from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import "styling/Widget.css"
 import "styling/Root.css"
 import "./css/MessagePanel.css"
@@ -16,205 +16,185 @@ interface IProps {
   setCollapsed: Function
 }
 
-interface IState {
-  msgIn: string
-}
+function MessageList(props: IProps) {
+  const groupContainerRef = React.createRef<HTMLDivElement>()
+  const messageGroupCollapsibleRef = React.createRef<HTMLDivElement>()
+  const submitButtonRef = React.createRef<HTMLDivElement>()
+  const inputFieldRef = React.createRef<HTMLInputElement>()
 
-class MessageList extends React.Component<IProps, IState> {
-  private groupContainerRef = React.createRef<HTMLDivElement>()
-  private messageGroupCollapsibleRef = React.createRef<HTMLDivElement>()
-  private submitButtonRef = React.createRef<HTMLDivElement>()
-  private inputFieldRef = React.createRef<HTMLInputElement>()
+  let currentKey = 0
 
-  private currentKey = 0
+  const [msgIn, setMsgIn] = useState("")
 
-  constructor(props: any) {
-    super(props)
-
-    this.state = {
-      msgIn: ""
-    }
-
-    this.inputFieldRef = React.createRef()
+  const uniqueKey = (prefix: string) => {
+    currentKey++
+    return prefix + currentKey.toString()
   }
 
-  componentDidMount() {
-    this.release(this.props.collapsed)
-  }
-
-  componentDidUpdate() {
-    this.release(this.props.collapsed)
-  }
-
-  uniqueKey = (prefix: string) => {
-    this.currentKey++
-    return prefix + this.currentKey.toString()
-  }
-
-  onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ msgIn: e.target.value })
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMsgIn(e.target.value)
     if (e.target.value !== "") {
-      this.showButton(true)
+      showButton(true)
     } else {
-      this.showButton(false)
+      showButton(false)
     }
   }
 
-  showButton = (show: boolean) => {
+  const showButton = (show: boolean) => {
     if (show === true) {
-      Object.assign(this.submitButtonRef.current!.style, {
-        margin: "0px 5px 0px 5px",
+      Object.assign(submitButtonRef.current!.style, {
+        margin: "0px 4px 0px 8px",
         padding: "10px 5px 10px 5px",
       })
-      executeTransitionOffset(this.submitButtonRef.current!, () => {
-        this.submitButtonRef.current!.style.width = "40px"
+
+      executeTransitionOffset(submitButtonRef.current!, (element) => {
+        element.style.width = "40px"
       }, -100)
-      // this.submitButtonRef.current!.style.width = this.submitButtonRef.current!.scrollWidth.toString() + "px"
+      // submitButtonRef.current!.style.width = submitButtonRef.current!.scrollWidth.toString() + "px"
       return
     }
 
-    Object.assign(this.submitButtonRef.current!.style, {
+    Object.assign(submitButtonRef.current!.style, {
       width: "0px",
     })
-    executeTransitionOffset(this.submitButtonRef.current!, () => {
-      Object.assign(this.submitButtonRef.current!.style, {
+    executeTransitionOffset(submitButtonRef.current!, (element) => {
+      Object.assign(element.style, {
         margin: "0px",
         padding: "0px",
       })
     }, -100)
-    // this.submitButtonRef.current!.style.width = "0px"
+    // submitButtonRef.current!.style.width = "0px"
   }
 
-  onToggleCollapse = () => {
-    this.props.setCollapsed(this.props.user, this.props.collapsed * -1)
+  const onToggleCollapse = () => {
+    props.setCollapsed(props.user, props.collapsed * -1)
   }
 
-  release = (released: number) => {
-    if (released < 0) {
-      this.groupContainerRef.current!.style.background =
-        "linear-gradient(180deg, rgba(40,40,40,0.6979166666666667) 0%, rgba(255,255,255,0) 35%)"
-      this.groupContainerRef.current!.style.maxHeight =
-        this.groupContainerRef.current!.scrollHeight.toString() + "px"
-      this.groupContainerRef.current!.style.height = "auto"
-      this.messageGroupCollapsibleRef.current!.style.borderRadius =
-        "10px 10px 0px 0px"
-      this.inputFieldRef.current!.focus()
-    } else {
-      this.inputFieldRef.current!.blur()
-      this.groupContainerRef.current!.style.maxHeight = "0px"
+  const release = useCallback((released: number) => {
+    if (released >= 0) {
+      inputFieldRef.current!.blur()
+      groupContainerRef.current!.style.maxHeight = "0px"
+      return
+    }
+
+    groupContainerRef.current!.style.background =
+      "linear-gradient(180deg, rgba(40,40,40,0.6979166666666667) 0%, rgba(255,255,255,0) 35%)"
+    groupContainerRef.current!.style.maxHeight =
+      groupContainerRef.current!.scrollHeight.toString() + "px"
+    groupContainerRef.current!.style.height = "auto"
+    messageGroupCollapsibleRef.current!.style.borderRadius =
+      "10px 10px 0px 0px"
+    inputFieldRef.current!.focus()
+  }, [groupContainerRef, inputFieldRef, messageGroupCollapsibleRef])
+
+  const onCollapseFinish = () => {
+    if (groupContainerRef.current!.style.maxHeight === "0px") {
+      groupContainerRef.current!.style.background = "none"
+      messageGroupCollapsibleRef.current!.style.borderRadius = "10px"
     }
   }
 
-  onCollapseFinish = () => {
-    if (this.groupContainerRef.current!.style.maxHeight === "0px") {
-      this.groupContainerRef.current!.style.background = "none"
-      this.messageGroupCollapsibleRef.current!.style.borderRadius = "10px"
-    }
-  }
-
-  onSubmitMessage = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const onSubmitMessage = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      this.submitButtonRef.current!.style.backgroundColor = "#96fa60"
-      this.submitButtonRef.current!.style.border = "1px solid #ffffff"
-      this.submit()
+      submitButtonRef.current!.style.backgroundColor = "#96fa60"
+      submitButtonRef.current!.style.border = "1px solid #ffffff"
+      submit()
     }
   }
 
-  onSubmit = () => {
-    this.submit()
-  }
-
-  submit = () => {
-    if (this.state.msgIn === "") {
+  const submit = () => {
+    if (msgIn === "") {
       return
-    } else if (this.submitButtonRef.current!.className === "SubmitButton Activated") {
-      this.submitButtonRef.current!.className = "SubmitButton"
+    } else if (submitButtonRef.current!.className === "SubmitButton Activated") {
+      submitButtonRef.current!.className = "SubmitButton"
       return
     }
-    this.submitButtonRef.current!.className = "SubmitButton Activated"
-    this.setState({ msgIn: "" })
+    submitButtonRef.current!.className = "SubmitButton Activated"
+    setMsgIn("")
 
-    this.props.submitMessage(this.state.msgIn, this.props.user)
+    props.submitMessage(msgIn, props.user)
   }
 
-  onButtonTransitionEnd = () => {
-    if (this.submitButtonRef.current!.className === "SubmitButton Activated") {
-      this.submitButtonRef.current!.style.backgroundColor = ""
-      this.submitButtonRef.current!.style.border = ""
-      this.submitButtonRef.current!.className = "SubmitButton"
-      this.showButton(false)
+  const onButtonTransitionEnd = () => {
+    if (submitButtonRef.current!.className === "SubmitButton Activated") {
+      submitButtonRef.current!.style.backgroundColor = ""
+      submitButtonRef.current!.style.border = ""
+      submitButtonRef.current!.className = "SubmitButton"
+      showButton(false)
     }
   }
 
-  render() {
-    return (
-      <div className="MessageList">
-        <div
-          className="MessageGroupCollapsible"
-          onClick={this.onToggleCollapse}
-          ref={this.messageGroupCollapsibleRef}
-        >
-          <span className="MessageGroupUser">{this.props.user}</span>
-        </div>
+  useEffect(() => {
+    release(props.collapsed)
+  }, [props.collapsed, release])
 
-        <div
-          className="MessageGroupContainer"
-          onTransitionEnd={this.onCollapseFinish}
-          ref={this.groupContainerRef}
-        >
-          {this.props.messages.map((message) => {
-            return (
-              <Message
-                key={this.uniqueKey("Message_")}
-                text={message.content}
-                author={message.author}
-              />
-            )
-          })}
+  return (
+    <div className="MessageList">
+      <div
+        className="MessageGroupCollapsible"
+        onClick={onToggleCollapse}
+        ref={messageGroupCollapsibleRef}
+      >
+        <span className="MessageGroupUser">{props.user}</span>
+      </div>
 
-          <div className="Message">
-            <p className="MessageAuthor">Reply</p>
+      <div
+        className="MessageGroupContainer"
+        onTransitionEnd={onCollapseFinish}
+        ref={groupContainerRef}
+      >
+        {props.messages.map((message) => {
+          return (
+            <Message
+              key={uniqueKey("Message_")}
+              text={message.content}
+              author={message.author}
+            />
+          )
+        })}
+
+        <div className="Message">
+          <p className="MessageAuthor">Reply</p>
+          <div
+            style={{
+              margin: "10px 5px 5px 5px",
+              display: "flex",
+              overflow: "hidden",
+            }}
+          >
+
+            <input
+              tabIndex={-1}
+              className="InputField"
+              ref={inputFieldRef}
+              placeholder="Message"
+              onChange={onChange}
+              onKeyDown={onSubmitMessage}
+            />
+
             <div
-              style={{
-                margin: "10px 5px 5px 5px",
-                display: "flex",
-                overflow: "hidden",
-              }}
+              className="SubmitButton"
+              onClick={submit}
+              ref={submitButtonRef}
+              onTransitionEnd={onButtonTransitionEnd}
             >
 
-              <input
-                tabIndex={-1}
-                className="InputField"
-                ref={this.inputFieldRef}
-                placeholder="Message"
-                onChange={this.onChange}
-                onKeyDown={this.onSubmitMessage}
-              />
-
-              <div
-                className="SubmitButton"
-                onClick={this.onSubmit}
-                ref={this.submitButtonRef}
-                onTransitionEnd={this.onButtonTransitionEnd}
+              <svg
+                height="12px"
+                width="30px"
+                viewBox="75 0 150 200"
+                transform="rotate(90 0 0)"
+                style={{ fill: "#4d4d4d" }}
               >
+                <path d="M150 0 L75 200 L225 200 Z"></path>
+              </svg>
 
-                <svg
-                  height="12px"
-                  width="30px"
-                  viewBox="75 0 150 200"
-                  transform="rotate(90 0 0)"
-                  style={{ fill: "#4d4d4d" }}
-                >
-                  <path d="M150 0 L75 200 L225 200 Z"></path>
-                </svg>
-
-              </div>
             </div>
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 export default MessageList

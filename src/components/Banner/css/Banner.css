@@ -21,7 +21,7 @@ span {
 
   height: 1.5em;
 
-  border-radius: 5px;
+  border-radius: var(--round);
   margin: 5px;
   padding: 5px;
 
@@ -31,7 +31,7 @@ span {
 .SetupButton {
   margin: 0px 5px 0px 5px;
   padding: 0px 3px 1px 3px;
-  border-radius: 5px;
+  border-radius: var(--round);
 
   border-width: 2px;
   border-style: solid;

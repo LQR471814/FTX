@@ -9,72 +9,67 @@ interface IProps {
   closeCallback: Function
 }
 
-class Choice extends React.Component<IProps> {
-  private iconRef = React.createRef<any>()
-  private tagRef = React.createRef<HTMLParagraphElement>()
+export default function Choice(props: IProps) {
+  const iconRef = React.createRef<any>()
+  const tagRef = React.createRef<HTMLParagraphElement>()
 
-  private textFactor = 0.015
-  private iconFactor = 0.1
+  let textFactor = 0.015
+  let iconFactor = 0.1
 
-  componentDidMount() {
-    window.addEventListener("resize", this.updateChoiceSizes)
-  }
+  // useEffect(() => {
+  //   const updateChoiceSizes = () => {
+  //     let calc = Math.round(
+  //       Math.min(window.innerWidth, window.innerHeight) * iconFactor
+  //     )
 
-  componentWillUnmount() {
-    window.removeEventListener("resize", this.updateChoiceSizes)
-  }
+  //     iconRef.current!.style.width = calc
+  //     iconRef.current!.style.height = calc
 
-  render() {
-    return (
-      <div
-        className="ChoiceDiv"
-        onClick={(event) => {
-          event.persist()
-          if (this.props.identifier === undefined) {
-            this.props.closeCallback(this.props.label)
-          } else {
-            this.props.closeCallback(this.props.identifier)
-          }
+  //     tagRef.current!.style.fontSize = Math.round(
+  //       Math.min(window.innerWidth, window.innerHeight) * textFactor
+  //     ).toString()
+  //   }
+
+  //   window.addEventListener("resize", updateChoiceSizes)
+  //   return () => {
+  //     window.removeEventListener("resize", updateChoiceSizes)
+  //   }
+  // }, [iconFactor, iconRef, tagRef, textFactor])
+
+  return (
+    <div
+      className="ChoiceDiv"
+      onClick={(event) => {
+        event.persist()
+        if (props.identifier === undefined) {
+          props.closeCallback(props.label)
+        } else {
+          props.closeCallback(props.identifier)
+        }
+      }}
+    >
+      <props.icon
+        ref={iconRef}
+        style={{
+          width: Math.round(
+            Math.min(window.innerWidth, window.innerHeight) * iconFactor
+          ),
+          height: Math.round(
+            Math.min(window.innerWidth, window.innerHeight) * iconFactor
+          ),
+        }}
+      />
+      <p
+        className="Tag"
+        ref={tagRef}
+        style={{
+          fontSize: Math.round(
+            Math.min(window.innerWidth, window.innerHeight) * textFactor
+          ),
         }}
       >
-        <this.props.icon
-          ref={this.iconRef}
-          style={{
-            width: Math.round(
-              Math.min(window.innerWidth, window.innerHeight) * this.iconFactor
-            ),
-            height: Math.round(
-              Math.min(window.innerWidth, window.innerHeight) * this.iconFactor
-            ),
-          }}
-        />
-        <p
-          className="Tag"
-          ref={this.tagRef}
-          style={{
-            fontSize: Math.round(
-              Math.min(window.innerWidth, window.innerHeight) * this.textFactor
-            ),
-          }}
-        >
-          {this.props.label}
-        </p>
-      </div>
-    )
-  }
-
-  updateChoiceSizes = () => {
-    var calc = Math.round(
-      Math.min(window.innerWidth, window.innerHeight) * this.iconFactor
-    )
-
-    this.iconRef.current!.style.width = calc
-    this.iconRef.current!.style.height = calc
-
-    this.tagRef.current!.style.fontSize = Math.round(
-      Math.min(window.innerWidth, window.innerHeight) * this.textFactor
-    ).toString()
-  }
+        {props.label}
+      </p>
+    </div>
+  )
 }
-
-export default Choice

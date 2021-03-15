@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import "styling/Widget.css"
 import "styling/Window.css"
 import "./css/UserList.css"
@@ -13,99 +13,98 @@ interface IProps {
   setCurrentTargetUser: Function
 }
 
-interface IState {
-  users: Array<{ name: string, ip: string }>
-}
-
 interface IDisplayUser {
   name: string,
   ip: string
 }
 
-class UserList extends React.Component<IProps, IState> {
-  private currentKey = 0
-  private userUpdateClient = new WebSocketClient(
+export default function UserList(props: IProps) {
+  let currentKey = 0
+  const userUpdateClient = new WebSocketClient(
     "ws://localhost:3000/updateUsers"
   )
 
-  constructor(props: any) {
-    super(props)
+  const [users, setUsers] = useState([
+    { name: "John", ip: "127.0.0.1" },
+    { name: "John1", ip: "127.0.0.1" },
+    { name: "John2", ip: "127.0.0.1" },
+    { name: "John3", ip: "127.0.0.1" },
+    { name: "John4", ip: "127.0.0.1" },
+    { name: "John5", ip: "127.0.0.1" },
+    { name: "John6", ip: "127.0.0.1" },
+    { name: "John7", ip: "127.0.0.1" },
+    { name: "John", ip: "127.0.0.1" },
+    { name: "John", ip: "127.0.0.1" },
+    { name: "John", ip: "127.0.0.1" },
+    { name: "John", ip: "127.0.0.1" },
+    { name: "John", ip: "127.0.0.1" },
+    { name: "John", ip: "127.0.0.1" },
+  ])
 
-    this.state = {
-      users: [],
-    }
+  userUpdateClient.onopen = () => {
+    console.log("Connected to user update backend.")
+    userUpdateClient.send("Connected")
+  }
 
-    this.userUpdateClient.onopen = () => {
-      console.log("Connected to backend.")
-      this.userUpdateClient.send("Connected")
-    }
-
-    this.userUpdateClient.onmessage = (message) => {
-      if (typeof message.data === "string") {
-        var messageObj = JSON.parse(message.data)
-        console.log(messageObj)
-        switch (messageObj.MsgType) {
-          case "addUser":
-            if (
-              !this.state.users.some((user) => {
-                return user.name === messageObj.Name && user.ip === messageObj.IP
-              })
-            ) {
-              this.addUser({ name: messageObj.Name, ip: messageObj.IP })
-            }
-            break
-          case "removeUser":
-            this.removeUser({ name: messageObj.Name, ip: messageObj.IP })
-            break
-          default:
-            break
-        }
+  userUpdateClient.onmessage = (message) => {
+    if (typeof message.data === "string") {
+      var messageObj = JSON.parse(message.data)
+      console.log(messageObj)
+      switch (messageObj.MsgType) {
+        case "addUser":
+          if (
+            !users.some((user) => {
+              return user.name === messageObj.Name && user.ip === messageObj.IP
+            })
+          ) {
+            addUser({ name: messageObj.Name, ip: messageObj.IP })
+          }
+          break
+        case "removeUser":
+          removeUser({ name: messageObj.Name, ip: messageObj.IP })
+          break
+        default:
+          break
       }
     }
-
-    this.uniqueKey = this.uniqueKey.bind(this)
   }
 
-  uniqueKey(prefix: string) {
-    this.currentKey++
-    return prefix + this.currentKey.toString()
+  const uniqueKey = (prefix: string) => {
+    currentKey++
+    return prefix + currentKey.toString()
   }
 
-  async addUser(user: IDisplayUser) {
-    while (this.props.hostname === undefined) {
+  const addUser = async (user: IDisplayUser) => {
+    while (props.hostname === undefined) {
       await new Promise((r) => setTimeout(r, 1))
     }
-    if (user.name === this.props.hostname) {
+    if (user.name === props.hostname) {
       return
     }
-    var newUsers = _.cloneDeep(this.state.users)
+    var newUsers = _.cloneDeep(users)
     newUsers.push(user)
-    this.setState({ users: newUsers })
+    setUsers(newUsers)
   }
 
-  removeUser(user: IDisplayUser) {
-    var newUsers = _.cloneDeep(this.state.users)
+  const removeUser = (user: IDisplayUser) => {
+    var newUsers = _.cloneDeep(users)
     newUsers.splice(newUsers.indexOf(user), 1)
-    this.setState({ users: newUsers })
+    setUsers(newUsers)
   }
 
-  render() {
-    return (
-      <div className="ComponentContainer UserList">
-        {this.state.users.map((user) => {
-          return (
-            <User
-              key={this.uniqueKey("User_")}
-              name={user.name}
-              ip={user.ip}
-              displayCommChoice={this.props.displayCommChoice}
-              setCurrentTargetUser={this.props.setCurrentTargetUser}
-            />
-          )
-        })}
-      </div>
-    )
-  }
+  return (
+    <div className="ComponentContainer UserList">
+      {users.map((user) => {
+        return (
+          <User
+            key={uniqueKey("User_")}
+            name={user.name}
+            ip={user.ip}
+            displayCommChoice={props.displayCommChoice}
+            setCurrentTargetUser={props.setCurrentTargetUser}
+          />
+        )
+      })}
+    </div>
+  )
 }
-
-export default UserList

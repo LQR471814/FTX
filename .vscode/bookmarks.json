@@ -4,14 +4,9 @@
 			"path": "src/components/UserList/css/UserList.css",
 			"bookmarks": [
 				{
-					"line": 26,
+					"line": 25,
 					"column": 9,
 					"label": "Misc Styles"
-				},
-				{
-					"line": 52,
-					"column": 10,
-					"label": "Scrollbar Styles"
 				}
 			]
 		}

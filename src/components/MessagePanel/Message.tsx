@@ -7,15 +7,13 @@ interface IProps {
   author: string
 }
 
-class Message extends React.Component<IProps> {
-  render() {
-    return (
-      <div className="Message">
-        <p className="MessageAuthor">{this.props.author}</p>
-        <p className="MessageContent">{this.props.text}</p>
-      </div>
-    )
-  }
+function Message(props: IProps) {
+  return (
+    <div className="Message">
+      <p className="MessageAuthor">{props.author}</p>
+      <p className="MessageContent">{props.text}</p>
+    </div>
+  )
 }
 
 export default Message

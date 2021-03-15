@@ -4,11 +4,11 @@ export function executeTransition(element: HTMLElement, callback: (e: Transition
     }, {once: true})
 }
 
-export function executeTransitionOffset(element: HTMLElement, callback: () => void, offset?: number) {
+export function executeTransitionOffset(element: HTMLElement, callback: (element: HTMLElement) => void, offset?: number) {
     const cs = window.getComputedStyle(element)
     let waitTime = parseFloat(cs.transitionDelay) * 1000 + parseFloat(cs.transitionDuration) * 1000
 
     if (offset) waitTime += offset
 
-    setTimeout(callback, waitTime)
+    setTimeout(() => {callback(element)}, waitTime)
 }

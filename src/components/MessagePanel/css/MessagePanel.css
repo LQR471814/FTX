@@ -25,9 +25,8 @@
 
 .MessageGroupCollapsible {
   background-color: #42424277;
-  border-radius: 10px;
+  border-radius: var(--very-round);
   padding: 5px;
-  width: 100%;
   transition: all 0.1s ease-in-out;
 }
 
@@ -48,14 +47,13 @@
   padding: 5px;
 
   transition: all 0.2s ease-in-out;
-  width: 100%;
 
   overflow: hidden;
   max-height: 0px;
 }
 
 .Message {
-  border-radius: 5px;
+  border-radius: var(--round);
 
   padding: 7.5px 10px 7.5px 10px;
 
@@ -86,9 +84,7 @@
 
   box-sizing: border-box;
 
-  /* margin: 0px 5px 0px 5px;
-    padding: 10px 5px 10px 5px; */
-  border-radius: 5px;
+  border-radius: var(--round);
   box-shadow: none;
 
   color: #ffffff;

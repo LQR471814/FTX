@@ -12,39 +12,35 @@ interface IProps {
   closedCallback: Function
 }
 
-class Banner extends React.Component<IProps> {
-  onClickClose = () => {
-    this.props.closedCallback()
+export default function Banner (props: IProps) {
+  const onClickClose = () => {
+    props.closedCallback()
   }
 
-  onClickSetup = () => {
-    this.props.callback()
+  const onClickSetup = () => {
+    props.callback()
   }
 
-  render() {
-    if (this.props.show === true) {
-      return (
-        <div
-          className="BannerContainer"
-          style={{ backgroundColor: this.props.backgroundColor }}
-        >
-          <div style={{ flex: "1", justifyContent: "center" }}>
-            <span style={{ color: this.props.textColor }}>
-              {this.props.text}
-            </span>
-            <button className="SetupButton" onClick={this.onClickSetup}>
-              {this.props.buttonText}
-            </button>
-          </div>
-          <button onClick={this.onClickClose} className="CloseButton">
-            <CloseIcon />
+  if (props.show === true) {
+    return (
+      <div
+        className="BannerContainer"
+        style={{ backgroundColor: props.backgroundColor }}
+      >
+        <div style={{ flex: "1", justifyContent: "center" }}>
+          <span style={{ color: props.textColor }}>
+            {props.text}
+          </span>
+          <button className="SetupButton" onClick={onClickSetup}>
+            {props.buttonText}
           </button>
         </div>
-      )
-    } else {
-      return <div style={{gridColumn: "1 / -1"}}></div>
-    }
+        <button onClick={onClickClose} className="CloseButton">
+          <CloseIcon />
+        </button>
+      </div>
+    )
+  } else {
+    return <div style={{gridColumn: "1 / -1"}}></div>
   }
 }
-
-export default Banner

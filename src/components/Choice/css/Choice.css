@@ -21,7 +21,7 @@
 .ChoiceDiv {
   text-align: center;
   border: 2px solid #ffffff00;
-  border-radius: 10px;
+  border-radius: var(--very-round);
 
   padding: 20px 20px 20px 20px;
 
@@ -39,5 +39,5 @@
 .ChoiceDiv:active {
   border: 2px solid #9dff0073;
   background-color: #9dff0048;
-  border-radius: 5px;
+  border-radius: var(--round);
 }
