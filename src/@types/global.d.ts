@@ -16,3 +16,5 @@ interface IMessage {
 }
 
 type INetInterface = [string, string, string]; //? ID, Name, IP
+
+type Primitive = string | number | bigint | boolean | symbol

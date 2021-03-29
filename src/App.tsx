@@ -14,6 +14,27 @@ import { ReactComponent as MessageIcon } from "styling/assets/message.svg"
 import { w3cwebsocket as WebSocketClient } from "websocket"
 import _ from "lodash"
 
+const wifiKeywords = [
+  "wi-fi",
+  "wifi",
+  "wi fi",
+  "wlan",
+  "wireless",
+]
+
+const lanKeywords = [
+  "lan",
+  "local area network",
+  "ethernet",
+]
+
+function containsKeywords(str: string, keywords: Array<string>) {
+  for (const word of keywords) {
+    if (str.toLowerCase().includes(word)) return true
+  }
+  return false
+}
+
 export default function App() {
   const [showChoiceNetworkInterfaces, setShowChoiceNetworkInterfaces] = useState(false)
   const [showCommChoice, setShowCommChoice] = useState(false)
@@ -32,7 +53,7 @@ export default function App() {
 
   //? Initialize variables
   const currentChoiceKey = useRef(0)
-  const currentTargetUser = useRef("")
+  const addUserGroupContext = useRef({user: ""})
 
   //? Initialize Websocket Connections
   const recvMsgSocket = new WebSocketClient("ws://localhost:3000/recvMessage")
@@ -98,12 +119,6 @@ export default function App() {
     return prefix + currentChoiceKey.current.toString()
   }
 
-  const setCollapsed = (user: string, opened: number) => {
-    const newGroups = _.cloneDeep(groups)
-    newGroups[user].collapsed = opened
-    setGroups(newGroups)
-  }
-
   const onRecvMessage = (messageContent: string, user: string) => {
     const newGroups = _.cloneDeep(groups)
     if (newGroups[user] !== undefined) {
@@ -130,33 +145,51 @@ export default function App() {
     )
   }
 
-  const setCurrentTargetUser = (user: string) => {
-    currentTargetUser.current = user
+  const setAddUserGroupContext = (user: string) => {
+    addUserGroupContext.current.user = user
   }
 
-  const onCommChosen = (type: string) => {
+  // * When a message / file transfer is chosen
+  const onCommChosen = (type: Primitive) => {
     setShowCommChoice(false)
-    if (type === "Message") {
-      addToGroup([], currentTargetUser.current, -1)
+    switch (type) {
+      case "MESSAGE":
+        addToGroups([], addUserGroupContext.current.user, -1)
+        break
+      case "FILE":
+        break
     }
   }
 
-  const addToGroup = (initMessages: IMessage[], user: string, opened: number) => {
+  // * Uncollapse / Collapse user's message group
+  const setCollapsed = (user: string, opened: number) => {
     const newGroups = _.cloneDeep(groups)
-    if (newGroups[user] === undefined) {
+    newGroups[user].collapsed = opened
+    setGroups(newGroups)
+  }
+
+  // * Add message group
+  const addToGroups = (initMessages: IMessage[], user: string, opened: number) => {
+    const newGroups = _.cloneDeep(groups)
+
+    console.log(initMessages, user, opened)
+
+    if (newGroups[user] === undefined) { //? If user doesn't exist
       newGroups[user] = { messages: initMessages, collapsed: opened }
       setGroups(newGroups)
-    } else {
-      setCollapsed(user, -1)
+      return
     }
+
+    setCollapsed(user, -1)
   }
 
-  const chooseInterface = (intf: string) => {
+  // * Callback when user has chosen network interface
+  const chooseInterface = (intf: Primitive) => {
     if (intf !== undefined) {
       resourceSocket.send(
         JSON.stringify({
           name: "setInterfaces",
-          parameters: { InterfaceID: parseInt(intf) },
+          parameters: { InterfaceID: parseInt(intf as string) },
         })
       )
 
@@ -198,7 +231,7 @@ export default function App() {
             <UserList
               hostname={hostname}
               displayCommChoice={setShowCommChoice}
-              setCurrentTargetUser={setCurrentTargetUser}
+              setCurrentTargetUser={setAddUserGroupContext}
             />
           </Window>
           <Window height="30%" title="Pending Transfers"></Window>
@@ -214,24 +247,18 @@ export default function App() {
             <label className="button" for="fileElem">Select some files</label>
           </form>
         </div> */}
+
       <ChoicesContainer
         show={showCommChoice}
         mainLabel="Choose what to send"
-        icons={[MessageIcon, FileIcon]}
-        items={[0, 1]}
+        items={
+          [
+            { label: "Message", icon: MessageIcon, identifier: "MESSAGE" },
+            { label: "File", icon: FileIcon, identifier: "FILE" },
+          ]
+        }
         columns={2}
         chosenCallback={onCommChosen}
-        labelLogic={(item: number) => {
-          let result = { label: "", icon: OtherIcon }
-          if (item === 0) {
-            result.label = "Message"
-            result.icon = MessageIcon
-          } else if (item === 1) {
-            result.label = "File"
-            result.icon = FileIcon
-          }
-          return result
-        }}
         componentID={uniqueChoiceKey("ChoiceContainer_")}
       />
       {/* CommChoice */}
@@ -239,28 +266,27 @@ export default function App() {
       <ChoicesContainer
         show={showChoiceNetworkInterfaces}
         mainLabel="Choose a network interface to receive multicast"
-        icons={[WifiIcon, EthernetIcon, OtherIcon]}
-        items={netInterfaces}
+        items={
+          netInterfaces.map(
+            (intf: INetInterface) => {
+              const item = {
+                label: `${intf[1]} [${intf[2]}]`,
+                icon: OtherIcon,
+                identifier: intf[0],
+              }
+
+              if (containsKeywords(intf[1], wifiKeywords)) {
+                item.icon = WifiIcon
+              } else if (containsKeywords(intf[1], lanKeywords)) {
+                item.icon = EthernetIcon
+              }
+
+              return item
+            }
+          )
+        }
         columns={6}
         chosenCallback={chooseInterface}
-        // chosenCallback={() => {}}
-        labelLogic={(item: INetInterface) => {
-          let result = {
-            label: `${item[1]} [${item[2]}]`,
-            icon: OtherIcon,
-            identifier: item[0],
-          }
-          if (item[1].includes("Wi-Fi") || item[1].includes("Wlan")) {
-            result.icon = WifiIcon
-          } else if (
-            item.includes("Local Area Connection") ||
-            item[1].includes("LAN") ||
-            item[1].includes("Ethernet")
-          ) {
-            result.icon = EthernetIcon
-          }
-          return result
-        }}
         componentID={uniqueChoiceKey("ChoiceContainer_")}
       />
       {/* NetInterfaceChoice */}

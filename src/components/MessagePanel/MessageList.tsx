@@ -6,7 +6,7 @@ import "styling/Root.css"
 import "./css/MessagePanel.css"
 
 import Message from "./Message"
-import { executeTransitionOffset } from "lib/TransitionHelper"
+import { transitionEffectOffset } from "lib/TransitionHelper"
 
 interface IProps {
   collapsed: number,
@@ -47,7 +47,7 @@ function MessageList(props: IProps) {
         padding: "10px 5px 10px 5px",
       })
 
-      executeTransitionOffset(submitButtonRef.current!, (element) => {
+      transitionEffectOffset(submitButtonRef.current!, (element) => {
         element.style.width = "40px"
       }, -100)
       // submitButtonRef.current!.style.width = submitButtonRef.current!.scrollWidth.toString() + "px"
@@ -57,7 +57,7 @@ function MessageList(props: IProps) {
     Object.assign(submitButtonRef.current!.style, {
       width: "0px",
     })
-    executeTransitionOffset(submitButtonRef.current!, (element) => {
+    transitionEffectOffset(submitButtonRef.current!, (element) => {
       Object.assign(element.style, {
         margin: "0px",
         padding: "0px",

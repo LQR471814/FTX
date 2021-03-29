@@ -1,11 +1,11 @@
 <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 223 220">
-    <defs>
-        <style>
-            .cls-1 {
-                fill: #bdbdbd;
-            }
-        </style>
-    </defs>
-    <rect class="cls-1" width="223" height="164" rx="46" />
-    <polygon class="cls-1" points="193.65 220 179.65 161.48 107.15 161.48 193.65 220" />
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #ababab;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" width="223" height="164" rx="46" />
+  <polygon class="cls-1" points="193.65 220 179.65 161.48 107.15 161.48 193.65 220" />
 </svg>

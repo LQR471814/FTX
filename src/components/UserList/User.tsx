@@ -1,4 +1,3 @@
-import { executeTransitionOffset } from "lib/TransitionHelper"
 import React, { createRef } from "react"
 import "./css/UserList.css"
 
@@ -15,9 +14,7 @@ export default function User(props: IProps) {
   const onClick = () => {
     props.setCurrentTargetUser(props.name)
 
-    executeTransitionOffset(userRef.current!, () => {
-      props.displayCommChoice(true)
-    }, -10)
+    props.displayCommChoice(true)
   }
 
   return (

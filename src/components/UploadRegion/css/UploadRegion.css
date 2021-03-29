@@ -1,0 +1,19 @@
+.UploadFileContainer {
+    position: fixed;
+
+    left: 50vw;
+    top: 50vh;
+
+    transform: translate(-50vw, -50vh);
+
+    width: 80vw;
+    height: 80vh;
+}
+
+.UploadFileRegion {
+    width: 50%;
+    height: 40%;
+
+    outline: 2px dashed white;
+    outline-offset: -10px;
+}

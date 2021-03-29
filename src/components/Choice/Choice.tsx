@@ -5,15 +5,15 @@ import "./css/Choice.css"
 interface IProps {
   icon: any,
   label: string,
-  identifier: any,
-  closeCallback: Function
+  identifier: Primitive,
+  closeCallback: (identifier: Primitive) => void
 }
 
 export default function Choice(props: IProps) {
   const iconRef = React.createRef<any>()
   const tagRef = React.createRef<HTMLParagraphElement>()
 
-  let textFactor = 0.015
+  let textFactor = 0.0175
   let iconFactor = 0.1
 
   // useEffect(() => {
@@ -41,13 +41,10 @@ export default function Choice(props: IProps) {
       className="ChoiceDiv"
       onClick={(event) => {
         event.persist()
-        if (props.identifier === undefined) {
-          props.closeCallback(props.label)
-        } else {
-          props.closeCallback(props.identifier)
-        }
+        props.closeCallback(props.identifier)
       }}
     >
+
       <props.icon
         ref={iconRef}
         style={{
@@ -57,6 +54,7 @@ export default function Choice(props: IProps) {
           height: Math.round(
             Math.min(window.innerWidth, window.innerHeight) * iconFactor
           ),
+          fill: "",
         }}
       />
       <p
