@@ -1,6 +1,6 @@
 //? This component contains all message groups
 
-import React, { useEffect, useRef } from "react"
+import { useEffect, useRef } from "react"
 import "styling/Widget.css"
 import "styling/Root.css"
 

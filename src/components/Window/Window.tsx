@@ -1,4 +1,3 @@
-import React, { ReactChild } from 'react'
 import "styling/Widget.css"
 import "styling/Root.css"
 import "styling/Window.css"
@@ -6,7 +5,7 @@ import "styling/Window.css"
 interface IProps {
   height: string
   title: string
-  children?: ReactChild
+  children?: React.ReactChild
   col?: boolean
 }
 

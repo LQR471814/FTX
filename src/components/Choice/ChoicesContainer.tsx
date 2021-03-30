@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react"
+import { createRef, useCallback, useEffect } from "react"
 import "./css/ChoiceOverlay.css"
 import Overlay from 'components/Overlay/Overlay'
 import Choice from "./Choice"
@@ -10,18 +10,18 @@ interface Item {
 }
 
 interface IProps {
-  chosenCallback: (identifier: Primitive) => void, //? Gets called when an item is chosen
+  chosenCallback: (identifier: Primitive | undefined) => void, //? Gets called when an item is chosen
   mainLabel: string, //? The main text at the top of the Choices overlay
-  columns: number, //? How many columns Choices will have
+  columns: number, //? How many columns Choices will have (if it is -1 then it will tell it to use auto-fit)
   show: boolean, //? show Choices or not
   componentID: string, //? distinguish other Choices components from each other
   items: Array<Item>, //? List of items
 }
 
 export default function ChoicesContainer(props: IProps) {
-  const choiceDivRef = React.createRef<HTMLDivElement>()
-  const overlayDivRef = React.createRef<HTMLDivElement>()
-  const closeButtonRef = React.createRef<HTMLDivElement>()
+  const choiceDivRef = createRef<HTMLDivElement>()
+  const overlayDivRef = createRef<HTMLDivElement>()
+  const closeButtonRef = createRef<HTMLDivElement>()
 
   let currentKey = 0
   const cancelButtonFactor = 0.03
@@ -41,7 +41,7 @@ export default function ChoicesContainer(props: IProps) {
 
   const onKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.code === "Escape") {
-      var evObj = document.createEvent("Events")
+      const evObj = document.createEvent("Events")
       evObj.initEvent("click", true, false)
 
       closeButtonRef.current!.dispatchEvent(evObj)
@@ -62,7 +62,7 @@ export default function ChoicesContainer(props: IProps) {
       display: "grid"
     })
 
-    new Promise((r) => setTimeout(r, 10)).then(() => {
+    new Promise((r) => setTimeout(r, 50)).then(() => {
       Object.assign(choiceDivRef.current!.style, {
         opacity: "100%",
         width: "75%"
@@ -89,7 +89,7 @@ export default function ChoicesContainer(props: IProps) {
 
     document.removeEventListener("keydown", onKeyDown)
 
-    if (identifier) props.chosenCallback(identifier)
+    props.chosenCallback(identifier)
   }
 
 
@@ -101,8 +101,7 @@ export default function ChoicesContainer(props: IProps) {
           className="ChoiceContainer"
           ref={choiceDivRef}
           style={{
-            gridTemplateColumns:
-              "repeat(" + props.columns.toString() + ", 1fr)",
+            gridTemplateColumns: props.columns >= 0 ? `repeat(${props.columns.toString()}, 1fr)` : `repeat(auto-fit, minmax(200px, 1fr))`,
             display: "none",
           }}
         >

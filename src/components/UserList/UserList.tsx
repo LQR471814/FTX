@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import { useCallback, useState } from "react"
 import "styling/Widget.css"
 import "styling/Window.css"
 import "./css/UserList.css"
@@ -18,37 +18,42 @@ interface IDisplayUser {
   ip: string
 }
 
+const userUpdateClient = new WebSocketClient(
+  "ws://localhost:3000/updateUsers"
+)
+
+let currentKey = 0
+
 export default function UserList(props: IProps) {
-  let currentKey = 0
-  const userUpdateClient = new WebSocketClient(
-    "ws://localhost:3000/updateUsers"
-  )
+  const [users, setUsers]: [IDisplayUser[], Function] = useState([])
 
-  const [users, setUsers] = useState([
-    { name: "John", ip: "127.0.0.1" },
-    { name: "John1", ip: "127.0.0.1" },
-    { name: "John2", ip: "127.0.0.1" },
-    { name: "John3", ip: "127.0.0.1" },
-    { name: "John4", ip: "127.0.0.1" },
-    { name: "John5", ip: "127.0.0.1" },
-    { name: "John6", ip: "127.0.0.1" },
-    { name: "John7", ip: "127.0.0.1" },
-    { name: "John", ip: "127.0.0.1" },
-    { name: "John", ip: "127.0.0.1" },
-    { name: "John", ip: "127.0.0.1" },
-    { name: "John", ip: "127.0.0.1" },
-    { name: "John", ip: "127.0.0.1" },
-    { name: "John", ip: "127.0.0.1" },
-  ])
-
-  userUpdateClient.onopen = () => {
+  userUpdateClient.onopen = useCallback(() => {
     console.log("Connected to user update backend.")
     userUpdateClient.send("Connected")
-  }
+  }, [])
 
-  userUpdateClient.onmessage = (message) => {
+  userUpdateClient.onmessage = useCallback((message) => {
+    const addUser = async (user: IDisplayUser) => {
+      while (props.hostname === undefined) {
+        await new Promise((r) => setTimeout(r, 1))
+      }
+      if (user.name === props.hostname) {
+        return
+      }
+
+      const newUsers: IDisplayUser[] = _.cloneDeep(users)
+      newUsers.push(user)
+      setUsers(newUsers)
+    }
+
+    const removeUser = (user: IDisplayUser) => {
+      const newUsers = _.cloneDeep(users)
+      newUsers.splice(newUsers.indexOf(user), 1)
+      setUsers(newUsers)
+    }
+
     if (typeof message.data === "string") {
-      var messageObj = JSON.parse(message.data)
+      const messageObj = JSON.parse(message.data)
       console.log(messageObj)
       switch (messageObj.MsgType) {
         case "addUser":
@@ -67,29 +72,11 @@ export default function UserList(props: IProps) {
           break
       }
     }
-  }
+  }, [props.hostname, users])
 
   const uniqueKey = (prefix: string) => {
     currentKey++
     return prefix + currentKey.toString()
-  }
-
-  const addUser = async (user: IDisplayUser) => {
-    while (props.hostname === undefined) {
-      await new Promise((r) => setTimeout(r, 1))
-    }
-    if (user.name === props.hostname) {
-      return
-    }
-    var newUsers = _.cloneDeep(users)
-    newUsers.push(user)
-    setUsers(newUsers)
-  }
-
-  const removeUser = (user: IDisplayUser) => {
-    var newUsers = _.cloneDeep(users)
-    newUsers.splice(newUsers.indexOf(user), 1)
-    setUsers(newUsers)
   }
 
   return (

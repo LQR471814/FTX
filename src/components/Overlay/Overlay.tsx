@@ -1,4 +1,4 @@
-import React from 'react'
+import { createRef } from 'react'
 import "./css/Overlay.css"
 
 interface IProps {
@@ -7,7 +7,7 @@ interface IProps {
 }
 
 export default function Overlay(props: IProps) {
-  const overlayDivRef = React.createRef<HTMLDivElement>()
+  const overlayDivRef = createRef<HTMLDivElement>()
 
   let divStyle = { display: "none", backdropFilter: "none" }
 

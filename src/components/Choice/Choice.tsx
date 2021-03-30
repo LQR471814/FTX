@@ -1,4 +1,4 @@
-import React from "react"
+import { createRef } from "react"
 import "./css/ChoiceOverlay.css"
 import "./css/Choice.css"
 
@@ -10,8 +10,8 @@ interface IProps {
 }
 
 export default function Choice(props: IProps) {
-  const iconRef = React.createRef<any>()
-  const tagRef = React.createRef<HTMLParagraphElement>()
+  const iconRef = createRef<any>()
+  const tagRef = createRef<HTMLParagraphElement>()
 
   let textFactor = 0.0175
   let iconFactor = 0.1

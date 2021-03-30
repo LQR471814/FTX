@@ -1,4 +1,3 @@
-import React from "react"
 import "./css/Banner.css"
 import { ReactComponent as CloseIcon } from "styling/assets/close.svg"
 

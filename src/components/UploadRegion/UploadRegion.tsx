@@ -1,4 +1,3 @@
-import React from 'react'
 import "./css/UploadRegion.css"
 import "styling/Widget.css"
 

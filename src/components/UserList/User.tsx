@@ -1,4 +1,4 @@
-import React, { createRef } from "react"
+import { createRef } from "react"
 import "./css/UserList.css"
 
 interface IProps {

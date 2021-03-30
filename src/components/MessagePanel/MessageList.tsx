@@ -1,6 +1,6 @@
 //? This component acts as a SINGLE message group containing a reply box and a bunch of messages
 
-import React, { useCallback, useEffect, useState } from "react"
+import { createRef, useCallback, useEffect, useState } from "react"
 import "styling/Widget.css"
 import "styling/Root.css"
 import "./css/MessagePanel.css"
@@ -17,10 +17,10 @@ interface IProps {
 }
 
 function MessageList(props: IProps) {
-  const groupContainerRef = React.createRef<HTMLDivElement>()
-  const messageGroupCollapsibleRef = React.createRef<HTMLDivElement>()
-  const submitButtonRef = React.createRef<HTMLDivElement>()
-  const inputFieldRef = React.createRef<HTMLInputElement>()
+  const groupContainerRef = createRef<HTMLDivElement>()
+  const messageGroupCollapsibleRef = createRef<HTMLDivElement>()
+  const submitButtonRef = createRef<HTMLDivElement>()
+  const inputFieldRef = createRef<HTMLInputElement>()
 
   let currentKey = 0
 

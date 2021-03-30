@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import Banner from "components/Banner/Banner"
 import Window from "components/Window/Window"
 import MessageComponent from "components/MessagePanel/MessageComponent"
@@ -38,7 +38,7 @@ function containsKeywords(str: string, keywords: Array<string>) {
 export default function App() {
   const [showChoiceNetworkInterfaces, setShowChoiceNetworkInterfaces] = useState(false)
   const [showCommChoice, setShowCommChoice] = useState(false)
-  const [showBanner, setShowBanner] = useState(false)
+  const [showBanner, setShowBanner] = useState(true)
   const [groups, setGroups] = useState({} as Record<string, IMessageGroup>)
   const [banner] = useState(
     {
@@ -48,27 +48,61 @@ export default function App() {
       textColor: "#ffffff",
     }
   )
-  const [netInterfaces, setNetInterfaces] = useState([])
+  const [netInterfaces, setNetInterfaces]: [INetInterface[], Function] = useState([
+    ["7", "Ethernet 3", "169.254.80.66/16"],
+    ["63", "vEthernet (Network Bridge)", "192.168.32.1/20"],
+    ["68", "vEthernet (Default Switch) 2", "172.26.48.1/20"],
+    ["22", "Network Bridge", "192.168.1.6/24"],
+    ["31", "Local Area Connection* 1", "169.254.119.232/16"],
+    ["16", "Local Area Connection* 2", "169.254.145.230/16"],
+    ["23", "Ethernet 4", "169.254.190.23/16"],
+    ["17", "Bluetooth Network Connection 3", "169.254.147.224/16"],
+    ["1", "Loopback Pseudo-Interface 1", "127.0.0.1/8"],
+    ["73", "vEthernet (Ethernet 3)", "172.24.192.1/20"],
+    ["64", "vEthernet (Ethernet 4)", "172.21.32.1/20"]
+  ])
   const [hostname, setHostname] = useState("")
 
   //? Initialize variables
   const currentChoiceKey = useRef(0)
-  const addUserGroupContext = useRef({user: ""})
+  const addUserGroupContext = useRef({ user: "" })
 
   //? Initialize Websocket Connections
   const recvMsgSocket = new WebSocketClient("ws://localhost:3000/recvMessage")
-  recvMsgSocket.onopen = () => {
-    console.log("Connected to message out.")
-  }
-  recvMsgSocket.onmessage = (message) => {
-    if (typeof message.data === "string") {
-      let messageObj = JSON.parse(message.data)
-      onRecvMessage(messageObj.Message, messageObj.User)
-    }
-  }
 
-  const resourceSocket = new WebSocketClient("ws://localhost:3000/resource")
-  resourceSocket.onopen = () => {
+  recvMsgSocket.onopen = useCallback(
+    () => {
+      console.log("Connected to message out.")
+    },
+    []
+  )
+
+  recvMsgSocket.onmessage = useCallback(
+    (message) => {
+      const onRecvMessage = (messageContent: string, user: string) => {
+        const newGroups = _.cloneDeep(groups)
+        if (newGroups[user] !== undefined) {
+          newGroups[user].messages.push({ content: messageContent, author: user })
+        } else {
+          newGroups[user] = {
+            collapsed: -1,
+            messages: [{ content: messageContent, author: user }],
+          }
+        }
+        console.log(newGroups)
+        setGroups(newGroups)
+      }
+
+      if (typeof message.data === "string") {
+        let messageObj = JSON.parse(message.data)
+        onRecvMessage(messageObj.Message, messageObj.User)
+      }
+    },
+    [groups]
+  )
+
+  const resourceSocket = useRef(new WebSocketClient("ws://localhost:3000/resource")).current
+  resourceSocket.onopen = useCallback(() => {
     console.log("Connected to resource.")
 
     resourceSocket.send(
@@ -80,9 +114,9 @@ export default function App() {
     resourceSocket.send(
       JSON.stringify({ name: "requireSetup", parameters: {} })
     )
-  }
+  }, [resourceSocket])
 
-  resourceSocket.onmessage = (message) => {
+  resourceSocket.onmessage = useCallback((message) => {
     if (typeof message.data === "string") {
       let messageObj = JSON.parse(message.data)
       console.log(messageObj)
@@ -112,25 +146,11 @@ export default function App() {
           break
       }
     }
-  }
+  }, [resourceSocket])
 
   const uniqueChoiceKey = (prefix: string) => {
     currentChoiceKey.current++
     return prefix + currentChoiceKey.current.toString()
-  }
-
-  const onRecvMessage = (messageContent: string, user: string) => {
-    const newGroups = _.cloneDeep(groups)
-    if (newGroups[user] !== undefined) {
-      newGroups[user].messages.push({ content: messageContent, author: user })
-    } else {
-      newGroups[user] = {
-        collapsed: -1,
-        messages: [{ content: messageContent, author: user }],
-      }
-    }
-    console.log(newGroups)
-    setGroups(newGroups)
   }
 
   const replyMessage = (messageContent: string, destHost: string) => {
@@ -150,7 +170,7 @@ export default function App() {
   }
 
   // * When a message / file transfer is chosen
-  const onCommChosen = (type: Primitive) => {
+  const onCommChosen = (type: Primitive | undefined) => {
     setShowCommChoice(false)
     switch (type) {
       case "MESSAGE":
@@ -161,7 +181,7 @@ export default function App() {
     }
   }
 
-  // * Uncollapse / Collapse user's message group
+  // * Un-collapse / Collapse user's message group
   const setCollapsed = (user: string, opened: number) => {
     const newGroups = _.cloneDeep(groups)
     newGroups[user].collapsed = opened
@@ -184,7 +204,7 @@ export default function App() {
   }
 
   // * Callback when user has chosen network interface
-  const chooseInterface = (intf: Primitive) => {
+  const chooseInterface = (intf: Primitive | undefined) => {
     if (intf !== undefined) {
       resourceSocket.send(
         JSON.stringify({
@@ -194,8 +214,9 @@ export default function App() {
       )
 
       setShowBanner(false)
-      setShowChoiceNetworkInterfaces(false)
     }
+
+    setShowChoiceNetworkInterfaces(false)
   }
 
   return (
@@ -285,7 +306,7 @@ export default function App() {
             }
           )
         }
-        columns={6}
+        columns={-1}
         chosenCallback={chooseInterface}
         componentID={uniqueChoiceKey("ChoiceContainer_")}
       />
