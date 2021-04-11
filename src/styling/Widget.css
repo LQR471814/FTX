@@ -28,11 +28,6 @@
   background-color: var(--neutral);
 }
 
-p {
-  font-family: "OpenSans", Arial, Helvetica, sans-serif;
-  margin: 0px;
-}
-
 .Title {
   font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
   color: var(--highlight-lighter);

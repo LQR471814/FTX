@@ -1,16 +1,3 @@
-@font-face {
-  font-family: "OpenSansBold";
-  src: url("styling/fonts/OpenSans/opensans-bold-webfont.woff2") format("woff2"),
-    url("styling/fonts/OpenSans/opensans-bold-webfont.woff") format("woff");
-  font-weight: normal;
-}
-
-@font-face {
-  font-family: "PTMono-Regular";
-  src: url("styling/fonts/PTMono/PTMono-Regular.woff") format("woff");
-  font-weight: normal;
-}
-
 .MessageList {
   margin: 0px 0px 10px 0px;
 }
@@ -25,7 +12,7 @@
 
 .MessageGroupCollapsible {
   background-color: #42424277;
-  border-radius: var(--very-round);
+  border-radius: var(--extremely-round);
   padding: 5px;
   transition: all 0.1s ease-in-out;
 }
@@ -50,6 +37,11 @@
 
   overflow: hidden;
   max-height: 0px;
+}
+
+.MessageGroupContainer .Uncollapsed {
+  background: linear-gradient(180deg, rgba(40,40,40,0.6979166666666667) 0%, rgba(255,255,255,0) 35%);
+  height: auto;
 }
 
 .Message {

@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useState } from "react"
+import React, { createRef, useEffect } from "react"
 import "./css/ChoiceOverlay.css"
 import 'styling/Root.css'
 import Overlay from 'components/Overlay/Overlay'
@@ -23,8 +23,6 @@ export default function ChoicesContainer(props: IProps) {
   const containerRef = createRef<HTMLDivElement>()
   const closeButtonRef = createRef<HTMLDivElement>()
   const choicesContainerRef = createRef<ChoicesContainer>()
-
-  const [showOverlay, setShowOverlay] = useState(true)
 
   const cancelButtonFactor = 0.03
 
@@ -84,7 +82,6 @@ export default function ChoicesContainer(props: IProps) {
     transitionEffectOffset(refToHTMLElement(containerRef), () => {
       containerRef.current!.style.transition = ""
 
-      setShowOverlay(false)
       props.chosenCallback(id)
     }, -50)
   }
@@ -97,7 +94,7 @@ export default function ChoicesContainer(props: IProps) {
   }, [])
 
   return (
-    <Overlay show={showOverlay}>
+    <Overlay show={true}>
       <div style={{ opacity: "0%", transition: "0.5s ease-in-out all" }} ref={containerRef}>
         <p className="Info">{props.mainLabel}</p>
 

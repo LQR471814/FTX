@@ -13,6 +13,7 @@ import { ReactComponent as MessageIcon } from "styling/assets/message.svg"
 
 import { w3cwebsocket as WebSocketClient } from "websocket"
 import _ from "lodash"
+import UploadRegion from "components/UploadRegion/UploadRegion"
 
 const wifiKeywords = [
   "wi-fi",
@@ -312,6 +313,7 @@ export default function App() {
           componentID={uniqueChoiceKey("ChoiceContainer_")}
         /> : undefined}
 
+      <UploadRegion />
     </div>
   )
 }

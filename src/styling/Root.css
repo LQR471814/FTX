@@ -12,12 +12,21 @@
   font-weight: normal;
 }
 
-:root {
-  font-family: "OpenSans";
+@font-face {
+  font-family: "PTMono-Regular";
+  src: url("styling/fonts/PTMono/PTMono-Regular.woff") format("woff");
+  font-weight: normal;
+}
 
+p, span {
+  font-family: "OpenSans";
+}
+
+:root {
   box-sizing: border-box;
 
   /* Border Radius */
+  --extremely-round: 25px;
   --very-round: 15px;
   --round: 10px;
 

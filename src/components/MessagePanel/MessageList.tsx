@@ -77,19 +77,19 @@ function MessageList(props: IProps) {
       return
     }
 
-    groupContainerRef.current!.style.background =
-      "linear-gradient(180deg, rgba(40,40,40,0.6979166666666667) 0%, rgba(255,255,255,0) 35%)"
-    groupContainerRef.current!.style.maxHeight =
-      groupContainerRef.current!.scrollHeight.toString() + "px"
-    groupContainerRef.current!.style.height = "auto"
-    messageGroupCollapsibleRef.current!.style.borderRadius =
-      "10px 10px 0px 0px"
+    groupContainerRef.current!.style.maxHeight = groupContainerRef.current!.scrollHeight.toString() + "px"
+
+    groupContainerRef.current!.classList.add('Uncollapsed')
+    messageGroupCollapsibleRef.current!.classList.add('Uncollapsed')
+
+    messageGroupCollapsibleRef.current!.style.borderRadius = "10px 10px 0px 0px"
     inputFieldRef.current!.focus()
   }, [groupContainerRef, inputFieldRef, messageGroupCollapsibleRef])
 
   const onCollapseFinish = () => {
     if (groupContainerRef.current!.style.maxHeight === "0px") {
       groupContainerRef.current!.style.background = "none"
+      messageGroupCollapsibleRef.current!.classList.remove('Uncollapsed')
       messageGroupCollapsibleRef.current!.style.borderRadius = "10px"
     }
   }
