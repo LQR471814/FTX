@@ -9,5 +9,6 @@
   top: 0;
 
   overflow-y: auto;
+  overflow-x: hidden;
   justify-content: center;
 }

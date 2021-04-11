@@ -20,7 +20,7 @@ interface IProps {
 }
 
 export default function ChoicesContainer(props: IProps) {
-  const choiceContainerRef = createRef<HTMLDivElement>()
+  const containerRef = createRef<HTMLDivElement>()
   const closeButtonRef = createRef<HTMLDivElement>()
   const choicesContainerRef = createRef<ChoicesContainer>()
 
@@ -64,46 +64,34 @@ export default function ChoicesContainer(props: IProps) {
   }
 
   const onCloseClicked = () => {
-    // @ts-ignore
-    choicesContainerRef.current!.setShrink(false)
-
-    document.removeEventListener("keydown", onKeyDown)
-    closeButtonRef.current!.classList.add("Active")
-
     closeChoice(undefined)
   }
 
   const onKeyDown = (e: KeyboardEvent) => {
     if (e.code === "Escape") {
-      const evObj = new MouseEvent('click', {
-        bubbles: true,
-        cancelable: false,
-      })
-
-      if (closeButtonRef.current) {
-        closeButtonRef.current.dispatchEvent(evObj)
-      }
+      closeChoice(undefined)
     }
   }
 
   const closeChoice = (id: Primitive | undefined) => {
-    choiceContainerRef.current!.style.opacity = "0%"
+    document.removeEventListener("keydown", onKeyDown)
 
-    console.log(choiceContainerRef.current, closeButtonRef.current)
+    // @ts-ignore
+    choicesContainerRef.current!.setShrink(false)
 
-    return
-    transitionEffectOffset(refToHTMLElement(closeButtonRef), () => {
-      closeButtonRef.current!.classList.remove("Active")
-    }, -100)
+    containerRef.current!.style.transition = "0.2s ease-in all"
+    containerRef.current!.style.opacity = "0%"
 
-    transitionEffectOffset(refToHTMLElement(choiceContainerRef), () => {
+    transitionEffectOffset(refToHTMLElement(containerRef), () => {
+      containerRef.current!.style.transition = ""
+
       setShowOverlay(false)
       props.chosenCallback(id)
-    }, -100)
+    }, -50)
   }
 
   useEffect(() => {
-    choiceContainerRef.current!.style.opacity = "100%"
+    containerRef.current!.style.opacity = "100%"
     document.addEventListener("keydown", onKeyDown)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,7 +99,7 @@ export default function ChoicesContainer(props: IProps) {
 
   return (
     <Overlay show={showOverlay}>
-      <div style={{ opacity: "0%", transition: "0.5s ease-in-out all" }} ref={choiceContainerRef}>
+      <div style={{ opacity: "0%", transition: "0.5s ease-in-out all" }} ref={containerRef}>
         <p className="Info">{props.mainLabel}</p>
 
         <ChoicesContainer
