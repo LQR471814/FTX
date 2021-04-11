@@ -16,6 +16,8 @@
   left: 93%;
   top: 6%;
 
+  fill: var(--highlight-lighter);
+
   border-radius: 50%;
 
   border: solid 1px #ffffff00;
@@ -28,39 +30,42 @@
 .CancelButton:hover {
   transform: scale(1.2);
 
-  background-color: #ffffff28;
+  background-color: var(--white-transparent-1);
 
   cursor: pointer;
 }
 
 .CancelButton:active {
-  background-color: #ffffff46;
+  background-color: var(--white-transparent-2);
+
+  fill: var(--white);
 
   border: solid 1px #e4e4e4;
 }
 
 .Active {
-  background-color: #ffffff46;
-
-  border: solid 1px #c0c0c0;
+  border: solid 1px var(--highlight-lighter);
 }
 
 .ChoiceContainer {
+  display: flex;
+
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 5%;
 
-  grid-auto-flow: dense;
-  justify-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 5px;
 
   max-height: 100vh;
-
-  grid-template-rows: repeat(auto-fit, minmax(0px, 1fr));
+  width: 95%;
 
   transition: 0.25s ease-in-out;
-  transition-property: width, opacity;
+  transition-property: opacity;
 
-  will-change: width, opacity;
+  will-change: opacity;
 }
 
 .Info {

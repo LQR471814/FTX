@@ -1,7 +1,10 @@
-import { createRef, useCallback, useEffect } from "react"
+import React, { createRef, useEffect, useState } from "react"
 import "./css/ChoiceOverlay.css"
+import 'styling/Root.css'
 import Overlay from 'components/Overlay/Overlay'
 import Choice from "./Choice"
+import { refToHTMLElement, transitionEffectOffset } from "lib/TransitionHelper"
+import _ from "lodash"
 
 interface Item {
   label: string
@@ -12,104 +15,43 @@ interface Item {
 interface IProps {
   chosenCallback: (identifier: Primitive | undefined) => void, //? Gets called when an item is chosen
   mainLabel: string, //? The main text at the top of the Choices overlay
-  columns: number, //? How many columns Choices will have (if it is -1 then it will tell it to use auto-fit)
-  show: boolean, //? show Choices or not
   componentID: string, //? distinguish other Choices components from each other
   items: Array<Item>, //? List of items
 }
 
 export default function ChoicesContainer(props: IProps) {
-  const choiceDivRef = createRef<HTMLDivElement>()
-  const overlayDivRef = createRef<HTMLDivElement>()
+  const choiceContainerRef = createRef<HTMLDivElement>()
   const closeButtonRef = createRef<HTMLDivElement>()
+  const choicesContainerRef = createRef<ChoicesContainer>()
 
-  let currentKey = 0
+  const [showOverlay, setShowOverlay] = useState(true)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
   const cancelButtonFactor = 0.03
 
+  //* Because setting the "shrink" state in ChoicesContainer component re-rendered the entire component making all the refs null I decided to put ChoicesContainer div into it's own component
+  //* But since I need to change the state on the standalone component without re-passing props (since that'll require a re-render of the entire thing) I tried to use refs to call a function
+  class ChoicesContainer extends React.Component<{ componentID: string, items: Array<Item> }, { shrink: boolean }> {
+    constructor(props: { componentID: string, items: Array<Item> }) {
+      super(props)
 
-  const uniqueKey = (prefix: string) => {
-    currentKey++
-    return prefix + currentKey.toString()
-  }
-
-
-  const onCloseClicked = () => {
-    closeButtonRef.current!.className += " Active"
-    closeChoice(undefined)
-  }
-
-
-  const onKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.code === "Escape") {
-      const evObj = document.createEvent("Events")
-      evObj.initEvent("click", true, false)
-
-      closeButtonRef.current!.dispatchEvent(evObj)
-    }
-  }, [closeButtonRef])
-
-
-  useEffect(() => {
-    if (!props.show) {
-      return
+      this.state = {
+        shrink: true
+      }
     }
 
-    document.addEventListener("keydown", onKeyDown)
+    setShrink(val: boolean) {
+      this.setState({ shrink: val })
+    }
 
-    Object.assign(choiceDivRef.current!.style, {
-      opacity: "50%",
-      width: "50%",
-      display: "grid"
-    })
-
-    new Promise((r) => setTimeout(r, 50)).then(() => {
-      Object.assign(choiceDivRef.current!.style, {
-        opacity: "100%",
-        width: "75%"
-      })
-    })
-
-  }, [choiceDivRef, closeButtonRef, onKeyDown, overlayDivRef, props.show])
-
-
-  const closeChoice = async (identifier: Primitive | undefined) => {
-    Object.assign(choiceDivRef.current!.style, {
-      width: "100%",
-      opacity: "50%"
-    })
-
-    await new Promise((r) =>
-      setTimeout(
-        r,
-        parseFloat(window.getComputedStyle(choiceDivRef.current!)["transitionDuration"]) * 1000
-      )
-    )
-
-    choiceDivRef.current!.style.display = "none"
-
-    document.removeEventListener("keydown", onKeyDown)
-
-    props.chosenCallback(identifier)
-  }
-
-
-  return (
-    <Overlay show={props.show}>
-      <div>
-        <p className="Info">{props.mainLabel}</p>
-        <div
-          className="ChoiceContainer"
-          ref={choiceDivRef}
-          style={{
-            gridTemplateColumns: props.columns >= 0 ? `repeat(${props.columns.toString()}, 1fr)` : `repeat(auto-fit, minmax(200px, 1fr))`,
-            display: "none",
-          }}
-        >
-
+    render() {
+      return (
+        <div className="ChoiceContainer">
           {props.items.map(
             (arrayItem) =>
               <Choice
-                key={uniqueKey(`${props.componentID}_Choice_`)}
+                key={_.uniqueId(`${props.componentID}_Choice_`)}
+                shrink={this.state.shrink}
                 label={arrayItem.label}
                 icon={arrayItem.icon}
                 identifier={arrayItem.identifier}
@@ -117,6 +59,66 @@ export default function ChoicesContainer(props: IProps) {
               />
           )}
         </div>
+      )
+    }
+  }
+
+  const onCloseClicked = () => {
+    // @ts-ignore
+    choicesContainerRef.current!.setShrink(false)
+
+    document.removeEventListener("keydown", onKeyDown)
+    closeButtonRef.current!.classList.add("Active")
+
+    closeChoice(undefined)
+  }
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.code === "Escape") {
+      const evObj = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: false,
+      })
+
+      if (closeButtonRef.current) {
+        closeButtonRef.current.dispatchEvent(evObj)
+      }
+    }
+  }
+
+  const closeChoice = (id: Primitive | undefined) => {
+    choiceContainerRef.current!.style.opacity = "0%"
+
+    console.log(choiceContainerRef.current, closeButtonRef.current)
+
+    return
+    transitionEffectOffset(refToHTMLElement(closeButtonRef), () => {
+      closeButtonRef.current!.classList.remove("Active")
+    }, -100)
+
+    transitionEffectOffset(refToHTMLElement(choiceContainerRef), () => {
+      setShowOverlay(false)
+      props.chosenCallback(id)
+    }, -100)
+  }
+
+  useEffect(() => {
+    choiceContainerRef.current!.style.opacity = "100%"
+    document.addEventListener("keydown", onKeyDown)
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return (
+    <Overlay show={showOverlay}>
+      <div style={{ opacity: "0%", transition: "0.5s ease-in-out all" }} ref={choiceContainerRef}>
+        <p className="Info">{props.mainLabel}</p>
+
+        <ChoicesContainer
+          componentID={props.componentID}
+          items={props.items}
+          ref={choicesContainerRef}
+        />
 
         <div
           className="CancelButton"
@@ -154,6 +156,7 @@ export default function ChoicesContainer(props: IProps) {
           </svg>
         </div>
       </div>
+
     </Overlay>
   )
 }

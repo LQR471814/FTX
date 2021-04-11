@@ -9,8 +9,8 @@ import { w3cwebsocket as WebSocketClient } from "websocket"
 
 interface IProps {
   hostname: string,
-  displayCommChoice: Function,
-  setCurrentTargetUser: Function
+  onCommChosen: (identifier: Primitive | undefined) => void
+  showCommChoice: Function
 }
 
 interface IDisplayUser {
@@ -84,11 +84,11 @@ export default function UserList(props: IProps) {
       {users.map((user) => {
         return (
           <User
+            onCommChosen={props.onCommChosen}
             key={uniqueKey("User_")}
             name={user.name}
             ip={user.ip}
-            displayCommChoice={props.displayCommChoice}
-            setCurrentTargetUser={props.setCurrentTargetUser}
+            showCommChoice={props.showCommChoice}
           />
         )
       })}

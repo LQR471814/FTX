@@ -35,9 +35,9 @@ function containsKeywords(str: string, keywords: Array<string>) {
   return false
 }
 
+
+
 export default function App() {
-  const [showChoiceNetworkInterfaces, setShowChoiceNetworkInterfaces] = useState(false)
-  const [showCommChoice, setShowCommChoice] = useState(false)
   const [showBanner, setShowBanner] = useState(true)
   const [groups, setGroups] = useState({} as Record<string, IMessageGroup>)
   const [banner] = useState(
@@ -48,6 +48,7 @@ export default function App() {
       textColor: "#ffffff",
     }
   )
+
   const [netInterfaces, setNetInterfaces]: [INetInterface[], Function] = useState([
     ["7", "Ethernet 3", "169.254.80.66/16"],
     ["63", "vEthernet (Network Bridge)", "192.168.32.1/20"],
@@ -63,9 +64,12 @@ export default function App() {
   ])
   const [hostname, setHostname] = useState("")
 
+  const [showNetworkInterfacesChoice, setShowNetworkInterfacesChoice] = useState(false)
+  const [showCommChoice, setShowCommChoiceState] = useState(false)
+
   //? Initialize variables
   const currentChoiceKey = useRef(0)
-  const addUserGroupContext = useRef({ user: "" })
+  const addMessageUserGroupContext = useRef({ user: "" })
 
   //? Initialize Websocket Connections
   const recvMsgSocket = new WebSocketClient("ws://localhost:3000/recvMessage")
@@ -165,16 +169,17 @@ export default function App() {
     )
   }
 
-  const setAddUserGroupContext = (user: string) => {
-    addUserGroupContext.current.user = user
+  // * When a user is chosen from UserList
+  const setShowCommChoice = (user: string) => {
+    setShowCommChoiceState(true)
+    addMessageUserGroupContext.current.user = user
   }
 
   // * When a message / file transfer is chosen
   const onCommChosen = (type: Primitive | undefined) => {
-    setShowCommChoice(false)
     switch (type) {
       case "MESSAGE":
-        addToGroups([], addUserGroupContext.current.user, -1)
+        addToGroups([], addMessageUserGroupContext.current.user, -1)
         break
       case "FILE":
         break
@@ -206,28 +211,28 @@ export default function App() {
   // * Callback when user has chosen network interface
   const chooseInterface = (intf: Primitive | undefined) => {
     if (intf !== undefined) {
-      resourceSocket.send(
-        JSON.stringify({
-          name: "setInterfaces",
-          parameters: { InterfaceID: parseInt(intf as string) },
-        })
-      )
+      // resourceSocket.send(
+      //   JSON.stringify({
+      //     name: "setInterfaces",
+      //     parameters: { InterfaceID: parseInt(intf as string) },
+      //   })
+      // )
 
       setShowBanner(false)
     }
-
-    setShowChoiceNetworkInterfaces(false)
+    setShowNetworkInterfacesChoice(false)
   }
 
   return (
-
     <div style={{ height: "100vh", width: "100vw", overflow: "hidden" }}>
       <div className="AppDiv" id="AppGrid">
         <Banner
           show={showBanner}
-          callback={() => {
-            setShowChoiceNetworkInterfaces(true)
-          }}
+          callback={
+            () => {
+              setShowNetworkInterfacesChoice(true)
+            }
+          }
           closedCallback={() => {
             setShowBanner(false)
           }}
@@ -250,9 +255,9 @@ export default function App() {
         <div className="Col" style={{ overflow: "hidden" }}>
           <Window height="40%" title="User List">
             <UserList
+              onCommChosen={onCommChosen}
               hostname={hostname}
-              displayCommChoice={setShowCommChoice}
-              setCurrentTargetUser={setAddUserGroupContext}
+              showCommChoice={setShowCommChoice}
             />
           </Window>
           <Window height="30%" title="Pending Transfers"></Window>
@@ -260,6 +265,32 @@ export default function App() {
         </div>
 
       </div>
+
+      {showNetworkInterfacesChoice ?
+        <ChoicesContainer
+          mainLabel="Choose a network interface to receive multicast"
+          items={
+            netInterfaces.map(
+              (intf: INetInterface) => {
+                const item = {
+                  label: `${intf[1]} [${intf[2]}]`,
+                  icon: OtherIcon,
+                  identifier: intf[0],
+                }
+
+                if (containsKeywords(intf[1], wifiKeywords)) {
+                  item.icon = WifiIcon
+                } else if (containsKeywords(intf[1], lanKeywords)) {
+                  item.icon = EthernetIcon
+                }
+
+                return item
+              }
+            )
+          }
+          chosenCallback={chooseInterface}
+          componentID={uniqueChoiceKey("ChoiceContainer_")}
+        /> : undefined}
 
       {/* <div className="UploadFileArea">
           <form>
@@ -269,48 +300,18 @@ export default function App() {
           </form>
         </div> */}
 
-      <ChoicesContainer
-        show={showCommChoice}
-        mainLabel="Choose what to send"
-        items={
-          [
-            { label: "Message", icon: MessageIcon, identifier: "MESSAGE" },
-            { label: "File", icon: FileIcon, identifier: "FILE" },
-          ]
-        }
-        columns={2}
-        chosenCallback={onCommChosen}
-        componentID={uniqueChoiceKey("ChoiceContainer_")}
-      />
-      {/* CommChoice */}
-
-      <ChoicesContainer
-        show={showChoiceNetworkInterfaces}
-        mainLabel="Choose a network interface to receive multicast"
-        items={
-          netInterfaces.map(
-            (intf: INetInterface) => {
-              const item = {
-                label: `${intf[1]} [${intf[2]}]`,
-                icon: OtherIcon,
-                identifier: intf[0],
-              }
-
-              if (containsKeywords(intf[1], wifiKeywords)) {
-                item.icon = WifiIcon
-              } else if (containsKeywords(intf[1], lanKeywords)) {
-                item.icon = EthernetIcon
-              }
-
-              return item
-            }
-          )
-        }
-        columns={-1}
-        chosenCallback={chooseInterface}
-        componentID={uniqueChoiceKey("ChoiceContainer_")}
-      />
-      {/* NetInterfaceChoice */}
+      {showCommChoice ?
+        <ChoicesContainer
+          mainLabel="Choose what to send"
+          items={
+            [
+              { label: "Message", icon: MessageIcon, identifier: "MESSAGE" },
+              { label: "File", icon: FileIcon, identifier: "FILE" },
+            ]
+          }
+          chosenCallback={onCommChosen}
+          componentID={uniqueChoiceKey("ChoiceContainer_")}
+        /> : undefined}
 
     </div>
   )

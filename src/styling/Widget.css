@@ -5,7 +5,7 @@
 
   outline: none;
   border: none;
-  background-color: var(--lighter-neutral);
+  background-color: var(--neutral-lighter);
 
   font-size: 14px;
 
@@ -20,11 +20,11 @@
 .InputField::placeholder {
   font-family: "OpenSansBold";
 
-  color: var(--lighter-highlight);
+  color: var(--highlight-lighter);
 }
 
 .InputField:focus {
-  border: 1px solid var(--lighter-highlight);
+  border: 1px solid var(--highlight-lighter);
   background-color: var(--neutral);
 }
 
@@ -35,7 +35,7 @@ p {
 
 .Title {
   font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
-  color: var(--lighter-highlight);
+  color: var(--highlight-lighter);
   margin: 0px;
   margin-bottom: 10px;
 }

@@ -3,6 +3,6 @@ module ftx
 go 1.16
 
 require (
-	github.com/gorilla/websocket v1.4.2 // indirect
-	golang.org/x/sys v0.0.0-20210326220804-49726bf1d181 // indirect
+	github.com/gorilla/websocket v1.4.2
+	golang.org/x/sys v0.0.0-20210330210617-4fbd30eecc44
 )

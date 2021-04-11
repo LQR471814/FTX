@@ -1,3 +1,6 @@
+import React from "react"
+import "styling/Root.css"
+
 export function transitionEffect(element: HTMLElement, callback: (e: TransitionEvent) => void) {
     element.addEventListener("transitionend", (e: TransitionEvent) => {
         callback(e)
@@ -11,4 +14,19 @@ export function transitionEffectOffset(element: HTMLElement, callback: (element:
     if (offset) waitTime += offset
 
     setTimeout(() => { callback(element) }, waitTime)
+}
+
+export function setWithoutTransition(element: HTMLElement, properties: {}) {
+    const originalTransition = window.getComputedStyle(element).transition
+    element.style.transition = "none"
+    Object.assign(element.style, properties)
+    setTimeout(
+        () => {
+            element.style.transition = originalTransition
+        }, 10
+    )
+}
+
+export function refToHTMLElement(ref: React.RefObject<any>) {
+    return ref.current! as HTMLElement
 }

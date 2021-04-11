@@ -1,9 +1,10 @@
 import { createRef } from "react"
+
 import "./css/UserList.css"
 
 interface IProps {
-  displayCommChoice: Function,
-  setCurrentTargetUser: Function,
+  onCommChosen: (identifier: Primitive | undefined) => void,
+  showCommChoice: Function,
   name: string,
   ip: string
 }
@@ -12,9 +13,7 @@ export default function User(props: IProps) {
   const userRef = createRef<HTMLDivElement>()
 
   const onClick = () => {
-    props.setCurrentTargetUser(props.name)
-
-    props.displayCommChoice(true)
+    props.showCommChoice(props.name)
   }
 
   return (

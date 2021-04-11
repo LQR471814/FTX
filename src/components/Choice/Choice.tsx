@@ -1,48 +1,79 @@
-import { createRef } from "react"
+import { createRef, useCallback } from "react"
 import "./css/ChoiceOverlay.css"
 import "./css/Choice.css"
+import "styling/Root.css"
+import { setWithoutTransition } from "lib/TransitionHelper"
 
 interface IProps {
-  icon: any,
-  label: string,
-  identifier: Primitive,
+  icon: any
+  label: string
+  identifier: Primitive
   closeCallback: (identifier: Primitive) => void
+  shrink: boolean
 }
 
 export default function Choice(props: IProps) {
   const iconRef = createRef<any>()
   const tagRef = createRef<HTMLParagraphElement>()
+  // const divRef = createRef<HTMLDivElement>()
 
-  let textFactor = 0.0175
-  let iconFactor = 0.1
+  const textFactor = 0.0175
+  const iconFactor = 0.1
+
+  const movePixels = 1000
+
+  const choiceDivRefCallback = useCallback((div) => {
+    const screenCenterX = window.innerWidth / 2
+    const divCenterX = div.getBoundingClientRect().left + div.getBoundingClientRect().width / 2
+    const fromCenterLengthFactor = (divCenterX - screenCenterX) / window.innerWidth
+
+    const translateOffset = movePixels * fromCenterLengthFactor
+
+    if (props.shrink) {
+      setWithoutTransition(
+        div,
+        { transform: `translateX(${translateOffset}px)` }
+      )
+
+      setTimeout(() => {
+        div.style.transform = `translateX(0px)`
+      }, 10)
+
+      return
+    }
+
+    div.style.transform = `translateX(${translateOffset}px)`
+  }, [props.shrink])
 
   // useEffect(() => {
-  //   const updateChoiceSizes = () => {
-  //     let calc = Math.round(
-  //       Math.min(window.innerWidth, window.innerHeight) * iconFactor
-  //     )
+  //   setTimeout(() => {
+  //     const screenCenterX = window.innerWidth / 2
+  //     const divCenterX = divRef.current!.getBoundingClientRect().left + divRef.current!.getBoundingClientRect().width / 2
+  //     const fromCenterLengthFactor = (divCenterX - screenCenterX) / window.innerWidth
 
-  //     iconRef.current!.style.width = calc
-  //     iconRef.current!.style.height = calc
+  //     const translateOffset = movePixels * fromCenterLengthFactor
 
-  //     tagRef.current!.style.fontSize = Math.round(
-  //       Math.min(window.innerWidth, window.innerHeight) * textFactor
-  //     ).toString()
-  //   }
+  //     if (props.shrink) {
+  //       setWithoutTransition(
+  //         refToHTMLElement(divRef),
+  //         { transform: `translateX(${translateOffset}px)` }
+  //       )
+  //     }
 
-  //   window.addEventListener("resize", updateChoiceSizes)
-  //   return () => {
-  //     window.removeEventListener("resize", updateChoiceSizes)
-  //   }
-  // }, [iconFactor, iconRef, tagRef, textFactor])
+  //     setTimeout(() => {
+  //       divRef.current!.style.transform = `translateX(0px)`
+  //     }, 10)
+  //   }, 10)
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [props.shrink])
 
   return (
     <div
       className="ChoiceDiv"
-      onClick={(event) => {
-        event.persist()
+      onClick={() => {
         props.closeCallback(props.identifier)
       }}
+      ref={choiceDivRefCallback}
     >
 
       <props.icon

@@ -12,23 +12,33 @@
   font-weight: normal;
 }
 
-html,
-body,
-#root {
+:root {
   font-family: "OpenSans";
 
   box-sizing: border-box;
 
+  /* Border Radius */
   --very-round: 15px;
   --round: 10px;
 
-  --lightest-highlight: #dadada;
-  --lighter-highlight: #c4c4c4;
+  /* Colors */
+  --white: #f3f3f3;
+
+  --highlight-lightest: #dadada;
+  --highlight-lighter: #c4c4c4;
+
   --active-neutral: #aaaaaa;
-  --lighter-neutral: #707070;
+
+  --neutral-lighter: #707070;
   --neutral: #7c7c7c;
-  --darker-neutral: #5c5c5c;
-  --darker-shadow: #383838;
+  --neutral-darker: #5c5c5c;
+
+  --shadow-darker: #383838;
+
+  /* Transparency */
+  --white-transparent-0: #ffffff1a;
+  --white-transparent-1: #ffffff3f;
+  --white-transparent-2: #ffffff60;
 }
 
 .AppDiv {
@@ -72,4 +82,11 @@ body,
 
   background-clip: content-box;
   border: 7px solid transparent;
+}
+
+.notransition {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important;
 }

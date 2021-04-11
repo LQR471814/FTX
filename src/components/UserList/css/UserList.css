@@ -12,26 +12,26 @@
 }
 
 .User:hover {
-  background-color: var(--lighter-neutral);
+  background-color: var(--neutral-lighter);
   cursor: pointer;
-  border: 2px solid var(--lighter-highlight);
+  border: 2px solid var(--highlight-lighter);
 }
 
 .User:active {
   background-color: var(--active-neutral);
   cursor: pointer;
-  border: 2px solid var(--lightest-highlight);
+  border: 2px solid var(--highlight-lightest);
 }
 
 /* Misc */
 .UserName {
   font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
-  color: var(--lightest-highlight);
+  color: var(--highlight-lightest);
   margin: 1px;
 }
 
 .Ip {
   font-family: "PTMono-Regular", "Times New Roman", Times, serif;
-  color: var(--lighter-highlight);
+  color: var(--highlight-lighter);
   margin: 0px;
 }
