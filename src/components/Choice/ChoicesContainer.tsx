@@ -13,10 +13,10 @@ interface Item {
 }
 
 interface IProps {
-  chosenCallback: (identifier: Primitive | undefined) => void, //? Gets called when an item is chosen
-  mainLabel: string, //? The main text at the top of the Choices overlay
-  componentID: string, //? distinguish other Choices components from each other
-  items: Array<Item>, //? List of items
+  chosenCallback: (identifier: Primitive | undefined) => void //? Gets called when an item is chosen
+  mainLabel: string //? The main text at the top of the Choices overlay
+  componentID: string //? distinguish other Choices components from each other
+  items: Array<Item> //? List of items
 }
 
 export default function ChoicesContainer(props: IProps) {
@@ -25,7 +25,6 @@ export default function ChoicesContainer(props: IProps) {
   const choicesContainerRef = createRef<ChoicesContainer>()
 
   const [showOverlay, setShowOverlay] = useState(true)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
   const cancelButtonFactor = 0.03
 

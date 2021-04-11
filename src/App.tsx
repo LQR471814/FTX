@@ -35,8 +35,6 @@ function containsKeywords(str: string, keywords: Array<string>) {
   return false
 }
 
-
-
 export default function App() {
   const [showBanner, setShowBanner] = useState(true)
   const [groups, setGroups] = useState({} as Record<string, IMessageGroup>)
@@ -184,6 +182,7 @@ export default function App() {
       case "FILE":
         break
     }
+    setShowCommChoiceState(false)
   }
 
   // * Un-collapse / Collapse user's message group

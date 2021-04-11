@@ -25,7 +25,21 @@ const userUpdateClient = new WebSocketClient(
 let currentKey = 0
 
 export default function UserList(props: IProps) {
-  const [users, setUsers]: [IDisplayUser[], Function] = useState([])
+  const [users, setUsers]: [IDisplayUser[], Function] = useState([
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+    {name: "Joe", ip: "127.0.0.1"},
+  ])
 
   userUpdateClient.onopen = useCallback(() => {
     console.log("Connected to user update backend.")
