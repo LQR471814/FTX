@@ -1,9 +1,9 @@
-import React, { createRef, useEffect } from "react"
+import { Component, createRef, useEffect } from "react"
 import "./css/ChoiceOverlay.css"
 import 'styling/Root.css'
 import Overlay from 'components/Overlay/Overlay'
 import Choice from "./Choice"
-import { refToHTMLElement, transitionEffectOffset } from "lib/TransitionHelper"
+import { refToHTMLElement, transitionEffectOffset } from "lib/Utils"
 import _ from "lodash"
 
 interface Item {
@@ -28,7 +28,7 @@ export default function ChoicesContainer(props: IProps) {
 
   //* Because setting the "shrink" state in ChoicesContainer component re-rendered the entire component making all the refs null I decided to put ChoicesContainer div into it's own component
   //* But since I need to change the state on the standalone component without re-passing props (since that'll require a re-render of the entire thing) I tried to use refs to call a function
-  class ChoicesContainer extends React.Component<{ componentID: string, items: Array<Item> }, { shrink: boolean }> {
+  class ChoicesContainer extends Component<{ componentID: string, items: Array<Item> }, { shrink: boolean }> {
     constructor(props: { componentID: string, items: Array<Item> }) {
       super(props)
 

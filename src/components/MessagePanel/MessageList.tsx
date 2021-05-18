@@ -6,7 +6,7 @@ import "styling/Root.css"
 import "./css/MessagePanel.css"
 
 import Message from "./Message"
-import { transitionEffectOffset } from "lib/TransitionHelper"
+import { transitionEffectOffset } from "lib/Utils"
 
 interface IProps {
   collapsed: number,

@@ -1,4 +1,4 @@
-import React from "react"
+import { RefObject } from "react"
 import "styling/Root.css"
 
 export function transitionEffect(element: HTMLElement, callback: (e: TransitionEvent) => void) {
@@ -27,6 +27,11 @@ export function setWithoutTransition(element: HTMLElement, properties: {}) {
     )
 }
 
-export function refToHTMLElement(ref: React.RefObject<any>) {
+export function refToHTMLElement(ref: RefObject<any>) {
     return ref.current! as HTMLElement
+}
+
+export function clickElement(target: HTMLElement) {
+    const e = new MouseEvent('click', {})
+    target.dispatchEvent(e)
 }

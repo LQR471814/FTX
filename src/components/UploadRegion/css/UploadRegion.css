@@ -1,4 +1,5 @@
-.UploadFileContainer {
+/* Main Container */
+.UploadFileRoot {
   display: flex;
 
   align-items: center;
@@ -8,31 +9,73 @@
   height: 100%;
 }
 
+/* Small container */
 .UploadFileRegion {
-  width: 50%;
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex-basis: 50%;
+
   height: 45%;
 
-  border-radius: var(--round);
-
-  outline: 4px dashed var(--highlight-lighter);
-  outline-offset: 10px;
-
   background-color: var(--white-transparent-0);
+  border-radius: var(--very-round);
 
-  text-align: center;
   transition: 0.1s ease-in-out all;
 }
 
 .UploadFileRegion:hover {
   background-color: var(--white-transparent-1);
-  outline-offset: -17.5px;
+  border-radius: calc(var(--very-round) + 5px);
 
   cursor: pointer;
 }
 
+/* Small Container border */
+.UploadFileRegionBorder {
+  border: var(--highlight-lighter) dashed 5px;
+  border-radius: var(--very-round);
+
+  width: calc(100% - 50px);
+  height: calc(100% - 50px);
+
+  transition: all 0.15s ease-in-out;
+}
+
+.UploadFileRegion:hover .UploadFileRegionBorder, .DraggedBorder {
+  width: calc(100% - 70px);
+  height: calc(100% - 70px);
+
+  border-radius: calc(var(--very-round) + 5px);
+}
+
+.UploadFileRegion:active .UploadFileRegionBorder, .ActiveBorder {
+  width: calc(100% - 85px);
+  height: calc(100% - 85px);
+
+  border-radius: calc(var(--very-round) + 6px);
+}
+
+/* Small Container Content */
+.ContentBox {
+  position: absolute;
+  text-align: center;
+
+  width: 30%;
+}
+
 .UploadText {
-  font-family: "OpenSansBold";
+  font-family: 'OpenSansBold';
   font-size: 30px;
 
   color: var(--highlight-lightest);
+}
+
+.UploadStipulate {
+  font-family: 'PTMono-Regular';
+
+  color: var(--highlight-lighter);
+  font-size: 20px;
 }

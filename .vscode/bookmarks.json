@@ -4,9 +4,34 @@
 			"path": "src/components/UserList/css/UserList.css",
 			"bookmarks": [
 				{
+					"line": 0,
+					"column": 9,
+					"label": ""
+				},
+				{
 					"line": 25,
 					"column": 9,
-					"label": "Misc Styles"
+					"label": ""
+				}
+			]
+		},
+		{
+			"path": "src/components/UploadRegion/css/UploadRegion.css",
+			"bookmarks": [
+				{
+					"line": 0,
+					"column": 0,
+					"label": ""
+				},
+				{
+					"line": 11,
+					"column": 0,
+					"label": ""
+				},
+				{
+					"line": 35,
+					"column": 0,
+					"label": ""
 				}
 			]
 		}

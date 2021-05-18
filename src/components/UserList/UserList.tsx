@@ -9,13 +9,7 @@ import { w3cwebsocket as WebSocketClient } from "websocket"
 
 interface IProps {
   hostname: string,
-  onCommChosen: (identifier: Primitive | undefined) => void
-  showCommChoice: Function
-}
-
-interface IDisplayUser {
-  name: string,
-  ip: string
+  setShowCommChoice: (user: User) => void
 }
 
 const userUpdateClient = new WebSocketClient(
@@ -25,20 +19,20 @@ const userUpdateClient = new WebSocketClient(
 let currentKey = 0
 
 export default function UserList(props: IProps) {
-  const [users, setUsers]: [IDisplayUser[], Function] = useState([
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
-    {name: "Joe", ip: "127.0.0.1"},
+  const [users, setUsers]: [User[], Function] = useState([
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1" },
   ])
 
   userUpdateClient.onopen = useCallback(() => {
@@ -47,7 +41,7 @@ export default function UserList(props: IProps) {
   }, [])
 
   userUpdateClient.onmessage = useCallback((message) => {
-    const addUser = async (user: IDisplayUser) => {
+    const addUser = async (user: User) => {
       while (props.hostname === undefined) {
         await new Promise((r) => setTimeout(r, 1))
       }
@@ -55,12 +49,12 @@ export default function UserList(props: IProps) {
         return
       }
 
-      const newUsers: IDisplayUser[] = _.cloneDeep(users)
+      const newUsers: User[] = _.cloneDeep(users)
       newUsers.push(user)
       setUsers(newUsers)
     }
 
-    const removeUser = (user: IDisplayUser) => {
+    const removeUser = (user: User) => {
       const newUsers = _.cloneDeep(users)
       newUsers.splice(newUsers.indexOf(user), 1)
       setUsers(newUsers)
@@ -98,11 +92,10 @@ export default function UserList(props: IProps) {
       {users.map((user) => {
         return (
           <User
-            onCommChosen={props.onCommChosen}
             key={uniqueKey("User_")}
             name={user.name}
             ip={user.ip}
-            showCommChoice={props.showCommChoice}
+            setShowCommChoice={props.setShowCommChoice}
           />
         )
       })}

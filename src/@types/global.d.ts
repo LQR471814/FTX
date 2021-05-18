@@ -1,8 +1,8 @@
 declare module "*.svg" { //? Fix svg imports
-    import React = require("react");
-    export const ReactComponent: React.SFC<React.SVGProps<SVGSVGElement>>;
-    const src: string;
-    export default src;
+  import React = require("react")
+  export const ReactComponent: React.SFC<React.SVGProps<SVGSVGElement>>
+  const src: string
+  export default src
 }
 
 interface IMessageGroup {
@@ -15,6 +15,11 @@ interface IMessage {
   author: string
 }
 
-type INetInterface = [string, string, string]; //? ID, Name, IP
+interface User {
+  name: string,
+  ip: string
+}
+
+type INetInterface = [string, string, string] //? ID, Name, IP
 
 type Primitive = string | number | bigint | boolean | symbol

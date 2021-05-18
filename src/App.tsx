@@ -14,6 +14,10 @@ import { ReactComponent as MessageIcon } from "styling/assets/message.svg"
 import { w3cwebsocket as WebSocketClient } from "websocket"
 import _ from "lodash"
 import UploadRegion from "components/UploadRegion/UploadRegion"
+import TransferStatus from "components/TransferStatus/TransferStatus"
+
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import UploadWorker from 'worker-loader!./components/TransferStatus/upload_worker.js'
 
 const wifiKeywords = [
   "wi-fi",
@@ -37,6 +41,8 @@ function containsKeywords(str: string, keywords: Array<string>) {
 }
 
 export default function App() {
+  const [activeWorkers, setActiveWorkers] = useState<Array<Worker>>([])
+
   const [showBanner, setShowBanner] = useState(true)
   const [groups, setGroups] = useState({} as Record<string, IMessageGroup>)
   const [banner] = useState(
@@ -64,11 +70,12 @@ export default function App() {
   const [hostname, setHostname] = useState("")
 
   const [showNetworkInterfacesChoice, setShowNetworkInterfacesChoice] = useState(false)
+  const [showUploadRegion, setShowUploadRegion] = useState(false)
   const [showCommChoice, setShowCommChoiceState] = useState(false)
 
   //? Initialize variables
   const currentChoiceKey = useRef(0)
-  const addMessageUserGroupContext = useRef({ user: "" })
+  const currentTargetUser = useRef<User>({ name: "", ip: "" })
 
   //? Initialize Websocket Connections
   const recvMsgSocket = new WebSocketClient("ws://localhost:3000/recvMessage")
@@ -169,18 +176,19 @@ export default function App() {
   }
 
   // * When a user is chosen from UserList
-  const setShowCommChoice = (user: string) => {
+  const setShowCommChoice = (user: User) => {
     setShowCommChoiceState(true)
-    addMessageUserGroupContext.current.user = user
+    currentTargetUser.current = user
   }
 
   // * When a message / file transfer is chosen
   const onCommChosen = (type: Primitive | undefined) => {
     switch (type) {
       case "MESSAGE":
-        addToGroups([], addMessageUserGroupContext.current.user, -1)
+        addToGroups([], currentTargetUser.current.name, -1)
         break
       case "FILE":
+        setShowUploadRegion(true)
         break
     }
     setShowCommChoiceState(false)
@@ -233,9 +241,11 @@ export default function App() {
               setShowNetworkInterfacesChoice(true)
             }
           }
-          closedCallback={() => {
-            setShowBanner(false)
-          }}
+          closedCallback={
+            () => {
+              setShowBanner(false)
+            }
+          }
           text={banner.text}
           buttonText={banner.buttonText}
           backgroundColor={banner.backgroundColor}
@@ -255,13 +265,14 @@ export default function App() {
         <div className="Col" style={{ overflow: "hidden" }}>
           <Window height="40%" title="User List">
             <UserList
-              onCommChosen={onCommChosen}
               hostname={hostname}
-              showCommChoice={setShowCommChoice}
+              setShowCommChoice={setShowCommChoice}
             />
           </Window>
           <Window height="30%" title="Pending Transfers"></Window>
-          <Window height="30%" title="Transfer Status"></Window>
+          <Window height="30%" title="Transfer Status">
+            <TransferStatus activeWorkers={activeWorkers} />
+          </Window>
         </div>
 
       </div>
@@ -292,14 +303,6 @@ export default function App() {
           componentID={uniqueChoiceKey("ChoiceContainer_")}
         /> : undefined}
 
-      {/* <div className="UploadFileArea">
-          <form>
-            <p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>
-            <input type="file" id="fileElem" multiple accept="image/*" />
-            <label className="button" for="fileElem">Select some files</label>
-          </form>
-        </div> */}
-
       {showCommChoice ?
         <ChoicesContainer
           mainLabel="Choose what to send"
@@ -313,7 +316,22 @@ export default function App() {
           componentID={uniqueChoiceKey("ChoiceContainer_")}
         /> : undefined}
 
-      <UploadRegion />
+      {showUploadRegion ? <UploadRegion onChosen={
+        (files: FileList) => {
+          const worker = new UploadWorker()
+          worker.postMessage(
+            {
+              type: 'start',
+              targetUser: {
+                name: currentTargetUser.current
+              },
+              files: files
+            }
+          )
+
+          setActiveWorkers([...activeWorkers, worker])
+        }
+      } /> : undefined}
     </div>
   )
 }

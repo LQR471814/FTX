@@ -2,7 +2,7 @@ import { createRef, useCallback } from "react"
 import "./css/ChoiceOverlay.css"
 import "./css/Choice.css"
 import "styling/Root.css"
-import { setWithoutTransition } from "lib/TransitionHelper"
+import { setWithoutTransition } from "lib/Utils"
 
 interface IProps {
   icon: any
