@@ -32,9 +32,11 @@ onmessage = (e) => {
         type: 'state',
         message: 'Reading file...'
       })
+
       reader.readAsArrayBuffer(msg.files[0])
       break
     default:
       postMessage(`Worker got unexpected message type: ${msg.type}`)
+      break
   }
 }

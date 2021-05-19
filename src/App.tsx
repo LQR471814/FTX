@@ -18,6 +18,7 @@ import TransferStatus from "components/TransferStatus/TransferStatus"
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import UploadWorker from 'worker-loader!./components/TransferStatus/upload_worker.js'
+import PendingTransfers from "components/PendingTransfers/PendingTransfers"
 
 const wifiKeywords = [
   "wi-fi",
@@ -269,7 +270,9 @@ export default function App() {
               setShowCommChoice={setShowCommChoice}
             />
           </Window>
-          <Window height="30%" title="Pending Transfers"></Window>
+          <Window height="30%" title="Pending Transfers">
+            <PendingTransfers />
+          </Window>
           <Window height="30%" title="Transfer Status">
             <TransferStatus activeWorkers={activeWorkers} />
           </Window>
@@ -317,7 +320,10 @@ export default function App() {
         /> : undefined}
 
       {showUploadRegion ? <UploadRegion onChosen={
-        (files: FileList) => {
+        (files: FileList | null) => {
+          setShowUploadRegion(false)
+          if (!files) return
+
           const worker = new UploadWorker()
           worker.postMessage(
             {

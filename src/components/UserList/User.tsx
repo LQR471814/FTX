@@ -2,13 +2,13 @@ import { createRef } from "react"
 
 import "./css/UserList.css"
 
-interface IProps {
+interface Props {
   setShowCommChoice: (user: User) => void,
   name: string,
   ip: string
 }
 
-export default function User(props: IProps) {
+export default function User(props: Props) {
   const userRef = createRef<HTMLDivElement>()
 
   const onClick = () => {

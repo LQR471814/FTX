@@ -1,8 +1,10 @@
-interface IProps {
+import 'styling/Widget.css'
+
+interface Props {
   activeWorkers: Worker[]
 }
 
-export default function TransferStatus(props: IProps) {
+export default function TransferStatus(props: Props) {
   for (const worker of props.activeWorkers) {
     worker.onmessage = (e: MessageEvent) => {
       const msg = e.data
@@ -22,7 +24,7 @@ export default function TransferStatus(props: IProps) {
   }
 
   return (
-    <div>
+    <div className="ComponentContainer">
 
     </div>
   )

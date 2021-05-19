@@ -1,7 +1,7 @@
 import "./css/Banner.css"
 import { ReactComponent as CloseIcon } from "styling/assets/close.svg"
 
-interface IProps {
+interface Props {
   show: boolean,
   text: string,
   buttonText: string,
@@ -11,7 +11,7 @@ interface IProps {
   closedCallback: Function
 }
 
-export default function Banner (props: IProps) {
+export default function Banner (props: Props) {
   const onClickClose = () => {
     props.closedCallback()
   }
@@ -26,7 +26,7 @@ export default function Banner (props: IProps) {
         className="BannerContainer"
         style={{ backgroundColor: props.backgroundColor }}
       >
-        <div style={{ flex: "1", justifyContent: "center" }}>
+        <div style={{ flex: "1", justifyContent: "center", marginLeft: "5px" }}>
           <span style={{ color: props.textColor }}>
             {props.text}
           </span>

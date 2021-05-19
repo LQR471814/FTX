@@ -5,11 +5,11 @@ import "styling/Widget.css"
 import { ChangeEvent, createRef } from 'react'
 import { clickElement, refToHTMLElement } from 'lib/Utils'
 
-interface IProps {
-  onChosen: (files: FileList) => void
+interface Props {
+  onChosen: (files: FileList | null) => void
 }
 
-export default function UploadRegion(props: IProps) {
+export default function UploadRegion(props: Props) {
   const fileDialogRef = createRef<HTMLInputElement>()
 
   const onFileChosen = (e: ChangeEvent<HTMLInputElement>) => {
@@ -17,7 +17,7 @@ export default function UploadRegion(props: IProps) {
   }
 
   return (
-    <Overlay show={true}>
+    <Overlay transition={true} onClose={() => { props.onChosen(null) }}>
       <div className="UploadFileRoot">
         <input ref={fileDialogRef} type="file" style={{ display: 'none' }} onChange={onFileChosen} multiple />
 
@@ -26,7 +26,7 @@ export default function UploadRegion(props: IProps) {
             () => {
               clickElement(refToHTMLElement(fileDialogRef))
             }
-        }>
+          }>
           <div className="ContentBox">
             <p className="UploadText">Upload files!</p>
             <p className="UploadStipulate">Drag and drop or click to upload files</p>

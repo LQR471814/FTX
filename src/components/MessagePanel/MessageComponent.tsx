@@ -6,13 +6,13 @@ import "styling/Root.css"
 
 import MessageList from "./MessageList"
 
-interface IProps {
+interface Props {
   groups: Record<string, IMessageGroup>
   submitMessage: Function,
   setCollapsed: Function
 }
 
-function MessageComponent(props: IProps) {
+function MessageComponent(props: Props) {
   const prevScroll = useRef(0)
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import "./css/Choice.css"
 import "styling/Root.css"
 import { setWithoutTransition } from "lib/Utils"
 
-interface IProps {
+interface Props {
   icon: any
   label: string
   identifier: Primitive
@@ -12,7 +12,7 @@ interface IProps {
   shrink: boolean
 }
 
-export default function Choice(props: IProps) {
+export default function Choice(props: Props) {
   const iconRef = createRef<any>()
   const tagRef = createRef<HTMLParagraphElement>()
 

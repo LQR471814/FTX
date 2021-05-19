@@ -8,7 +8,7 @@ import "./css/MessagePanel.css"
 import Message from "./Message"
 import { transitionEffectOffset } from "lib/Utils"
 
-interface IProps {
+interface Props {
   collapsed: number,
   messages: Array<IMessage>,
   user: string,
@@ -16,7 +16,7 @@ interface IProps {
   setCollapsed: Function
 }
 
-function MessageList(props: IProps) {
+function MessageList(props: Props) {
   const groupContainerRef = createRef<HTMLDivElement>()
   const messageGroupCollapsibleRef = createRef<HTMLDivElement>()
   const submitButtonRef = createRef<HTMLDivElement>()
