@@ -20,19 +20,19 @@ let currentKey = 0
 
 export default function UserList(props: Props) {
   const [users, setUsers]: [User[], Function] = useState([
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
-    { name: "Joe", ip: "127.0.0.1" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
+    { name: "Joe", ip: "127.0.0.1:5000" },
   ])
 
   userUpdateClient.onopen = useCallback(() => {

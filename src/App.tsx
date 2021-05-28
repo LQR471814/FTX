@@ -328,9 +328,7 @@ export default function App() {
           worker.postMessage(
             {
               type: 'start',
-              targetUser: {
-                name: currentTargetUser.current
-              },
+              targetUser: currentTargetUser.current,
               files: files
             }
           )
