@@ -77,7 +77,10 @@ function MessageList(props: Props) {
       return
     }
 
-    groupContainerRef.current!.style.maxHeight = groupContainerRef.current!.scrollHeight.toString() + "px"
+    Object.assign(groupContainerRef.current!.style, {
+      background: '',
+      maxHeight: groupContainerRef.current!.scrollHeight.toString() + "px"
+    })
 
     groupContainerRef.current!.classList.add('Uncollapsed')
     messageGroupCollapsibleRef.current!.classList.add('Uncollapsed')
@@ -88,7 +91,8 @@ function MessageList(props: Props) {
 
   const onCollapseFinish = () => {
     if (groupContainerRef.current!.style.maxHeight === "0px") {
-      groupContainerRef.current!.style.background = "none"
+      groupContainerRef.current!.style.background = 'none'
+
       messageGroupCollapsibleRef.current!.classList.remove('Uncollapsed')
       messageGroupCollapsibleRef.current!.style.borderRadius = "10px"
     }
@@ -117,9 +121,11 @@ function MessageList(props: Props) {
 
   const onButtonTransitionEnd = () => {
     if (submitButtonRef.current!.className === "SubmitButton Activated") {
-      submitButtonRef.current!.style.backgroundColor = ""
-      submitButtonRef.current!.style.border = ""
-      submitButtonRef.current!.className = "SubmitButton"
+      Object.assign(submitButtonRef.current!.style, {
+        backgroundColor: '',
+        border: '',
+        className: 'SubmitButton'
+      })
       showButton(false)
     }
   }

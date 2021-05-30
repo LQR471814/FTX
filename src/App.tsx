@@ -17,7 +17,7 @@ import UploadRegion from "components/UploadRegion/UploadRegion"
 import TransferStatus from "components/TransferStatus/TransferStatus"
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import UploadWorker from 'worker-loader!./components/TransferStatus/upload_worker.js'
+import UploadWorker from 'worker-loader!./components/TransferStatus/upload_worker_manager.js'
 import PendingTransfers from "components/PendingTransfers/PendingTransfers"
 
 const wifiKeywords = [

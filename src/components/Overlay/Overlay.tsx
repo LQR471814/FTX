@@ -6,6 +6,7 @@ interface Props {
   children: React.ReactChild
   onOpen?: Function
   onClose?: Function
+  dontHandleClose?: boolean
 }
 
 export default function Overlay(props: Props) {
@@ -18,13 +19,13 @@ export default function Overlay(props: Props) {
   }
 
   const closeRegion = () => {
-    document.removeEventListener('keydown', listenForClose)
+    if (!props.dontHandleClose) document.removeEventListener('keydown', listenForClose)
 
     if (props.onClose) props.onClose()
   }
 
   useEffect(() => {
-    document.addEventListener('keydown', listenForClose)
+    if (!props.dontHandleClose) document.addEventListener('keydown', listenForClose)
 
     if (props.onOpen) props.onOpen()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -33,7 +34,7 @@ export default function Overlay(props: Props) {
   return (
     <div className="OverlayDiv" ref={overlayDivRef}>
       {props.children}
-      <CancelButton onClick={closeRegion} size={0.03} />
+      {!props.dontHandleClose ? (<CancelButton onClick={closeRegion} size={0.03} />) : undefined}
     </div>
   )
 }

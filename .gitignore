@@ -30,4 +30,4 @@ settings.json
 yarn.lock
 
 # Webserver test
-test_webserver.py
+test_webserver/

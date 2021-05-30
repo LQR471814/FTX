@@ -23,11 +23,11 @@ interface Props {
 export default function ChoicesContainer(props: Props) {
   const rootContainerRef = createRef<HTMLDivElement>()
   const closeButtonRef = createRef<HTMLDivElement>()
-  const choicesContainerRef = createRef<ChoicesContainer>()
+  const choicesContainerRef = createRef<ChoiceElementsContainer>()
 
   //* Because setting the "shrink" state in ChoicesContainer component re-rendered the entire component making all the refs null I decided to put ChoicesContainer div into it's own component
   //* But since I need to change the state on the standalone component without re-passing props (since that'll require a re-render of the entire thing) I tried to use refs to call a function
-  class ChoicesContainer extends Component<{ componentID: string, items: Array<Item> }, { shrink: boolean }> {
+  class ChoiceElementsContainer extends Component<{ componentID: string, items: Array<Item> }, { shrink: boolean }> {
     constructor(props: { componentID: string, items: Array<Item> }) {
       super(props)
 
@@ -91,11 +91,11 @@ export default function ChoicesContainer(props: Props) {
   }, [])
 
   return (
-    <Overlay>
+    <Overlay dontHandleClose={true}>
       <div style={{ opacity: "0%", transition: "0.5s ease-in-out all" }} ref={rootContainerRef}>
         <p className="Info">{props.mainLabel}</p>
 
-        <ChoicesContainer
+        <ChoiceElementsContainer
           componentID={props.componentID}
           items={props.items}
           ref={choicesContainerRef}

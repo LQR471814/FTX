@@ -5,27 +5,30 @@ interface Props {
 }
 
 export default function Transfer(props: Props) {
-  const [currentState, setCurrentState] = useState('Initializing...')
+  const [currentStatus, setCurrentStatus] = useState('Initializing...')
 
   props.worker.onmessage = (e: MessageEvent) => {
     const msg = e.data
 
     switch (msg.type) {
-      case 'state':
-        setCurrentState(msg.message)
+      case 'status':
+        setCurrentStatus(msg.message)
         console.log(msg.message)
         break
       case 'read_progress':
         const readDisplay = `Reading in progress: ${Math.round((msg.loaded / msg.total) * 100)}%`
-        setCurrentState(readDisplay)
+        setCurrentStatus(readDisplay)
 
         console.log(readDisplay)
         break
       case 'upload_progress':
-        const uploadDisplay = `Uploading ${Math.round((msg.loaded / msg.total) * 100)}%...`
-        setCurrentState(uploadDisplay)
+        const uploadDisplay = `Uploading: ${Math.round((msg.loaded / msg.total) * 100)}%`
+        setCurrentStatus(uploadDisplay)
 
         console.log(uploadDisplay)
+        break
+      case 'terminate_worker':
+        props.worker.terminate()
         break
       default:
         console.log(msg)
@@ -35,7 +38,7 @@ export default function Transfer(props: Props) {
 
   return (
     <div>
-      <span>{currentState}</span>
+      <span>{currentStatus}</span>
     </div>
   )
 }

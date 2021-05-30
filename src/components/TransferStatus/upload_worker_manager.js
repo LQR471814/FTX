@@ -4,7 +4,7 @@ onmessage = (e) => {
   switch (msg.type) {
     case 'start':
       postMessage({
-        type: 'state',
+        type: 'status',
         message: 'Starting task...'
       })
 
@@ -23,16 +23,14 @@ onmessage = (e) => {
           resolve => {
             reader.addEventListener('load', () => {
               postMessage({
-                type: 'state',
-                message: `Compressing ${f.name}...`
+                type: 'status',
+                message: `Processing ${f.name}...`
               })
-
-              console.log(reader.result)
 
               resolve(
                 {
                   name: f.name,
-                  content: new Blob(reader.result)
+                  content: new Blob([reader.result])
                 }
               )
             })
@@ -43,22 +41,25 @@ onmessage = (e) => {
       })
 
       Promise.all(filePromises).then((files) => {
+        const maxFormSize = 850000 //? ~850 kB (at least for chrome)
+        const contentSize = Math.round(maxFormSize / files.length)
+
         const uploadForm = new FormData()
+
         for (const f of files) {
-          uploadForm.append(f.name, f.content)
+          uploadForm.append(f.name, f.content.slice(0, contentSize))
         }
 
         postMessage({
-          type: 'state',
+          type: 'status',
           message: 'Preparing to upload file...'
         })
 
         const sendFileRequest = new XMLHttpRequest()
 
-        sendFileRequest.open('POST', `http://${msg.targetUser.ip}/sendFile`)
         sendFileRequest.onerror = () => {
           postMessage({
-            type: 'state',
+            type: 'status',
             message: `Upload failed with code: ${sendFileRequest.status}`
           })
         }
@@ -71,11 +72,15 @@ onmessage = (e) => {
         }
         sendFileRequest.upload.onload = (e) => {
           postMessage({
-            type: 'state',
+            type: 'status',
             message: 'Upload complete!'
+          })
+          postMessage({
+            type: 'terminate_worker'
           })
         }
 
+        sendFileRequest.open('POST', `http://${msg.targetUser.ip}/sendFile`)
         sendFileRequest.send(uploadForm)
       })
 
