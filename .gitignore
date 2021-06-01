@@ -28,6 +28,3 @@ settings.json
 *.log
 
 yarn.lock
-
-# Webserver test
-test_webserver/

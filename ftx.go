@@ -95,7 +95,7 @@ func main() {
 
 	//? Start frontend
 	http.Handle("/", LimitHandler{http.FileServer(http.Dir("./build"))})
-	http.HandleFunc("/sendFile", sendFile)
+	http.HandleFunc("/sendFile", recvFile)
 	http.HandleFunc("/resource", resource)
 	http.HandleFunc("/updateUsers", updateUsers)
 	http.HandleFunc("/recvMessage", recvMessage)

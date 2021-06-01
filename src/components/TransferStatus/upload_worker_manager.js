@@ -1,92 +1,139 @@
+const FILE_REQUEST_TYPE = "file_requests"
+const UPLOAD_CONFIRMATION_TYPE = "upload_confirmation"
+const UPLOAD_DENY_TYPE = "upload_deny"
+const START_UPLOAD_TYPE = "start_upload"
+const TRANSFERRED_CONFIRMATION_TYPE = "transferred_confirmation"
+
+const CHUNK_SIZE = 1024 ** 2 //? 1 mB
+
+let state = 0 //% State: Initial
+function changeState(newstate) {
+  state = newstate
+  console.log(`State: ${state}`)
+}
+
+function sendCloseSignal() {
+  postMessage({
+    type: 'terminate_worker'
+  })
+}
+
+function updateStatus(message) {
+  postMessage({
+    type: 'status',
+    message: message
+  })
+}
+
+function sendUploadStartSignal(socket, fileIndex) {
+  socket.send(JSON.stringify({
+    Type: START_UPLOAD_TYPE,
+    Payload: fileIndex.toString()
+  }))
+}
+
+function uploadFile(socket, f) {
+  let currentStart = 0
+  let totalSize = f.size
+
+  while (totalSize >= 0) {
+    socket.send(f.slice(currentStart, currentStart + CHUNK_SIZE))
+
+    totalSize -= CHUNK_SIZE
+    currentStart += CHUNK_SIZE
+
+    postMessage({
+      type: 'upload_progress',
+      loaded: Math.min(currentStart, f.size), //? Otherwise, you might end up with 150% if the filesize is 1 kB but the chunk size is 1 mB
+      total: f.size
+    })
+  }
+}
+
+function constructFileTransferStatus(status_type, payload) {
+  return JSON.stringify({
+    Type: status_type,
+    Payload: JSON.stringify(payload)
+  })
+}
+
+function constructCumulativeFileRequest(context) {
+  return constructFileTransferStatus(FILE_REQUEST_TYPE, {
+    From: context.from,
+    Files: context.files.map(f => {
+      return {
+        Filename: f.name,
+        Size: f.size,
+      }
+    })
+  })
+}
+
 onmessage = (e) => {
-  const msg = e.data
+  const context = e.data
 
-  switch (msg.type) {
-    case 'start':
-      postMessage({
-        type: 'status',
-        message: 'Starting task...'
-      })
+  switch (context.type) {
+    case 'start': //? Event: start
+      updateStatus(`Connecting to ${context.targetUser.ip}...`)
 
-      const filePromises = Array.from(msg.files).map(f => {
-        const reader = new FileReader()
-
-        reader.addEventListener('progress', (e) => {
-          postMessage({
-            type: 'read_progress',
-            loaded: e.loaded,
-            total: e.total
-          })
-        })
-
-        return new Promise(
-          resolve => {
-            reader.addEventListener('load', () => {
-              postMessage({
-                type: 'status',
-                message: `Processing ${f.name}...`
-              })
-
-              resolve(
-                {
-                  name: f.name,
-                  content: new Blob([reader.result])
-                }
-              )
-            })
-
-            reader.readAsArrayBuffer(f)
-          }
-        )
-      })
-
-      Promise.all(filePromises).then((files) => {
-        const maxFormSize = 850000 //? ~850 kB (at least for chrome)
-        const contentSize = Math.round(maxFormSize / files.length)
-
-        const uploadForm = new FormData()
-
-        for (const f of files) {
-          uploadForm.append(f.name, f.content.slice(0, contentSize))
+      let currentUploadIndex = 0
+      const incrementIndex = () => {
+        currentUploadIndex += 1
+        if (context.files.length === currentUploadIndex) {
+          return false
+        } else {
+          return true
         }
+      }
 
-        postMessage({
-          type: 'status',
-          message: 'Preparing to upload file...'
-        })
+      const uploadSocket = new WebSocket(`ws://${context.targetUser.ip}/sendFile`) //* Action: opw
+      changeState(1) //% State: Connecting
 
-        const sendFileRequest = new XMLHttpRequest()
+      uploadSocket.onopen = () => { //? Event: onopen
+        uploadSocket.send(constructCumulativeFileRequest(context)) //* Action: srq
+        changeState(2) //% State: Waiting for Confirmation
 
-        sendFileRequest.onerror = () => {
-          postMessage({
-            type: 'status',
-            message: `Upload failed with code: ${sendFileRequest.status}`
-          })
+        updateStatus('Waiting for Approval')
+      }
+
+      uploadSocket.onmessage = (e) => {
+        const msg = JSON.parse(e.data)
+
+        switch (msg.Type) {
+          case UPLOAD_CONFIRMATION_TYPE: //? Event: onacceptrequest
+            const f = context.files[currentUploadIndex]
+            console.log(currentUploadIndex, context, f)
+
+            sendUploadStartSignal(uploadSocket, currentUploadIndex)
+            uploadFile(uploadSocket, f) //* Action: upl
+            changeState(3) //% State: Waiting for Upload Complete Confirmation
+            updateStatus('Waiting for peer to process data...')
+
+            break
+          case UPLOAD_DENY_TYPE: //? Event: ondenyrequest
+            updateStatus('Peer Canceled Upload...')
+
+            sendCloseSignal() //* Action: qui
+            break
+          case TRANSFERRED_CONFIRMATION_TYPE: //? Event: onuploadcomplete
+            updateStatus(`Finished transfer of ${msg.Payload}`)
+
+            if (incrementIndex()) { //* Action: inc
+              uploadFile(uploadSocket, context.files[currentUploadIndex])
+              changeState(3)
+            } else {
+              updateStatus('Transferred all files successfully!')
+              sendCloseSignal() //* Action: qui
+            }
+            break
+          default:
+            break
         }
-        sendFileRequest.upload.progress = (e) => {
-          postMessage({
-            type: 'upload_progress',
-            loaded: e.loaded,
-            total: e.total
-          })
-        }
-        sendFileRequest.upload.onload = (e) => {
-          postMessage({
-            type: 'status',
-            message: 'Upload complete!'
-          })
-          postMessage({
-            type: 'terminate_worker'
-          })
-        }
-
-        sendFileRequest.open('POST', `http://${msg.targetUser.ip}/sendFile`)
-        sendFileRequest.send(uploadForm)
-      })
+      }
 
       break
     default:
-      postMessage(`Worker got unexpected message type: ${msg.type}`)
+      postMessage(`Worker got unexpected message type: ${context.type}`)
       break
   }
 }

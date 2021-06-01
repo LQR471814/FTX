@@ -206,8 +206,6 @@ export default function App() {
   const addToGroups = (initMessages: IMessage[], user: string, opened: number) => {
     const newGroups = _.cloneDeep(groups)
 
-    console.log(initMessages, user, opened)
-
     if (newGroups[user] === undefined) { //? If user doesn't exist
       newGroups[user] = { messages: initMessages, collapsed: opened }
       setGroups(newGroups)
@@ -329,7 +327,8 @@ export default function App() {
             {
               type: 'start',
               targetUser: currentTargetUser.current,
-              files: files
+              files: Array.from(files),
+              from: hostname
             }
           )
 
