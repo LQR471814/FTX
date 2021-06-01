@@ -25,15 +25,34 @@ qui : close connection and quit
 | onrecvrequests          |      -      |             dsr/2             |                 -                 |                  -                  |                 -                 |
 | onuseraccept            |      -      |               -               |               sca/3               |                  -                  |                 -                 |
 | onuserdeny              |      -      |               -               |               scd/0               |                  -                  |                 -                 |
-| onrecvstartuploadsignal |      -      |               -               |                 -                 |                  4                  |                 -                 |
-| onrecvallfilecontents   |      -      |               -               |                 -                 |                  -                  |             tsc, sfc/3            |
+| onrecvstartuploadsignal |      -      |               -               |                 -                 |                bfw, 4               |                 -                 |
+| onrecvfilecontents      |      -      |               -               |                 -                 |                  -                  |                sgd                |
+| onrecvallfilecontents   |      -      |               -               |                 -                 |                  -                  |               upd/3               |
 | onpeerdisconnect        |    der/0    |             der/0             |               der/0               |                  0                  |               der/0               |
 
 ```text
 dsr : display file send requests to user
 sca : send client allow
 scd : send client deny
-tsc : store file contents and update gui
-sfc : send client file upload complete
+upd : update gui
+bfw : start file writer goroutine
+sgd : send file chunk to goroutine to be written to buffer
 der : throw unexpected disconnect error
+```
+
+## Server File Writer Goroutine State
+
+| Events         | 0 - Initial | 1 - Waiting for file data |
+|----------------|-------------|---------------------------|
+| oninit         | crf, ibf/1  | -                         |
+| onrecvfiledata | -           | wrb/1                     |
+| onfileallrecv  | -           | cll, clo/0                |
+
+```text
+crf : create file
+ibf : initialize buffer
+sfc : send client file upload complete
+wrb : write to buffer
+cll : call onfinish callback with filename
+clo : flush buffer and close file
 ```

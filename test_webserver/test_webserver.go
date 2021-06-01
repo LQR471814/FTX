@@ -1,11 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gorilla/websocket"
@@ -43,6 +44,31 @@ type FileTransferStatus struct {
 	Payload string
 }
 
+func fileWriterWorker(filename string, fileSize int, datachan chan []byte, onfinish func(filename string)) {
+	f, err := os.Create(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	writtenBytes := 0
+	w := bufio.NewWriterSize(f, 1024*1024*50)
+
+	for {
+		data := <-datachan
+		w.Write(data)
+
+		writtenBytes += len(data)
+		if writtenBytes >= fileSize {
+			onfinish(filename)
+			fmt.Printf("Wrote %v to disk\n", filename)
+
+			w.Flush()
+			f.Close()
+			return
+		}
+	}
+}
+
 func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 	conn, err := upgrader.Upgrade(w, r, nil) //? Event: onpeerconnect
 	if err != nil {
@@ -51,10 +77,10 @@ func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 	}
 
 	requestFileList := &CumulativeFileRequests{}
-	fileContents := map[int64][]byte{}
 
-	var currentRecvFileIndex int64 = 0
-	receivedBytes := 0
+	var writeDataChannel chan []byte
+	var currentRecvFileIndex int64
+	var receivedBytes int
 
 	//* Action: dsr
 
@@ -86,23 +112,32 @@ func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 			case START_UPLOAD_TYPE:
 				receivedBytes = 0
 				currentRecvFileIndex, _ = strconv.ParseInt(status.Payload, 10, 64)
+
+				currentFile := requestFileList.Files[currentRecvFileIndex]
+
+				writeDataChannel = make(chan []byte)
+				go fileWriterWorker(
+					currentFile.Filename,
+					currentFile.Size,
+					writeDataChannel,
+					func(filename string) {
+						response, _ := json.Marshal(
+							FileTransferStatus{
+								Type:    TRANSFERRED_CONFIRMATION_TYPE,
+								Payload: filename,
+							},
+						)
+
+						conn.WriteMessage(websocket.TextMessage, response)
+					},
+				)
 			}
 		} else {
 			receivedBytes += len(payload)
-			fileContents[currentRecvFileIndex] = append(fileContents[currentRecvFileIndex], payload...)
+			writeDataChannel <- payload
 
 			//? Event: onrecvallfilecontents
 			if receivedBytes >= requestFileList.Files[currentRecvFileIndex].Size {
-				response, _ := json.Marshal(
-					FileTransferStatus{
-						Type:    TRANSFERRED_CONFIRMATION_TYPE,
-						Payload: requestFileList.Files[currentRecvFileIndex].Filename,
-					},
-				)
-				ioutil.WriteFile(requestFileList.Files[currentRecvFileIndex].Filename, fileContents[currentRecvFileIndex], 0222)
-
-				conn.WriteMessage(websocket.TextMessage, response)
-
 				receivedBytes = 0
 				currentRecvFileIndex += 1
 				if currentRecvFileIndex >= int64(len(requestFileList.Files)) {

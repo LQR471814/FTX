@@ -32,6 +32,12 @@ function sendUploadStartSignal(socket, fileIndex) {
   }))
 }
 
+function sendFile(socket, index, context) {
+  sendUploadStartSignal(socket, index)
+  uploadFile(socket, context.files[index]) //* Action: upl
+  changeState(3) //% State: Waiting for Upload Complete Confirmation
+}
+
 function uploadFile(socket, f) {
   let currentStart = 0
   let totalSize = f.size
@@ -104,9 +110,7 @@ onmessage = (e) => {
             const f = context.files[currentUploadIndex]
             console.log(currentUploadIndex, context, f)
 
-            sendUploadStartSignal(uploadSocket, currentUploadIndex)
-            uploadFile(uploadSocket, f) //* Action: upl
-            changeState(3) //% State: Waiting for Upload Complete Confirmation
+            sendFile(uploadSocket, currentUploadIndex, context)
             updateStatus('Waiting for peer to process data...')
 
             break
@@ -119,8 +123,7 @@ onmessage = (e) => {
             updateStatus(`Finished transfer of ${msg.Payload}`)
 
             if (incrementIndex()) { //* Action: inc
-              uploadFile(uploadSocket, context.files[currentUploadIndex])
-              changeState(3)
+              sendFile(uploadSocket, currentUploadIndex, context)
             } else {
               updateStatus('Transferred all files successfully!')
               sendCloseSignal() //* Action: qui

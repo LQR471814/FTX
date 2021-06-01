@@ -21,7 +21,7 @@ let currentKey = 0
 export default function UserList(props: Props) {
   const [users, setUsers]: [User[], Function] = useState([
     { name: "Joe", ip: "192.168.1.7:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
+    { name: "Joe", ip: "192.168.1.2:7777" },
     { name: "Joe", ip: "127.0.0.1:7777" },
     { name: "Joe", ip: "127.0.0.1:7777" },
     { name: "Joe", ip: "127.0.0.1:7777" },
