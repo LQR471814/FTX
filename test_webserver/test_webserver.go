@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -98,6 +99,7 @@ func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 						Payload: requestFileList.Files[currentRecvFileIndex].Filename,
 					},
 				)
+				ioutil.WriteFile(requestFileList.Files[currentRecvFileIndex].Filename, fileContents[currentRecvFileIndex], 0222)
 
 				conn.WriteMessage(websocket.TextMessage, response)
 
