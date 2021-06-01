@@ -44,7 +44,7 @@ type FileTransferStatus struct {
 	Payload string
 }
 
-func fileWriterWorker(filename string, fileSize int, datachan chan []byte, onfinish func(filename string)) {
+func fileWriterWorker(filename string, fileSize int, datachan chan []byte) {
 	f, err := os.Create(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -59,8 +59,7 @@ func fileWriterWorker(filename string, fileSize int, datachan chan []byte, onfin
 
 		writtenBytes += len(data)
 		if writtenBytes >= fileSize {
-			onfinish(filename)
-			fmt.Printf("Wrote %v to disk\n", filename)
+			log.Printf("Wrote %v to disk\n", filename)
 
 			w.Flush()
 			f.Close()
@@ -72,8 +71,7 @@ func fileWriterWorker(filename string, fileSize int, datachan chan []byte, onfin
 func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 	conn, err := upgrader.Upgrade(w, r, nil) //? Event: onpeerconnect
 	if err != nil {
-		log.Println(err)
-		return
+		log.Fatal(err)
 	}
 
 	requestFileList := &CumulativeFileRequests{}
@@ -87,15 +85,14 @@ func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 	for {
 		msgType, payload, err := conn.ReadMessage()
 		if err != nil {
-			log.Println(err)
-			return
+			log.Fatal(err)
 		}
 
 		if msgType == websocket.TextMessage {
 			status := &FileTransferStatus{}
 			json.Unmarshal(payload, status)
 
-			fmt.Println(status)
+			log.Println(status)
 
 			switch status.Type {
 			case FILE_REQUEST_TYPE:
@@ -105,8 +102,10 @@ func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 
 				//% State: Waiting for User Confirmation
 
-				fmt.Println(string(response))
-				conn.WriteMessage(websocket.TextMessage, response) //* Action: scd
+				err := conn.WriteMessage(websocket.TextMessage, response) //* Action: scd
+				if err != nil {
+					log.Fatal(err)
+				}
 
 				//% State: Waiting for Start Upload Signal
 			case START_UPLOAD_TYPE:
@@ -120,16 +119,6 @@ func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 					currentFile.Filename,
 					currentFile.Size,
 					writeDataChannel,
-					func(filename string) {
-						response, _ := json.Marshal(
-							FileTransferStatus{
-								Type:    TRANSFERRED_CONFIRMATION_TYPE,
-								Payload: filename,
-							},
-						)
-
-						conn.WriteMessage(websocket.TextMessage, response)
-					},
 				)
 			}
 		} else {
@@ -139,6 +128,18 @@ func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 			//? Event: onrecvallfilecontents
 			if receivedBytes >= requestFileList.Files[currentRecvFileIndex].Size {
 				receivedBytes = 0
+				response, _ := json.Marshal(
+					FileTransferStatus{
+						Type:    TRANSFERRED_CONFIRMATION_TYPE,
+						Payload: requestFileList.Files[currentRecvFileIndex].Filename,
+					},
+				)
+
+				err := conn.WriteMessage(websocket.TextMessage, response)
+				if err != nil {
+					log.Fatal(err)
+				}
+
 				currentRecvFileIndex += 1
 				if currentRecvFileIndex >= int64(len(requestFileList.Files)) {
 					currentRecvFileIndex = 0

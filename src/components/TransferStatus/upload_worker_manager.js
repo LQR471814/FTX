@@ -111,7 +111,6 @@ onmessage = (e) => {
             console.log(currentUploadIndex, context, f)
 
             sendFile(uploadSocket, currentUploadIndex, context)
-            updateStatus('Waiting for peer to process data...')
 
             break
           case UPLOAD_DENY_TYPE: //? Event: ondenyrequest
