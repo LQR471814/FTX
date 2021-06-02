@@ -9,6 +9,8 @@ import (
 	"os"
 	"strconv"
 
+	_ "net/http/pprof"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -53,8 +55,7 @@ func fileWriterWorker(filename string, fileSize int, datachan chan []byte) {
 	writtenBytes := 0
 	w := bufio.NewWriterSize(f, 1024*1024*50) //? Buffsize = 50 mB
 
-	for {
-		data := <-datachan
+	for data := range datachan {
 		w.Write(data)
 
 		writtenBytes += len(data)
@@ -120,7 +121,7 @@ func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 
 					currentFile := requestFileList.Files[currentRecvFileIndex]
 
-					writeDataChannel = make(chan []byte)
+					writeDataChannel = make(chan []byte, 1000)
 					go fileWriterWorker(
 						currentFile.Filename,
 						currentFile.Size,
@@ -138,6 +139,8 @@ func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 
 			//? Event: onrecvallfilecontents
 			if receivedBytes >= requestFileList.Files[currentRecvFileIndex].Size && state == 4 {
+				close(writeDataChannel)
+
 				receivedBytes = 0
 				response, _ := json.Marshal(
 					FileTransferStatus{
@@ -163,7 +166,7 @@ func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 }
 
 func main() {
-	serveIp := ":7777"
+	serveIp := "localhost:7777"
 
 	http.HandleFunc("/sendFile", handler)
 	fmt.Println("Serving on: " + serveIp)
