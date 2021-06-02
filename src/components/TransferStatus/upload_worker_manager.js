@@ -2,6 +2,7 @@ const FILE_REQUEST_TYPE = "file_requests"
 const UPLOAD_CONFIRMATION_TYPE = "upload_confirmation"
 const UPLOAD_DENY_TYPE = "upload_deny"
 const START_UPLOAD_TYPE = "start_upload"
+const UPLOAD_STATUS_TYPE = "upload_status"
 const TRANSFERRED_CONFIRMATION_TYPE = "transferred_confirmation"
 
 const CHUNK_SIZE = 1024 ** 2 //? 1 mB
@@ -41,6 +42,8 @@ function sendFile(socket, index, context) {
 function uploadFile(socket, f) {
   let currentStart = 0
   let totalSize = f.size
+  const statusUpdateFrequency = totalSize / 15 // Only update every 10 bytes if total size is 1000
+  let currentUpdateIndex = statusUpdateFrequency
 
   while (totalSize >= 0) {
     socket.send(f.slice(currentStart, currentStart + CHUNK_SIZE))
@@ -48,11 +51,13 @@ function uploadFile(socket, f) {
     totalSize -= CHUNK_SIZE
     currentStart += CHUNK_SIZE
 
-    postMessage({
-      type: 'upload_progress',
-      loaded: Math.min(currentStart, f.size), //? Otherwise, you might end up with 150% if the filesize is 1 kB but the chunk size is 1 mB
-      total: f.size
-    })
+    if (currentStart > currentUpdateIndex) { // Only send file if current sent bytes is larger than update frequency
+      socket.send(JSON.stringify({
+        Type: UPLOAD_STATUS_TYPE
+      }))
+
+      currentUpdateIndex += statusUpdateFrequency
+    }
   }
 }
 
@@ -117,6 +122,16 @@ onmessage = (e) => {
             updateStatus('Peer Canceled Upload...')
 
             sendCloseSignal() //* Action: qui
+            break
+          case UPLOAD_STATUS_TYPE:
+            const status = JSON.parse(msg.Payload)
+
+            postMessage({
+              type: 'upload_progress',
+              loaded: Math.min(status.Received, status.Total), // Otherwise, you might end up with 150% if the filesize is 1 kB but the chunk size is 1 mB
+              total: status.Total
+            })
+
             break
           case TRANSFERRED_CONFIRMATION_TYPE: //? Event: onuploadcomplete
             updateStatus(`Finished transfer of ${msg.Payload}`)

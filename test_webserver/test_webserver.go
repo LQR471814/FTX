@@ -23,12 +23,18 @@ const FILE_REQUEST_TYPE = "file_requests"
 const UPLOAD_CONFIRMATION_TYPE = "upload_confirmation"
 const UPLOAD_DENY_TYPE = "upload_deny"
 const START_UPLOAD_TYPE = "start_upload"
+const UPLOAD_STATUS_TYPE = "upload_status"
 const TRANSFERRED_CONFIRMATION_TYPE = "transferred_confirmation"
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin:     func(*http.Request) bool { return true }, //? Allow cross-origin requests
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+}
+
+type UploadStatus struct {
+	Received int
+	Total    int
 }
 
 type FileSendRequest struct {
@@ -129,6 +135,26 @@ func handler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 					)
 
 					state = 4 //% State: Waiting for All File Contents
+				}
+			case UPLOAD_STATUS_TYPE:
+				if state == 4 {
+					status, err := json.Marshal(UploadStatus{
+						Received: receivedBytes,
+						Total:    requestFileList.Files[currentRecvFileIndex].Size,
+					})
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					response, err := json.Marshal(FileTransferStatus{
+						Type:    UPLOAD_STATUS_TYPE,
+						Payload: string(status),
+					})
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					conn.WriteMessage(websocket.TextMessage, response)
 				}
 			}
 		} else {

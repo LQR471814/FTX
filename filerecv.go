@@ -15,7 +15,13 @@ const FILE_REQUEST_TYPE = "file_requests"
 const UPLOAD_CONFIRMATION_TYPE = "upload_confirmation"
 const UPLOAD_DENY_TYPE = "upload_deny"
 const START_UPLOAD_TYPE = "start_upload"
+const UPLOAD_STATUS_TYPE = "upload_status"
 const TRANSFERRED_CONFIRMATION_TYPE = "transferred_confirmation"
+
+type UploadStatus struct {
+	Received int
+	Total    int
+}
 
 type FileSendRequest struct {
 	Filename string
