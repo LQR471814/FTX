@@ -15,6 +15,10 @@ export default function Transfer(props: Props) {
         setCurrentStatus(msg.message)
         console.log(msg.message)
         break
+      case 'error':
+        setCurrentStatus(msg.message)
+        props.worker.terminate()
+        break
       case 'read_progress':
         const readDisplay = `Reading in progress: ${Math.round((msg.loaded / msg.total) * 100)}%`
         setCurrentStatus(readDisplay)

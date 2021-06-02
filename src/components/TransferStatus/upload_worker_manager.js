@@ -26,6 +26,13 @@ function updateStatus(message) {
   })
 }
 
+function sendError(message) {
+  postMessage({
+    type: 'error',
+    message: message
+  })
+}
+
 function sendUploadStartSignal(socket, fileIndex) {
   socket.send(JSON.stringify({
     Type: START_UPLOAD_TYPE,
@@ -105,6 +112,10 @@ onmessage = (e) => {
         changeState(2) //% State: Waiting for Confirmation
 
         updateStatus('Waiting for Approval')
+      }
+
+      uploadSocket.onerror = (e) => {
+        sendError('An error occurred with the connection...')
       }
 
       uploadSocket.onmessage = (e) => {

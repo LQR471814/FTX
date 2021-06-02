@@ -13,12 +13,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-//MulticastPacket contains information for a given multicast packet received
-type MulticastPacket struct {
-	content []byte
-	src     net.Addr
-}
-
 func ping(buf []byte) {
 	group, err := net.ResolveUDPAddr("udp", multicastGroup)
 	if err != nil {
