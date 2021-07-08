@@ -1,9 +1,10 @@
-import { useCallback, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Banner from "components/Banner/Banner"
-import Window from "components/Window/Window"
+import Window from "components/Layout/Window/Window"
 import MessageComponent from "components/MessagePanel/MessageComponent"
 import UserList from "components/UserList/UserList"
 import ChoicesContainer from "components/Choice/ChoicesContainer"
+import ArrayLayout from "components/Layout/Array/Array"
 
 import { ReactComponent as OtherIcon } from "styling/assets/other.svg"
 import { ReactComponent as WifiIcon } from "styling/assets/interfaceLogos/wifi.svg"
@@ -11,7 +12,6 @@ import { ReactComponent as EthernetIcon } from "styling/assets/interfaceLogos/et
 import { ReactComponent as FileIcon } from "styling/assets/file.svg"
 import { ReactComponent as MessageIcon } from "styling/assets/message.svg"
 
-import { w3cwebsocket as WebSocketClient } from "websocket"
 import _ from "lodash"
 import UploadRegion from "components/UploadRegion/UploadRegion"
 import TransferStatus from "components/TransferStatus/TransferStatus"
@@ -19,6 +19,8 @@ import TransferStatus from "components/TransferStatus/TransferStatus"
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import UploadWorker from 'worker-loader!./components/TransferStatus/upload_worker_manager.js'
 import PendingTransfers from "components/PendingTransfers/PendingTransfers"
+
+import * as backendIntf from "lib/BackendInterface"
 
 const wifiKeywords = [
   "wi-fi",
@@ -42,13 +44,13 @@ function containsKeywords(str: string, keywords: Array<string>) {
 }
 
 export default function App() {
-  const [activeWorkers, setActiveWorkers] = useState<Array<Worker>>([])
+  const [activeTransfers, setActiveTransfers] = useState<Transfer[]>([])
 
   const [showBanner, setShowBanner] = useState(true)
   const [groups, setGroups] = useState({} as Record<string, IMessageGroup>)
   const [banner] = useState(
     {
-      text: "Make sure multicast peer discovery is working on your device",
+      text: "Choose your network interface",
       buttonText: "Setup",
       backgroundColor: "#ff9100",
       textColor: "#ffffff",
@@ -78,18 +80,29 @@ export default function App() {
   const currentChoiceKey = useRef(0)
   const currentTargetUser = useRef<User>({ name: "", ip: "" })
 
-  //? Initialize Websocket Connections
-  const recvMsgSocket = new WebSocketClient("ws://localhost:3000/recvMessage")
+  useEffect(() => {
+    //? Initialize websockets
+    backendIntf.initialize()
 
-  recvMsgSocket.onopen = useCallback(
-    () => {
-      console.log("Connected to message out.")
-    },
-    []
-  )
+    backendIntf.resourceSocket.request(
+      backendIntf.REQ_HOSTNAME, {}
+    )?.then((msg: any) => {
+      setHostname(msg.Response.GetHostname)
+    })
 
-  recvMsgSocket.onmessage = useCallback(
-    (message) => {
+    backendIntf.resourceSocket.request(
+      backendIntf.REQ_SETUP_REQUIREMENT, {}
+    )?.then((msg: any) => {
+      if (msg.Response.RequireSetup === true) {
+        backendIntf.resourceSocket.request(
+          backendIntf.REQ_INTERFACES, {}
+        )?.then((msg: any) => {
+          setNetInterfaces(msg.Response.GetInterfaces)
+        })
+      }
+    })
+
+    backendIntf.recvMessage.listen((msg) => {
       const onRecvMessage = (messageContent: string, user: string) => {
         const newGroups = _.cloneDeep(groups)
         if (newGroups[user] !== undefined) {
@@ -104,60 +117,12 @@ export default function App() {
         setGroups(newGroups)
       }
 
-      if (typeof message.data === "string") {
-        let messageObj = JSON.parse(message.data)
-        onRecvMessage(messageObj.Message, messageObj.User)
+      if (typeof msg.data === "string") {
+        onRecvMessage(msg.Message, msg.User)
       }
-    },
-    [groups]
-  )
-
-  const resourceSocket = useRef(new WebSocketClient("ws://localhost:3000/resource")).current
-  resourceSocket.onopen = useCallback(() => {
-    console.log("Connected to resource.")
-
-    resourceSocket.send(
-      JSON.stringify({ name: "getHostname", parameters: {} })
-    )
-    // resourceSocket.send( //? Unnecessary
-    //   JSON.stringify({ name: "getOS", parameters: {} })
-    // )
-    resourceSocket.send(
-      JSON.stringify({ name: "requireSetup", parameters: {} })
-    )
-  }, [resourceSocket])
-
-  resourceSocket.onmessage = useCallback((message) => {
-    if (typeof message.data === "string") {
-      let messageObj = JSON.parse(message.data)
-      console.log(messageObj)
-      switch (messageObj.MsgType) {
-        case "getInterfaces":
-          setNetInterfaces(messageObj.Response.GetInterfaces)
-          break
-
-        // case "getOS": //? Unnecessary
-        //   os = messageObj.Response.GetOS.toLowerCase()
-        //   break
-
-        case "getHostname":
-          setHostname(messageObj.Response.GetHostname)
-          break
-
-        case "requireSetup":
-          if (messageObj.Response.RequireSetup === true) {
-            resourceSocket.send(
-              JSON.stringify({ name: "getInterfaces", parameters: {} })
-            )
-          }
-          setShowBanner(messageObj.Response.RequireSetup)
-          break
-
-        default:
-          break
-      }
-    }
-  }, [resourceSocket])
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const uniqueChoiceKey = (prefix: string) => {
     currentChoiceKey.current++
@@ -168,11 +133,13 @@ export default function App() {
     const newGroups = _.cloneDeep(groups)
     newGroups[destHost].messages.push({ content: messageContent, author: "You" })
     setGroups(newGroups)
-    resourceSocket.send(
-      JSON.stringify({
-        name: "sendMessage",
-        parameters: { MessageDestination: destHost, Message: messageContent },
-      })
+
+    backendIntf.resourceSocket.request(
+      backendIntf.REQ_SEND_MESSAGE,
+      {
+        MessageDestination: destHost,
+        Message: messageContent
+      }
     )
   }
 
@@ -218,12 +185,10 @@ export default function App() {
   // * Callback when user has chosen network interface
   const chooseInterface = (intf: Primitive | undefined) => {
     if (intf !== undefined) {
-      // resourceSocket.send(
-      //   JSON.stringify({
-      //     name: "setInterfaces",
-      //     parameters: { InterfaceID: parseInt(intf as string) },
-      //   })
-      // )
+      backendIntf.resourceSocket.request(
+        backendIntf.REQ_SET_INTERFACES,
+        { InterfaceID: parseInt(intf as string) }
+      )
 
       setShowBanner(false)
     }
@@ -231,8 +196,8 @@ export default function App() {
   }
 
   return (
-    <div style={{ height: "100vh", width: "100vw", overflow: "hidden" }}>
-      <div className="AppDiv" id="AppGrid">
+    <div className="AppRoot">
+      <ArrayLayout childrenSizes="min-content minmax(0, 1fr)">
         <Banner
           show={showBanner}
           callback={
@@ -251,36 +216,39 @@ export default function App() {
           textColor={banner.textColor}
         />
 
-        <div className="Col" style={{ overflow: "hidden" }}>
-          <Window height="100%" title="Messages">
+        <ArrayLayout rows={true}>
+          <Window title="Messages">
             <MessageComponent
               groups={groups}
               submitMessage={replyMessage}
               setCollapsed={setCollapsed}
             />
           </Window>
-        </div>
 
-        <div className="Col" style={{ overflow: "hidden" }}>
-          <Window height="40%" title="User List">
-            <UserList
-              hostname={hostname}
-              setShowCommChoice={setShowCommChoice}
-            />
-          </Window>
-          <Window height="30%" title="Pending Transfers">
-            <PendingTransfers />
-          </Window>
-          <Window height="30%" title="Transfer Status">
-            <TransferStatus activeWorkers={activeWorkers} />
-          </Window>
-        </div>
+          <ArrayLayout childrenSizes="min-content 1fr">
+            <Window title="User List">
+              <UserList
+                hostname={hostname}
+                setShowCommChoice={setShowCommChoice}
+              />
+            </Window>
 
-      </div>
+            <ArrayLayout rows={true}>
+              <Window title="Pending Transfers">
+                <PendingTransfers />
+              </Window>
+              <Window title="Transfer Status">
+                <TransferStatus activeTransfers={activeTransfers} />
+              </Window>
+            </ArrayLayout>
+          </ArrayLayout>
+
+        </ArrayLayout>
+      </ArrayLayout>
 
       {showNetworkInterfacesChoice ?
         <ChoicesContainer
-          mainLabel="Choose a network interface to receive multicast"
+          mainLabel="Choose a network interface"
           items={
             netInterfaces.map(
               (intf: INetInterface) => {
@@ -323,6 +291,59 @@ export default function App() {
           if (!files) return
 
           const worker = new UploadWorker()
+
+          const currentTransferIndex = activeTransfers.length
+          const setNewState = (newState: TransferState) => {
+            console.log(activeTransfers, currentTransferIndex)
+            const mutateTransfers = activeTransfers
+            mutateTransfers[currentTransferIndex].state = newState
+
+            setActiveTransfers(mutateTransfers)
+          }
+          const setCurrentStatus = (status: string) => {
+            setNewState({ status: status })
+          }
+
+          worker.onmessage = (e: MessageEvent) => {
+            const msg = e.data
+
+            switch (msg.type) {
+              case 'status':
+                setCurrentStatus(msg.message)
+                console.log(msg.message)
+                break
+              case 'error':
+                setCurrentStatus(msg.message)
+                worker.terminate()
+                break
+              case 'read_progress':
+                const readDisplay = `Reading in progress: ${Math.round((msg.loaded / msg.total) * 100)}%`
+                setCurrentStatus(readDisplay)
+
+                console.log(readDisplay)
+                break
+              case 'upload_progress':
+                const uploadDisplay = `Uploading: ${Math.round((msg.loaded / msg.total) * 100)}%`
+                setCurrentStatus(uploadDisplay)
+
+                console.log(uploadDisplay)
+                break
+              case 'terminate_worker':
+                worker.terminate()
+                break
+              default:
+                console.log(msg)
+                break
+            }
+          }
+
+          setActiveTransfers([...activeTransfers, {
+            worker: worker,
+            state: {
+              status: 'Initializing...'
+            }
+          }])
+
           worker.postMessage(
             {
               type: 'start',
@@ -331,8 +352,6 @@ export default function App() {
               from: hostname
             }
           )
-
-          setActiveWorkers([...activeWorkers, worker])
         }
       } /> : undefined}
     </div>

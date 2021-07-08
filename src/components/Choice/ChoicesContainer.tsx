@@ -92,7 +92,11 @@ export default function ChoicesContainer(props: Props) {
 
   return (
     <Overlay dontHandleClose={true}>
-      <div style={{ opacity: "0%", transition: "0.5s ease-in-out all" }} ref={rootContainerRef}>
+      <div style={{
+        display: "block",
+        opacity: "0%",
+        transition: "0.5s ease-in-out all"
+      }} ref={rootContainerRef}>
         <p className="Info">{props.mainLabel}</p>
 
         <ChoiceElementsContainer

@@ -1,9 +1,8 @@
 import "styling/Widget.css"
 import "styling/Root.css"
-import "styling/Window.css"
+import "./css/Window.css"
 
 interface Props {
-  height: string
   title: string
   children?: React.ReactChild
   col?: boolean
@@ -11,7 +10,7 @@ interface Props {
 
 export default function Window(props: Props) {
   return (
-    <div className="Window" style={{ height: props.height, overflow: "hidden" }}>
+    <div className="Window" style={{ overflow: "hidden" }}>
       <p className="Title">{props.title}</p>
       {props.children}
     </div>

@@ -28,6 +28,10 @@ export default function Overlay(props: Props) {
     if (!props.dontHandleClose) document.addEventListener('keydown', listenForClose)
 
     if (props.onOpen) props.onOpen()
+
+    return () => {
+      if (!props.dontHandleClose) document.removeEventListener('keydown', listenForClose)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

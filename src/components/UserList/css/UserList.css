@@ -1,10 +1,12 @@
 /* User */
 .User {
+  display: block;
+
   margin: 2px;
-  padding: 8px;
+  padding: 8px 16px 8px 16px;
 
   border-radius: var(--very-round);
-  background-color: #5c5c5c;
+  background-color: var(--neutral);
 
   box-sizing: border-box;
 

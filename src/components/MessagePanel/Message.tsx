@@ -1,18 +1,25 @@
-//? This component acts as a SINGULAR message
-import "./css/MessagePanel.css"
+import "./css/Message.css"
 
 interface Props {
-  text: string,
-  author: string
+  text?: string,
+  author?: string
+
+  children?: React.ReactChild
 }
 
-function Message(props: Props) {
+export default function Message(props: Props) {
   return (
     <div className="Message">
-      <p className="MessageAuthor">{props.author}</p>
-      <p className="MessageContent">{props.text}</p>
+      {props.children ? props.children : null}
+
+      {(props.text && props.author) ? (
+        <div className="Block" style={{
+          wordBreak: "break-word",
+        }}>
+          <p className="MessageAuthor">{props.author}</p>
+          <p className="MessageContent">{props.text}</p>
+        </div>
+      ) : null}
     </div>
   )
 }
-
-export default Message

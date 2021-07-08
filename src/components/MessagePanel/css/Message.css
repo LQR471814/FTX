@@ -1,0 +1,26 @@
+.Message {
+  display: block;
+  border-radius: var(--round);
+
+  margin-top: 15px;
+
+  padding: 7.5px 10px 7.5px 10px;
+
+  background-color: #41414170;
+  box-shadow: 5px 5px 10px #272727;
+}
+
+.MessageContent {
+  margin: 5px;
+
+  font-size: 21px;
+  color: var(--highlight-lighter);
+}
+
+.MessageAuthor {
+  margin: 0;
+
+  font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  color: var(--active-neutral);
+}

@@ -1,4 +1,7 @@
 .MessageList {
+  display: block;
+  width: 100%;
+
   margin: 0px 0px 10px 0px;
 }
 
@@ -11,6 +14,8 @@
 }
 
 .MessageGroupCollapsible {
+  display: block;
+
   background-color: #42424277;
   border-radius: var(--extremely-round);
   padding: 5px;
@@ -30,6 +35,8 @@
 }
 
 .MessageGroupContainer {
+  display: block;
+
   background: none;
   padding: 5px;
 
@@ -40,61 +47,12 @@
 }
 
 .MessageGroupContainer.Uncollapsed {
-  background: linear-gradient(180deg, rgba(40,40,40,0.6979166666666667) 0%, rgba(255,255,255,0) 35%);
+  background: linear-gradient(
+    180deg,
+  rgba(40,40,40,0.6979166666666667) 0%,
+  rgba(255,255,255,0) 35%
+  );
   height: auto;
-}
 
-.Message {
-  border-radius: var(--round);
-
-  padding: 7.5px 10px 7.5px 10px;
-
-  margin: 10px;
-
-  background-color: #41414170;
-  box-shadow: 5px 5px 10px #272727;
-}
-
-.MessageContent {
-  font-family: "OpenSans", Arial, Helvetica, sans-serif;
-  font-size: 16px;
-  color: var(--highlight-lighter);
-}
-
-.MessageAuthor {
-  font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
-  font-size: 12px;
-  color: var(--active-neutral);
-}
-
-.SubmitButton {
-  font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
-  font-size: 12px;
-  display: block;
-
-  overflow: hidden;
-
-  box-sizing: border-box;
-
-  border-radius: var(--round);
-  box-shadow: none;
-
-  color: #ffffff;
-  border: none;
-  background-color: #45bbff;
-
-  transition: all ease-in-out 0.15s;
-
-  outline: none;
-  width: 0px;
-}
-
-.SubmitButton:hover {
-  cursor: pointer;
-  border: 2px solid var(--highlight-lighter);
-}
-
-.SubmitButton:active {
-  border: 2.5px solid #ffffff;
-  background-color: #96fa60;
+  padding: 10px;
 }

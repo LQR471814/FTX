@@ -5,6 +5,15 @@ declare module "*.svg" { //? Fix svg imports
   export default src
 }
 
+interface Transfer {
+  worker: Worker
+  state: TransferState
+}
+
+interface TransferState {
+  status: string
+}
+
 interface IMessageGroup {
   messages: IMessage[]
   collapsed: number

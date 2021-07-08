@@ -29,14 +29,16 @@ func updateUsers(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Fatal("UPGRADE FAILED: ", err)
-			return
 		}
+
 		updateUserConns = append(updateUserConns, conn)
+
 		for _, user := range mainState.MulticastPeers {
 			res, err := json.Marshal(user)
 			if err != nil {
 				log.Fatal(err)
 			}
+
 			conn.WriteMessage(websocket.TextMessage, res)
 		}
 	}
@@ -47,8 +49,8 @@ func recvMessage(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Fatal("UPGRADE FAILED: ", err)
-			return
 		}
+
 		recvMessageConns = append(recvMessageConns, conn)
 	}
 }
@@ -58,12 +60,12 @@ func resource(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Fatal("UPGRADE FAILED: ", err)
-			return
 		}
+
 		for {
 			_, message, err := conn.ReadMessage()
-			if err != nil {
-				fmt.Println("Quitting...")
+			if err != nil { //? On websocket disconnected
+				log.Println("Resource closed")
 				break
 			}
 
@@ -106,6 +108,7 @@ func resource(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 		}
+
 		writeSettings()
 		settings.File.Close()
 		server.Shutdown(context.Background())

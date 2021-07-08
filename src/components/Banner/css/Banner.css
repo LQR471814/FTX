@@ -1,4 +1,4 @@
-span {
+.BannerMessage {
   align-self: center;
 
   font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
@@ -6,10 +6,6 @@ span {
 }
 
 .BannerContainer {
-  grid-column: 1 / -1;
-
-  display: flex;
-
   flex-shrink: 1;
 
   height: 1.5em;
@@ -21,17 +17,17 @@ span {
   justify-content: center;
 }
 
-.SetupButton {
+.Button {
   margin: 0px 5px 0px 5px;
-  padding: 0px 3px 1px 3px;
+  padding: 0px 5px 0px 5px;
   border-radius: var(--round);
 
   border-width: 2px;
   border-style: solid;
   border-color: #ffffff;
 
-  font-family: "OpenSans";
-  font-size: 14px;
+  font-family: "SourceSansPro";
+  font-size: 16px;
   color: #ffffff;
   background-color: #ffffff00;
 
@@ -39,7 +35,7 @@ span {
   transition: all 0.1s;
 }
 
-.SetupButton:hover {
+.Button:hover {
   color: #ff9100;
   background-color: #ffffff;
   cursor: pointer;

@@ -1,22 +1,15 @@
-import { useCallback, useState } from "react"
+import { useRef, useState } from "react"
 import "styling/Widget.css"
-import "styling/Window.css"
 import "./css/UserList.css"
 
 import User from "./User"
 import _ from "lodash"
-import { w3cwebsocket as WebSocketClient } from "websocket"
+import * as backendIntf from "lib/BackendInterface"
 
 interface Props {
   hostname: string,
   setShowCommChoice: (user: User) => void
 }
-
-const userUpdateClient = new WebSocketClient(
-  "ws://localhost:3000/updateUsers"
-)
-
-let currentKey = 0
 
 export default function UserList(props: Props) {
   const [users, setUsers]: [User[], Function] = useState([
@@ -35,60 +28,54 @@ export default function UserList(props: Props) {
     { name: "Joe", ip: "127.0.0.1:7777" },
   ])
 
-  userUpdateClient.onopen = useCallback(() => {
-    console.log("Connected to user update backend.")
-    userUpdateClient.send("Connected")
-  }, [])
-
-  userUpdateClient.onmessage = useCallback((message) => {
-    const addUser = async (user: User) => {
-      while (props.hostname === undefined) {
-        await new Promise((r) => setTimeout(r, 1))
-      }
-      if (user.name === props.hostname) {
-        return
-      }
-
-      const newUsers: User[] = _.cloneDeep(users)
-      newUsers.push(user)
-      setUsers(newUsers)
+  const addUser = async (user: User) => {
+    while (props.hostname === undefined) {
+      await new Promise((r) => setTimeout(r, 1))
+    }
+    if (user.name === props.hostname) {
+      return
     }
 
-    const removeUser = (user: User) => {
-      const newUsers = _.cloneDeep(users)
-      newUsers.splice(newUsers.indexOf(user), 1)
-      setUsers(newUsers)
-    }
+    const newUsers: User[] = _.cloneDeep(users)
+    newUsers.push(user)
+    setUsers(newUsers)
+  }
 
-    if (typeof message.data === "string") {
-      const messageObj = JSON.parse(message.data)
-      console.log(messageObj)
-      switch (messageObj.MsgType) {
-        case "addUser":
-          if (
-            !users.some((user) => {
-              return user.name === messageObj.Name && user.ip === messageObj.IP
-            })
-          ) {
-            addUser({ name: messageObj.Name, ip: messageObj.IP })
+  const removeUser = (user: User) => {
+    const newUsers = _.cloneDeep(users)
+    newUsers.splice(newUsers.indexOf(user), 1)
+    setUsers(newUsers)
+  }
+
+  if (false)
+  backendIntf.userListUpdater.listen((msg) => {
+    const user = { name: msg.Name, ip: msg.IP }
+
+    switch (msg.MsgType) {
+      case "addUser":
+        if (!users.some(
+          (user) => {
+            return user.name === msg.Name
+              && user.ip === msg.IP
           }
-          break
-        case "removeUser":
-          removeUser({ name: messageObj.Name, ip: messageObj.IP })
-          break
-        default:
-          break
-      }
+        )) {
+          addUser(user)
+        }
+        break
+      case "removeUser":
+        removeUser(user)
+        break
     }
-  }, [props.hostname, users])
+  })
 
+  const currentKey = useRef(0)
   const uniqueKey = (prefix: string) => {
-    currentKey++
-    return prefix + currentKey.toString()
+    currentKey.current++
+    return prefix + currentKey.current.toString()
   }
 
   return (
-    <div className="ComponentContainer UserList">
+    <div className="ComponentContainer">
       {users.map((user) => {
         return (
           <User

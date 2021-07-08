@@ -8,8 +8,8 @@ import MessageList from "./MessageList"
 
 interface Props {
   groups: Record<string, IMessageGroup>
-  submitMessage: Function,
-  setCollapsed: Function
+  submitMessage: (messageContent: string, destHost: string) => void,
+  setCollapsed: (user: string, collapsed: number) => void
 }
 
 function MessageComponent(props: Props) {

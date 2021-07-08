@@ -12,6 +12,8 @@
 }
 
 .ChoiceDiv {
+  display: block;
+
   text-align: center;
   border: 2px solid #ffffff00;
   border-radius: var(--very-round);

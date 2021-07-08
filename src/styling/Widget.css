@@ -1,5 +1,5 @@
 .InputField {
-  font-family: "OpenSans", Arial, Helvetica, sans-serif;
+  font-family: "", Arial, Helvetica, sans-serif;
   border-radius: var(--round);
   box-sizing: border-box;
 
@@ -25,7 +25,6 @@
 
 .InputField:focus {
   border: 1px solid var(--highlight-lighter);
-  background-color: var(--neutral);
 }
 
 .Title {
@@ -36,14 +35,11 @@
 }
 
 .ComponentContainer {
-  display: block;
-
   overflow-y: auto;
 
   padding: 15px;
-
   height: 100%;
 
-  background-color: #5c5c5c;
+  background-color: var(--neutral);
   border-radius: var(--round);
 }

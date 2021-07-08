@@ -1,0 +1,30 @@
+.SubmitButton {
+	/* Remove Default Styling */
+
+  display: block;
+  outline: none;
+
+	/* Stylizing */
+
+  font-size: 12px;
+  display: block;
+
+  border-radius: var(--round);
+
+  transition: all ease-in-out 0.12s;
+
+	/* Fix CSS Bugs */
+
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.SubmitButton:hover {
+  cursor: pointer;
+  border: 2px solid var(--highlight-lighter);
+}
+
+.SubmitButton:active {
+  border: 2.5px solid #ffffff;
+  background-color: #96fa60;
+}

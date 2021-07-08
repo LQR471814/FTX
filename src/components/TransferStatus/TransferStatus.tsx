@@ -1,20 +1,20 @@
-import { useRef } from 'react'
 import 'styling/Widget.css'
 import Transfer from './Transfer'
 
 interface Props {
-  activeWorkers: Worker[]
+  activeTransfers: Transfer[]
+}
+
+export interface TransferState {
+  status: string
 }
 
 export default function TransferStatus(props: Props) {
-  const currentWorkerID = useRef(0)
-
   return (
     <div className="ComponentContainer">
       {
-        props.activeWorkers.map((w) => {
-          currentWorkerID.current += 1
-          return <Transfer worker={w} key={currentWorkerID.current} />
+        props.activeTransfers.map((t) => {
+          return <Transfer state={t.state} />
         })
       }
     </div>
