@@ -1,14 +1,11 @@
 import "./css/Banner.css"
 import { ReactComponent as CloseIcon } from "styling/assets/close.svg"
 
-interface Props {
-  show: boolean,
-  text: string,
-  buttonText: string,
-  backgroundColor: string,
-  textColor: string,
-  callback: Function,
-  closedCallback: Function
+type Props = {
+  show: boolean
+  style: BannerStyle
+  click: () => void
+  closedCallback: () => void
 }
 
 export default function Banner(props: Props) {
@@ -17,7 +14,7 @@ export default function Banner(props: Props) {
   }
 
   const onClickSetup = () => {
-    props.callback()
+    props.click()
   }
 
   if (props.show !== true) {
@@ -27,19 +24,19 @@ export default function Banner(props: Props) {
   return (
     <div
       className="BannerContainer"
-      style={{ backgroundColor: props.backgroundColor }}
+      style={{ backgroundColor: props.style.backgroundColor }}
     >
       <div style={{
         flex: "1",
         justifyContent: "center",
         marginLeft: "5px"
       }}>
-        <span className="BannerMessage" style={{ color: props.textColor }}>
-          {props.text}
+        <span className="BannerMessage" style={{ color: props.style.textColor }}>
+          {props.style.text}
         </span>
 
         <button className="Button" onClick={onClickSetup}>
-          <span>{props.buttonText}</span>
+          <span>{props.style.buttonText}</span>
         </button>
       </div>
 

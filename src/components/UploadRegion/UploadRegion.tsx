@@ -4,7 +4,7 @@ import "styling/Widget.css"
 import UploaderGUI from './Uploader/UploaderGUI'
 import { transitionEffectOffset } from 'lib/Utils'
 
-interface Props {
+type Props = {
   onChosen: (files: FileList | null) => void
 }
 

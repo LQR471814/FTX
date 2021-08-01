@@ -77,7 +77,7 @@ function constructFileTransferStatus(status_type, payload) {
 
 function constructCumulativeFileRequest(context) {
   return constructFileTransferStatus(FILE_REQUEST_TYPE, {
-    From: context.from,
+    From: context.targetIp,
     Files: context.files.map(f => {
       return {
         Filename: f.name,
@@ -92,7 +92,7 @@ onmessage = (e) => {
 
   switch (context.type) {
     case 'start': //? Event: start
-      updateStatus(`Connecting to ${context.targetUser.ip}...`)
+      updateStatus(`Connecting to ${context.targetIp}...`)
 
       let currentUploadIndex = 0
       const incrementIndex = () => {
@@ -104,7 +104,7 @@ onmessage = (e) => {
         }
       }
 
-      const uploadSocket = new WebSocket(`ws://${context.targetUser.ip}/sendFile`) //* Action: opw
+      const uploadSocket = new WebSocket(`ws://${context.targetIp}/sendFile`) //* Action: opw
       changeState(1) //% State: Connecting
 
       uploadSocket.onopen = () => { //? Event: onopen

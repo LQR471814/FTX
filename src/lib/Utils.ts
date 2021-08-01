@@ -1,6 +1,18 @@
 import { RefObject } from "react"
 import "styling/Root.css"
 
+const unique_ids: {
+    [key: string]: number
+} = {}
+
+export function uniqueId(prefix: string) {
+    if (!unique_ids[prefix])
+        unique_ids[prefix] = 0
+
+    unique_ids[prefix]++
+    return `${prefix}_${unique_ids[prefix]}`
+}
+
 export function transitionEffect(element: HTMLElement, callback: (e: TransitionEvent) => void) {
     element.addEventListener("transitionend", (e: TransitionEvent) => {
         callback(e)

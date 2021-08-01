@@ -7,28 +7,27 @@ import "./css/MessagePanel.css"
 
 import Message from "./Message"
 import MessageInput from "./MessageInput"
+import { useApp } from "context/AppContext"
+import { uniqueId } from "lib/Utils"
 
-interface Props {
-  collapsed: number,
-  messages: Array<IMessage>,
-  user: string,
-  submitMessage: (messageContent: string, destHost: string) => void,
-  setCollapsed: (user: string, collapsed: number) => void
+import * as backendIntf from "lib/BackendController"
+
+type Props = {
+  group: MessageGroup
+  ID: IP
 }
 
 function MessageList(props: Props) {
   const groupContainerRef = createRef<HTMLDivElement>()
   const messageGroupCollapsibleRef = createRef<HTMLDivElement>()
 
-  let currentKey = 0
-
-  const uniqueKey = (prefix: string) => {
-    currentKey++
-    return prefix + currentKey.toString()
-  }
+  const ctx = useApp()
 
   const onToggleCollapse = () => {
-    props.setCollapsed(props.user, props.collapsed * -1)
+    ctx.dispatch({
+      type: 'group_toggle_collapsed',
+      id: props.ID
+    })
   }
 
   const release = useCallback((released: number) => {
@@ -58,8 +57,8 @@ function MessageList(props: Props) {
   }
 
   useEffect(() => {
-    release(props.collapsed)
-  }, [props.collapsed, release])
+    release(props.group.collapsed)
+  }, [props.group.collapsed, release])
 
   return (
     <div className="MessageList">
@@ -68,7 +67,7 @@ function MessageList(props: Props) {
         onClick={onToggleCollapse}
         ref={messageGroupCollapsibleRef}
       >
-        <span className="MessageGroupUser">{props.user}</span>
+        <span className="MessageGroupUser">{props.group.user.name}</span>
       </div>
 
       <div
@@ -76,10 +75,10 @@ function MessageList(props: Props) {
         onTransitionEnd={onCollapseFinish}
         ref={groupContainerRef}
       >
-        {props.messages.map((message) => {
+        {props.group.messages.map((message) => {
           return (
             <Message
-              key={uniqueKey("Message_")}
+              key={uniqueId("Message")}
               text={message.content}
               author={message.author}
             />
@@ -88,7 +87,20 @@ function MessageList(props: Props) {
 
         <Message>
           <MessageInput onSubmit={(msg: string) => {
-            props.submitMessage(msg, props.user)
+            backendIntf.resourceSocket.request(
+              backendIntf.REQ_SEND_MESSAGE,
+              {
+                MessageDestination: props.ID,
+                Message: msg
+              }
+            )
+
+
+            ctx.dispatch({
+              type: 'message_send',
+              msg: msg,
+              destination: props.ID
+            })
           }} />
         </Message>
 

@@ -1,6 +1,6 @@
 import "./css/Message.css"
 
-interface Props {
+type Props = {
   text?: string,
   author?: string
 

@@ -2,7 +2,7 @@ import CancelButton from "components/Misc/CancelButton"
 import React, { createRef, useEffect } from "react"
 import "./css/Overlay.css"
 
-interface Props {
+type Props = {
   children: React.ReactChild
   onOpen?: Function
   onClose?: Function

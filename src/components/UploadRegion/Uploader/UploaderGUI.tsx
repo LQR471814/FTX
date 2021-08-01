@@ -2,7 +2,7 @@ import '../css/Uploader.css'
 import { clickElement, refToHTMLElement } from 'lib/Utils'
 import { ChangeEvent, createRef } from 'react'
 
-interface Props {
+type Props = {
 	onChosen?: (files: FileList | null) => void
 }
 

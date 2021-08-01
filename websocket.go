@@ -93,10 +93,29 @@ func resource(w http.ResponseWriter, r *http.Request) {
 			case "requireSetup":
 				requireSetupResult = requireSetup()
 			case "sendMessage":
-				ping(append(append(append([]byte{3}, []byte(request.Parameters.MessageDestination)...), append([]byte{0}, []byte(getHostname())...)...), append([]byte{0}, []byte(request.Parameters.Message)...)...))
+				ping(append(
+					append(
+						[]byte{3},
+						[]byte(request.Parameters.MessageDestination)...,
+					),
+					append(
+						[]byte{0},
+						[]byte(request.Parameters.Message)...,
+					)...,
+				))
 			}
 
-			response, err := json.Marshal(ResourceResponse{request.Name, ResponseContent{getInterfacesResult, getOSResult, getHostnameResult, requireSetupResult}})
+			response, err := json.Marshal(
+				ResourceResponse{
+					request.Name,
+					ResponseContent{
+						getInterfacesResult,
+						getOSResult,
+						getHostnameResult,
+						requireSetupResult,
+					},
+				},
+			)
 			fmt.Println(string(response))
 			if err != nil {
 				log.Fatal("MARSHAL FAILED: ", err)

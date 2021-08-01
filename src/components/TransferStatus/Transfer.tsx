@@ -1,6 +1,6 @@
 import { TransferState } from './TransferStatus'
 
-interface Props {
+type Props = {
   state: TransferState
 }
 

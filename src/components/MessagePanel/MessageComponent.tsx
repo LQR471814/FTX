@@ -6,10 +6,8 @@ import "styling/Root.css"
 
 import MessageList from "./MessageList"
 
-interface Props {
-  groups: Record<string, IMessageGroup>
-  submitMessage: (messageContent: string, destHost: string) => void,
-  setCollapsed: (user: string, collapsed: number) => void
+type Props = {
+  groups: Record<string, MessageGroup>
 }
 
 function MessageComponent(props: Props) {
@@ -26,15 +24,12 @@ function MessageComponent(props: Props) {
       onScroll={() => { prevScroll.current = document.getElementById("MessageGroupsContainer")!.scrollTop }}
     >
       {Object.keys(props.groups).map(
-        (key) => {
+        (ID) => {
           return (
             <MessageList
-              key={key}
-              collapsed={props.groups[key].collapsed}
-              messages={props.groups[key].messages}
-              user={key}
-              submitMessage={props.submitMessage}
-              setCollapsed={props.setCollapsed}
+              group={props.groups[ID]}
+              ID={ID}
+              key={ID}
             />
           )
         }

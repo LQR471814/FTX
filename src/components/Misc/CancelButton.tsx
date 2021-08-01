@@ -1,6 +1,6 @@
 import { MouseEventHandler, RefObject } from "react"
 
-interface Props {
+type Props = {
   size: number
   onClick: MouseEventHandler
   refObj?: RefObject<HTMLDivElement>

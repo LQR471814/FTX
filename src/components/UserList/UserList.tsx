@@ -1,88 +1,63 @@
-import { useRef, useState } from "react"
 import "styling/Widget.css"
 import "./css/UserList.css"
 
 import User from "./User"
-import _ from "lodash"
-import * as backendIntf from "lib/BackendInterface"
+import * as backendIntf from "lib/BackendController"
+import { useApp } from "context/AppContext"
+import { uniqueId } from "lib/Utils"
 
-interface Props {
-  hostname: string,
-  setShowCommChoice: (user: User) => void
-}
+export default function UserList() {
+  const ctx = useApp()
+  const users = ctx.state.users
 
-export default function UserList(props: Props) {
-  const [users, setUsers]: [User[], Function] = useState([
-    { name: "Joe", ip: "192.168.1.7:7777" },
-    { name: "Joe", ip: "192.168.1.2:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
-    { name: "Joe", ip: "127.0.0.1:7777" },
-  ])
-
-  const addUser = async (user: User) => {
-    while (props.hostname === undefined) {
-      await new Promise((r) => setTimeout(r, 1))
-    }
-    if (user.name === props.hostname) {
-      return
-    }
-
-    const newUsers: User[] = _.cloneDeep(users)
-    newUsers.push(user)
-    setUsers(newUsers)
+  const onStartCommunication = (user: User) => {
+    ctx.dispatch({
+      type: 'overlay_toggle',
+      overlay: 'commChoice',
+      context: {
+        id: user.ip
+      }
+    })
   }
 
-  const removeUser = (user: User) => {
-    const newUsers = _.cloneDeep(users)
-    newUsers.splice(newUsers.indexOf(user), 1)
-    setUsers(newUsers)
-  }
-
-  if (false)
   backendIntf.userListUpdater.listen((msg) => {
     const user = { name: msg.Name, ip: msg.IP }
 
     switch (msg.MsgType) {
       case "addUser":
-        if (!users.some(
+        //? Check if added user does not already exist in users
+        if (!Object.keys(users).some(
           (user) => {
-            return user.name === msg.Name
-              && user.ip === msg.IP
+            return users[user].name === msg.Name
+              && users[user] === msg.IP
           }
         )) {
-          addUser(user)
+          ctx.dispatch({
+            type: 'user_add',
+            user: {
+              name: msg.Name,
+              ip: msg.IP
+            }
+          })
         }
         break
       case "removeUser":
-        removeUser(user)
+        ctx.dispatch({
+          type: 'user_remove',
+          id: user.ip
+        })
         break
     }
   })
 
-  const currentKey = useRef(0)
-  const uniqueKey = (prefix: string) => {
-    currentKey.current++
-    return prefix + currentKey.current.toString()
-  }
-
   return (
     <div className="ComponentContainer">
-      {users.map((user) => {
+      {Object.values(users).map((user) => {
         return (
           <User
-            key={uniqueKey("User_")}
-            name={user.name}
-            ip={user.ip}
-            setShowCommChoice={props.setShowCommChoice}
+            key={uniqueId('DisplayUser')}
+            user={user}
+            click={onStartCommunication}
           />
         )
       })}

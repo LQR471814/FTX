@@ -2,7 +2,7 @@ import "styling/Widget.css"
 import "styling/Root.css"
 import "./css/Window.css"
 
-interface Props {
+type Props = {
   title: string
   children?: React.ReactChild
   col?: boolean

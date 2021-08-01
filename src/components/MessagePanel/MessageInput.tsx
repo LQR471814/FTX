@@ -2,7 +2,7 @@ import { transitionEffectOffset } from "lib/Utils"
 import { createRef, useState } from "react"
 import "./css/MessageInput.css"
 
-interface Props {
+type Props = {
 	onSubmit: (text: string) => void
 }
 

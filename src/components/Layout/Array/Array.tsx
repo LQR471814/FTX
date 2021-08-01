@@ -1,7 +1,7 @@
 import React from 'react'
 import './css/Array.css'
 
-interface Props {
+type Props = {
 	children: React.ReactChild[]
 	rows?: boolean
 	childrenSizes?: string

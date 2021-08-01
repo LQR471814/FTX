@@ -4,7 +4,7 @@ import "./css/Choice.css"
 import "styling/Root.css"
 import { setWithoutTransition } from "lib/Utils"
 
-interface Props {
+type Props = {
   icon: any
   label: string
   identifier: Primitive

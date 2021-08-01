@@ -1,11 +1,11 @@
 import 'styling/Widget.css'
 import Transfer from './Transfer'
 
-interface Props {
+type Props = {
   activeTransfers: Transfer[]
 }
 
-export interface TransferState {
+export type TransferState = {
   status: string
 }
 

@@ -4,16 +4,16 @@ import 'styling/Root.css'
 import Overlay from 'components/Overlay/Overlay'
 import Choice from "./Choice"
 import { refToHTMLElement, transitionEffectOffset } from "lib/Utils"
-import _ from "lodash"
+import { uniqueId } from "lib/Utils"
 import CancelButton from "components/Misc/CancelButton"
 
-interface Item {
+type Item = {
   label: string
   identifier: Primitive
   icon: any
 }
 
-interface Props {
+type Props = {
   chosenCallback: (identifier: Primitive | undefined) => void //? Gets called when an item is chosen
   mainLabel: string //? The main text at the top of the Choices overlay
   componentID: string //? distinguish other Choices components from each other
@@ -46,7 +46,7 @@ export default function ChoicesContainer(props: Props) {
           {props.items.map(
             (arrayItem) =>
               <Choice
-                key={_.uniqueId(`${props.componentID}_Choice_`)}
+                key={uniqueId(`${props.componentID}_Choice`)}
                 shrink={this.state.shrink}
                 label={arrayItem.label}
                 icon={arrayItem.icon}
