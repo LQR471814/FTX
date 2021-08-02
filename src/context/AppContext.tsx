@@ -34,10 +34,10 @@ function appReducer(state: AppState, action: AppAction) {
 			console.error("transfer_stop is currently unsupported!")
 			break
 
-		case 'group_toggle_collapsed':
+		case 'group_display':
 			newState.messageGroups[
 				action.id
-			].collapsed *= -1
+			].displayed = action.display
 			break
 		case 'group_new':
 			newState.messageGroups[

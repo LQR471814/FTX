@@ -1,7 +1,7 @@
 type MessageGroup = {
   user: User
   messages: Message[]
-  collapsed: number
+  displayed: boolean
 }
 
 type Message = {

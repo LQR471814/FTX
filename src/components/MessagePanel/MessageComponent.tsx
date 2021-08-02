@@ -21,6 +21,7 @@ function MessageComponent(props: Props) {
     <div
       className="ComponentContainer"
       id="MessageGroupsContainer"
+      style={{ flexDirection: "column" }}
       onScroll={() => { prevScroll.current = document.getElementById("MessageGroupsContainer")!.scrollTop }}
     >
       {Object.keys(props.groups).map(

@@ -38,11 +38,11 @@ type StopTransferAction = { type: "transfer_stop", id: IP }
 
 //TODO: Finish state for these as well
 type NewGroupAction = { type: "group_new", id: IP }
-type GroupCollapseAction = { type: "group_toggle_collapsed", id: IP }
+type GroupDisplayAction = { type: "group_display", display: boolean, id: IP }
 type SendMessageAction = { type: "message_send", msg: string, destination: IP }
 type RecvMessageAction = { type: "message_recv", msg: string, from: IP }
 
-type ToggleOverlayAction = {
+type DisplayOverlayAction = {
 	type: "overlay_display",
 	overlay: OverlayType,
 	display: boolean
@@ -60,7 +60,7 @@ type AppAction =
 	| UpdateTransferAction
 	| StopTransferAction
 	| NewGroupAction
-	| GroupCollapseAction
+	| GroupDisplayAction
 	| SendMessageAction
 	| RecvMessageAction
-	| ToggleOverlayAction
+	| DisplayOverlayAction

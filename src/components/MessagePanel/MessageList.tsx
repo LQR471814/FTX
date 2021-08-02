@@ -25,13 +25,14 @@ function MessageList(props: Props) {
 
   const onToggleCollapse = () => {
     ctx.dispatch({
-      type: 'group_toggle_collapsed',
+      type: 'group_display',
+      display: !props.group.displayed,
       id: props.ID
     })
   }
 
-  const release = useCallback((released: number) => {
-    if (released >= 0) {
+  const display = useCallback((display: boolean) => {
+    if (!display) {
       groupContainerRef.current!.style.maxHeight = "0px"
       return
     }
@@ -44,7 +45,7 @@ function MessageList(props: Props) {
     groupContainerRef.current!.classList.add('Uncollapsed')
     messageGroupCollapsibleRef.current!.classList.add('Uncollapsed')
 
-    messageGroupCollapsibleRef.current!.style.borderRadius = "10px 10px 0px 0px"
+    messageGroupCollapsibleRef.current!.style.borderRadius = "var(--very-round) var(--very-round) 0px 0px"
   }, [groupContainerRef, messageGroupCollapsibleRef])
 
   const onCollapseFinish = () => {
@@ -52,13 +53,13 @@ function MessageList(props: Props) {
       groupContainerRef.current!.style.background = 'none'
 
       messageGroupCollapsibleRef.current!.classList.remove('Uncollapsed')
-      messageGroupCollapsibleRef.current!.style.borderRadius = "10px"
+      messageGroupCollapsibleRef.current!.style.borderRadius = ""
     }
   }
 
   useEffect(() => {
-    release(props.group.collapsed)
-  }, [props.group.collapsed, release])
+    display(props.group.displayed)
+  }, [props.group.displayed, display])
 
   return (
     <div className="MessageList">

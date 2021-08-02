@@ -26,7 +26,7 @@ export function messageGroupDefaults(user: User): MessageGroup {
 	return {
 		user: user,
 		messages: [],
-		collapsed: 1,
+		displayed: false,
 	}
 }
 

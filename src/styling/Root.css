@@ -25,7 +25,6 @@ p, span {
   box-sizing: border-box;
 
   /* Border Radius */
-  --extremely-round: 25px;
   --very-round: 15px;
   --round: 10px;
 
