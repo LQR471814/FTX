@@ -42,7 +42,7 @@ type GroupCollapseAction = { type: "group_toggle_collapsed", id: IP }
 type SendMessageAction = { type: "message_send", msg: string, destination: IP }
 type RecvMessageAction = { type: "message_recv", msg: string, from: IP }
 
-type ToggleOverlayAction = { type: "overlay_toggle", overlay: OverlayType, context?: CascadingContext }
+type ToggleOverlayAction = { type: "overlay_toggle", overlay: OverlayType, context: CascadingContext }
 
 type AppAction =
 	| ToggleBannerAction

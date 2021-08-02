@@ -33,14 +33,16 @@ export default function CommChoice(props: Props) {
 					case "FILE":
 						ctx.dispatch({
 							type: 'overlay_toggle',
-							overlay: 'uploadRegion'
+							overlay: 'uploadRegion',
+							context: props.context
 						})
 						break
 				}
 
 				ctx.dispatch({
 					type: 'overlay_toggle',
-					overlay: 'commChoice'
+					overlay: 'commChoice',
+					context: null
 				})
 			}}
 			componentID={uniqueId("ChoiceContainer")}

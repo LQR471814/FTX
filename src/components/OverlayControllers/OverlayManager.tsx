@@ -5,17 +5,19 @@ import CommChoice from "./CommChoice"
 import Interfaces from "./Interfaces"
 import Upload from "./Upload"
 
+type OverlayComponent = FC<any>
+
+const typeComponentMap: Record<OverlayType, OverlayComponent> = {
+	'commChoice': CommChoice,
+	'networkInterfaces': Interfaces,
+	'uploadRegion': Upload,
+}
+
 export default function OverlayManager() {
 	const ctx = useApp()
 	const showOverlay = ctx.state.showOverlay
 
-	type OverlayComponent = FC<any>
-
-	const typeComponentMap: Record<OverlayType, OverlayComponent> = {
-		'commChoice': CommChoice,
-		'networkInterfaces': Interfaces,
-		'uploadRegion': Upload,
-	}
+	console.dir(showOverlay.commChoice.shown)
 
 	return <>
 		{Object.keys(typeComponentMap).map(
@@ -30,7 +32,7 @@ export default function OverlayManager() {
 
 				return createElement(typeComponentMap[type], {
 					key: uniqueId('Overlay'),
-					context: showOverlay.commChoice.context
+					context: showOverlay[type].context
 				})
 			}
 		)}

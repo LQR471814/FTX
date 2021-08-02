@@ -48,7 +48,8 @@ export default function Interfaces() {
 
     ctx.dispatch({
       type: 'overlay_toggle',
-      overlay: 'networkInterfaces'
+      overlay: 'networkInterfaces',
+      context: null
     })
   }
 

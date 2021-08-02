@@ -12,7 +12,8 @@ export default function BannerController() {
 			click={() => {
 				ctx.dispatch({
 					type: "overlay_toggle",
-					overlay: "networkInterfaces"
+					overlay: "networkInterfaces",
+					context: null
 				})
 			}}
 			closedCallback={() => ctx.dispatch(

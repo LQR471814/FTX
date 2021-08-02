@@ -1,6 +1,8 @@
 import { createContext, useReducer, useContext } from "react";
 import { appDefaults, messageGroupDefaults } from "./Defaults";
 
+const defaultState = appDefaults()
+
 const AppContext = createContext<{
 	state: AppState
 	dispatch: (action: AppAction) => void
@@ -16,18 +18,22 @@ function appReducer(state: AppState, action: AppAction) {
 		case 'banner_style_change':
 			newState.bannerStyling = action.bannerStyling
 			break
+
 		case "self_update":
 			newState.self.name = action.hostname
 			break
+
 		case "setup_update_netintfs":
 			newState.setupInfo.netInterfaces = action.interfaces
 			break
+
 		case 'transfer_new':
 			newState.activeTransfers[action.id] = action.initial
 			break
 		case 'transfer_stop':
 			console.error("transfer_stop is currently unsupported!")
 			break
+
 		case 'group_toggle_collapsed':
 			newState.messageGroups[
 				action.id
@@ -38,6 +44,7 @@ function appReducer(state: AppState, action: AppAction) {
 				action.id
 			] = messageGroupDefaults(newState.users[action.id])
 			break
+
 		case 'message_send':
 			console.error('message_send is currently unsupported!')
 			break
@@ -49,9 +56,13 @@ function appReducer(state: AppState, action: AppAction) {
 				author: newState.users[action.from].name
 			})
 			break
+
 		case 'overlay_toggle':
+			console.dir(action.overlay)
 			newState.showOverlay[action.overlay].shown *= -1
+			newState.showOverlay[action.overlay].context = action.context
 			break
+
 		default:
 			console.error("Dispatched action is not valid")
 			break
@@ -61,7 +72,7 @@ function appReducer(state: AppState, action: AppAction) {
 }
 
 function AppProvider(props: { children: React.ReactChild }) {
-	const [state, dispatch] = useReducer(appReducer, appDefaults())
+	const [state, dispatch] = useReducer(appReducer, defaultState)
 
 	return (
 		<AppContext.Provider value={{ state, dispatch }}>

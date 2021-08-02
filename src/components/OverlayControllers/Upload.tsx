@@ -17,7 +17,8 @@ export default function Upload(props: Props) {
 			(files: FileList | null) => {
 				ctx.dispatch({
 					type: "overlay_toggle",
-					overlay: "uploadRegion"
+					overlay: "uploadRegion",
+					context: null
 				})
 
 				if (!files) return
