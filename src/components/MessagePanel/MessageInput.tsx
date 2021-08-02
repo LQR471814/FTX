@@ -131,13 +131,16 @@ export default function MessageInput(props: Props) {
 				>
 
 					<svg
-						height="12px"
-						width="30px"
-						viewBox="75 0 150 200"
-						transform="rotate(90 0 0)"
-						style={{ fill: "#4d4d4d" }}
+						width="13px"
+						height="13px"
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 935.31 1080"
+						style={{
+							fill: "var(--neutral)",
+							margin: "auto"
+						}}
 					>
-						<path d="M150 0 L75 200 L225 200 Z"></path>
+						<polygon points="935.31 540 0 0 0 1080 935.31 540" />
 					</svg>
 
 				</div>

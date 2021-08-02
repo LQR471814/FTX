@@ -1,16 +1,16 @@
 .SubmitButton {
 	/* Remove Default Styling */
 
-  display: block;
+  display: flex;
   outline: none;
+
+  justify-content: center;
+  align-items: center;
 
 	/* Stylizing */
 
   font-size: 12px;
-  display: block;
-
   border-radius: var(--round);
-
   transition: all ease-in-out 0.12s;
 
 	/* Fix CSS Bugs */

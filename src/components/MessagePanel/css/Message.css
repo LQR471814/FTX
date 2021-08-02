@@ -13,6 +13,7 @@
 .MessageContent {
   margin: 5px;
 
+  font-family: "OpenSansBold";
   font-size: 21px;
   color: var(--highlight-lighter);
 }

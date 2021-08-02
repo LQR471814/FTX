@@ -1,4 +1,10 @@
 @font-face {
+  font-family: "OpenSansRegular";
+  src: url("styling/fonts/OpenSans/opensans-regular-webfont.woff2") format("woff2");
+  font-weight: normal;
+}
+
+@font-face {
   font-family: "OpenSansBold";
   src: url("styling/fonts/OpenSans/opensans-bold-webfont.woff2") format("woff2"),
     url("styling/fonts/OpenSans/opensans-bold-webfont.woff") format("woff");

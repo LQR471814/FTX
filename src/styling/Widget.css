@@ -1,5 +1,5 @@
 .InputField {
-  font-family: "", Arial, Helvetica, sans-serif;
+  font-family: "OpenSansRegular";
   border-radius: var(--round);
   box-sizing: border-box;
 
@@ -7,7 +7,7 @@
   border: none;
   background-color: var(--neutral-lighter);
 
-  font-size: 14px;
+  font-size: 15px;
 
   padding: 0.6em 0.6em;
   width: 100%;

@@ -46,7 +46,12 @@ function appReducer(state: AppState, action: AppAction) {
 			break
 
 		case 'message_send':
-			console.error('message_send is currently unsupported!')
+			newState.messageGroups[
+				action.destination
+			].messages.push({
+				content: action.msg,
+				author: "You"
+			})
 			break
 		case 'message_recv':
 			newState.messageGroups[
