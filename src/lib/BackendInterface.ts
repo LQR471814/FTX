@@ -1,14 +1,29 @@
 class BackendInterface {
 	path: string
 	ws: WebSocket
+	queuedMessages: string[]
 
 	dev?: boolean
 
 	constructor(path: string, dev?: boolean) {
-		this.path = path
-		this.ws = new WebSocket(path)
+		this.queuedMessages = []
 
+		this.path = path
 		this.dev = dev
+
+		this.ws = new WebSocket(path)
+		this.ws.onopen = () => {
+			for (const message of this.queuedMessages) {
+				this.send(message)
+			}
+		}
+	}
+
+	send(payload: string) {
+		if (this.ws.readyState === 0)
+			this.queuedMessages.push(payload)
+
+		this.ws.send(payload)
 	}
 }
 
@@ -53,7 +68,7 @@ export class BackendApiWS extends BackendInterface {
 			return
 		}
 
-		this.ws.send(JSON.stringify(
+		this.send(JSON.stringify(
 			{ name: requestName, parameters: parameters }
 		))
 

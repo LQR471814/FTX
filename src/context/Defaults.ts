@@ -1,4 +1,4 @@
-const defaultField = "[Loading...]"
+const defaultField = "Loading..."
 
 export function transferStateDefaults(): TransferState {
 	return {
@@ -38,7 +38,12 @@ export function appDefaults(): AppState {
 		activeTransfers: {},
 		messageGroups: {},
 
-		users: {},
+		users: {
+			'127.0.0.1:7777': {
+				name: 'AHHHHHHHHHHHH',
+				ip: '127.0.0.1:7777'
+			}
+		},
 		self: {
 			name: defaultField,
 			ip: defaultField

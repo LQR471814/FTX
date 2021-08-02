@@ -30,6 +30,9 @@ function appReducer(state: AppState, action: AppAction) {
 		case 'transfer_new':
 			newState.activeTransfers[action.id] = action.initial
 			break
+		case 'transfer_update':
+			newState.activeTransfers[action.id].state = action.state
+			break
 		case 'transfer_stop':
 			console.error("transfer_stop is currently unsupported!")
 			break

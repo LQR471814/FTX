@@ -28,6 +28,4 @@ export function initialize() {
 
 	userListUpdater = new BackendChannel(base + userListUpdaterPath, dev)
 	recvMessage = new BackendChannel(base + recvMessageSocketPath, dev)
-
-	console.log('initialized')
 }
