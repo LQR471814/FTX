@@ -5,8 +5,12 @@
 
   position: absolute;
 
-  left: 93%;
+  right: 6%;
   top: 6%;
+
+  width: 30px;
+  height: 30px;
+  padding: 17px;
 
   fill: var(--highlight-lighter);
 

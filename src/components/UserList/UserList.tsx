@@ -52,7 +52,7 @@ export default function UserList() {
           break
       }
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -66,6 +66,15 @@ export default function UserList() {
           />
         )
       })}
+
+      {Object.keys(users).length === 0 ?
+        <p
+          className="Tag"
+          style={{ maxWidth: "190px", margin: "auto", padding: "10px" }}
+        >
+          There are currently no peers to interact with ):
+        </p>
+        : undefined}
     </div>
   )
 }

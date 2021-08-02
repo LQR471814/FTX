@@ -16,9 +16,6 @@ export default function Choice(props: Props) {
   const iconRef = createRef<any>()
   const tagRef = createRef<HTMLParagraphElement>()
 
-  const textFactor = 0.0175
-  const iconFactor = 0.1
-
   const movePixels = 1000
 
   const choiceDivRefCallback = useCallback((div) => {
@@ -58,23 +55,15 @@ export default function Choice(props: Props) {
       <props.icon
         ref={iconRef}
         style={{
-          width: Math.round(
-            Math.min(window.innerWidth, window.innerHeight) * iconFactor
-          ),
-          height: Math.round(
-            Math.min(window.innerWidth, window.innerHeight) * iconFactor
-          ),
+          width: "90px",
+          height: "90px",
           fill: "",
         }}
       />
+
       <p
         className="Tag"
         ref={tagRef}
-        style={{
-          fontSize: Math.round(
-            Math.min(window.innerWidth, window.innerHeight) * textFactor
-          ),
-        }}
       >
         {props.label}
       </p>
