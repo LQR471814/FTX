@@ -12,8 +12,8 @@ function appReducer(state: AppState, action: AppAction) {
 	const newState = { ...state }
 
 	switch (action.type) {
-		case 'banner_toggle':
-			newState.showBanner *= -1
+		case 'banner_display':
+			newState.showBanner = action.display
 			break
 		case 'banner_style_change':
 			newState.bannerStyling = action.bannerStyling
@@ -57,9 +57,8 @@ function appReducer(state: AppState, action: AppAction) {
 			})
 			break
 
-		case 'overlay_toggle':
-			console.dir(action.overlay)
-			newState.showOverlay[action.overlay].shown *= -1
+		case 'overlay_display':
+			newState.showOverlay[action.overlay].shown = action.display
 			newState.showOverlay[action.overlay].context = action.context
 			break
 

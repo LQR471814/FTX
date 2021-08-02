@@ -1,11 +1,11 @@
 type OverlayType = "networkInterfaces" | "commChoice" | "uploadRegion"
 type OverlayState = {
-	shown: number
+	shown: boolean
 	context: CascadingContext | null
 }
 
 type AppState = {
-	showBanner: number
+	showBanner: boolean
 	bannerStyling: BannerStyle
 
 	activeTransfers: Record<IP, Transfer>
@@ -21,7 +21,7 @@ type AppState = {
 	showOverlay: Record<OverlayType, OverlayState>
 }
 
-type ToggleBannerAction = { type: "banner_toggle" }
+type DisplayBannerAction = { type: "banner_display", display: boolean }
 type ChangeBannerStyleAction = { type: "banner_style_change", bannerStyling: BannerStyle }
 
 type UpdateSelfAction = { type: "self_update", hostname: string }
@@ -42,10 +42,15 @@ type GroupCollapseAction = { type: "group_toggle_collapsed", id: IP }
 type SendMessageAction = { type: "message_send", msg: string, destination: IP }
 type RecvMessageAction = { type: "message_recv", msg: string, from: IP }
 
-type ToggleOverlayAction = { type: "overlay_toggle", overlay: OverlayType, context: CascadingContext }
+type ToggleOverlayAction = {
+	type: "overlay_display",
+	overlay: OverlayType,
+	display: boolean
+	context: CascadingContext,
+}
 
 type AppAction =
-	| ToggleBannerAction
+	| DisplayBannerAction
 	| ChangeBannerStyleAction
 	| NewPeerAction
 	| RemovePeerAction

@@ -68,6 +68,9 @@ export default function ChoicesContainer(props: Props) {
   const closeChoice = (id: Primitive | undefined) => {
     document.removeEventListener("keydown", listenForClose)
 
+    //? Return if ref is null
+    if (!choicesContainerRef.current) return
+
     // @ts-ignore
     choicesContainerRef.current!.setShrink(false)
 

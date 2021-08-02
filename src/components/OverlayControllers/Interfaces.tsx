@@ -42,13 +42,15 @@ export default function Interfaces() {
       )
 
       ctx.dispatch({
-        type: 'banner_toggle'
+        type: 'banner_display',
+        display: false
       })
     }
 
     ctx.dispatch({
-      type: 'overlay_toggle',
+      type: 'overlay_display',
       overlay: 'networkInterfaces',
+      display: false,
       context: null
     })
   }

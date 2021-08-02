@@ -17,14 +17,12 @@ export default function OverlayManager() {
 	const ctx = useApp()
 	const showOverlay = ctx.state.showOverlay
 
-	console.dir(showOverlay.commChoice.shown)
-
 	return <>
 		{Object.keys(typeComponentMap).map(
 			(overlayType) => {
 				const type = overlayType as OverlayType
 
-				if (showOverlay[type].shown < 0) {
+				if (!showOverlay[type].shown) {
 					return <React.Fragment
 						key={uniqueId('OverlayPlaceholder')}
 					/>

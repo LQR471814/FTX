@@ -32,16 +32,18 @@ export default function CommChoice(props: Props) {
 						break
 					case "FILE":
 						ctx.dispatch({
-							type: 'overlay_toggle',
+							type: 'overlay_display',
 							overlay: 'uploadRegion',
-							context: props.context
+							display: true,
+							context: props.context,
 						})
 						break
 				}
 
 				ctx.dispatch({
-					type: 'overlay_toggle',
+					type: 'overlay_display',
 					overlay: 'commChoice',
+					display: false,
 					context: null
 				})
 			}}

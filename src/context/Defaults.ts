@@ -6,7 +6,7 @@ export function transferStateDefaults(): TransferState {
 	}
 }
 
-export function overlayStateDefaults(active: number): OverlayState {
+export function overlayStateDefaults(active: boolean): OverlayState {
 	return {
 		shown: active,
 		context: null
@@ -32,7 +32,7 @@ export function messageGroupDefaults(user: User): MessageGroup {
 
 export function appDefaults(): AppState {
 	return {
-		showBanner: -1,
+		showBanner: false,
 		bannerStyling: bannerStylingDefaults(),
 
 		activeTransfers: {},
@@ -66,9 +66,9 @@ export function appDefaults(): AppState {
 		},
 
 		showOverlay: {
-			networkInterfaces: overlayStateDefaults(-1),
-			commChoice: overlayStateDefaults(-1),
-			uploadRegion: overlayStateDefaults(-1),
+			networkInterfaces: overlayStateDefaults(false),
+			commChoice: overlayStateDefaults(false),
+			uploadRegion: overlayStateDefaults(false),
 		}
 	}
 }

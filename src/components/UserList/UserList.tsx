@@ -12,11 +12,10 @@ export default function UserList() {
   const users = ctx.state.users
 
   const onStartCommunication = (user: User) => {
-    console.log('dispatched')
-
     ctx.dispatch({
-      type: 'overlay_toggle',
+      type: 'overlay_display',
       overlay: 'commChoice',
+      display: true,
       context: {
         id: user.ip
       }

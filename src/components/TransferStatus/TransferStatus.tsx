@@ -1,3 +1,4 @@
+import { uniqueId } from 'lib/Utils'
 import 'styling/Widget.css'
 import Transfer from './Transfer'
 
@@ -14,7 +15,10 @@ export default function TransferStatus(props: Props) {
     <div className="ComponentContainer">
       {
         props.activeTransfers.map((t) => {
-          return <Transfer state={t.state} />
+          return <Transfer
+            key={uniqueId('Transfer')}
+            state={t.state}
+          />
         })
       }
     </div>
