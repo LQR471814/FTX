@@ -25,7 +25,7 @@ export default function Upload(props: Props) {
 				if (!files) return
 				const worker = new UploadWorker()
 
-				const updateCurrentState = (update: TransferState) => {
+				const updateCurrentState = (update: any) => {
 					const currentTransfer = ctx.state.activeTransfers[props.context.id]
 
 					ctx.dispatch({
@@ -51,16 +51,16 @@ export default function Upload(props: Props) {
 							worker.terminate()
 							break
 						case 'read_progress':
-							const readDisplay = `Reading in progress: ${Math.round((msg.loaded / msg.total) * 100)}%`
-							updateCurrentState({status: readDisplay})
-
-							console.log(readDisplay)
+							updateCurrentState({
+								status: "Reading in progress...",
+								progress: Math.round((msg.loaded / msg.total) * 100)
+							})
 							break
 						case 'upload_progress':
-							const uploadDisplay = `Uploading: ${Math.round((msg.loaded / msg.total) * 100)}%`
-							updateCurrentState({status: uploadDisplay})
-
-							console.log(uploadDisplay)
+							updateCurrentState({
+								status: "Uploading...",
+								progress: Math.round((msg.loaded / msg.total) * 100)
+							})
 							break
 						case 'terminate_worker':
 							worker.terminate()

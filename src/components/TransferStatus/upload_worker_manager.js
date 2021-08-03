@@ -19,6 +19,14 @@ function sendCloseSignal() {
   })
 }
 
+function closeProgress() {
+  postMessage({
+    type: 'upload_progress',
+    loaded: null,
+    total: 0,
+  })
+}
+
 function updateStatus(message) {
   postMessage({
     type: 'status',
@@ -146,6 +154,7 @@ onmessage = (e) => {
             break
           case TRANSFERRED_CONFIRMATION_TYPE: //? Event: onuploadcomplete
             updateStatus(`Finished transfer of ${msg.Payload}`)
+            closeProgress()
 
             if (incrementIndex()) { //* Action: inc
               sendFile(uploadSocket, currentUploadIndex, context)

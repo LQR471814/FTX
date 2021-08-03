@@ -2,7 +2,8 @@ const defaultField = "Loading..."
 
 export function transferStateDefaults(): TransferState {
 	return {
-		status: ""
+		status: "",
+		progress: NaN
 	}
 }
 
@@ -39,9 +40,9 @@ export function appDefaults(): AppState {
 		messageGroups: {},
 
 		users: {
-			'127.0.0.1:7777': {
-				name: 'AHHHHHHHHHHHH',
-				ip: '127.0.0.1:7777'
+			"127.0.0.1:7777": {
+				name: "Help",
+				ip: "127.0.0.1:7777"
 			}
 		},
 		self: {
