@@ -2,45 +2,72 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"log"
 	"os"
-	"strconv"
 	"sync"
 )
 
-//* Miscellaneous
-func writeSettings() {
-	settings.Mux.Lock()
-
-	data, err := json.Marshal(settings)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	n, err := settings.File.Write(data)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(strconv.Itoa(n), "bytes written.")
-
-	settings.File.Sync()
-	settings.Mux.Unlock()
-}
+const settingsFileName = "settings.json"
 
 //Settings define the program settings
 type Settings struct {
 	InterfaceID int
 	Default     bool
-	Mux         sync.Mutex
-	File        *os.File
+	mux         sync.Mutex
+}
+
+//Lock is a shorthand for s.mux.Lock
+func (s *Settings) Lock() {
+	s.mux.Lock()
+}
+
+//Unlock is a shorthand for s.mux.Unlock
+func (s *Settings) Unlock() {
+	s.mux.Unlock()
 }
 
 //Defaults restores Settings to defaults
-func (settings *Settings) Defaults() {
-	settings.Mux.Lock()
-	settings.InterfaceID = 1
-	settings.Default = true
-	settings.Mux.Unlock()
+func (s *Settings) Defaults() {
+	s.Lock()
+
+	s.InterfaceID = 1
+	s.Default = true
+
+	s.Unlock()
+}
+
+//Load loads settings data from a file, will create the file if it doesn't exist
+func (s *Settings) Load() {
+	_, err := os.Open(settingsFileName)
+	if errors.Is(err, os.ErrNotExist) {
+		s.Defaults()
+		s.Write()
+	}
+
+	data, err := os.ReadFile(settingsFileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = json.Unmarshal(data, s)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+//Write writes settings to a file
+func (s *Settings) Write() {
+	f, err := os.Create(settingsFileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	settingsAsJSON, err := json.Marshal(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	f.Write(settingsAsJSON)
+	f.Close()
 }

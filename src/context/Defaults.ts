@@ -39,12 +39,7 @@ export function appDefaults(): AppState {
 		activeTransfers: {},
 		messageGroups: {},
 
-		users: {
-			"127.0.0.1:7777": {
-				name: "Help",
-				ip: "127.0.0.1:7777"
-			}
-		},
+		users: {},
 		self: {
 			name: defaultField,
 			ip: defaultField

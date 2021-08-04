@@ -2,14 +2,10 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	_ "net/http/pprof"
-	"os"
 	"runtime"
 	"sync"
 
@@ -44,27 +40,7 @@ func main() {
 	}()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	//? Load settings
-	data, err := ioutil.ReadFile("settings.json")
-	if err != nil {
-		settings.File, err = os.Create("settings.json")
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
-	settings.File, err = os.OpenFile("settings.json", os.O_RDWR, 0755)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	settings.Defaults()
-	fmt.Println(string(data))
-	err = json.Unmarshal(data, settings)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(settings)
+	settings.Load()
 
 	//? Initialize state
 	mainState.MulticastPeers = []*UserResponse{}

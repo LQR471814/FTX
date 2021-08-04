@@ -69,10 +69,10 @@ func getIpv4(Addrs []net.Addr) net.Addr {
 }
 
 func setInterfaces(parameters ResourceParameters) {
-	settings.Mux.Lock()
+	settings.mux.Lock()
 	settings.InterfaceID = parameters.InterfaceID
 	settings.Default = false
-	settings.Mux.Unlock()
+	settings.mux.Unlock()
 
 	if runtime.GOOS == "windows" {
 		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))

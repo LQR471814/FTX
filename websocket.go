@@ -128,8 +128,7 @@ func resource(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		writeSettings()
-		settings.File.Close()
+		settings.Write()
 		server.Shutdown(context.Background())
 	}
 }
