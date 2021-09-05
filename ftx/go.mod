@@ -2,7 +2,7 @@ module ftx
 
 go 1.16
 
-replace github.com/LQR471814/multicast => ../multicast
+replace github.com/LQR471814/multicast => ../../multicast
 
 require (
 	github.com/LQR471814/multicast v0.0.1

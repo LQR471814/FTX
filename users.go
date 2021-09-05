@@ -1,4 +1,0 @@
-package ftx
-
-func Register() {
-}

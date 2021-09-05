@@ -31,7 +31,7 @@ function frontend() {
 }
 
 function utility() {
-	shell.cd('multicast-utility')
+	shell.cd(`${BACKEND_NAME}${divider}${UTILITY_NAME}`)
 
 	const executableName = UTILITY_NAME + execFileExt
 
@@ -39,33 +39,44 @@ function utility() {
 
 	shell.cp(
 		executableName,
-		`..${divider}${executableName}`,
+		`..${divider}..${divider}${executableName}`,
 	)
 
 	shell.rm(executableName)
 
-	shell.cd('..')
+	shell.cd(`..${divider}..`)
 }
 
 function rpc() {
-	shell.cd('api')
+	shell.cd(`${BACKEND_NAME}${divider}api`)
 	shell.exec('protoc -I . --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative backend.proto')
-	shell.cd('..')
+	shell.cd(`..${divider}..`)
 }
 
 function backend() {
 	rpc()
+	shell.cd(BACKEND_NAME)
+
 	shell.exec(`go build -o ${BACKEND_NAME}${execFileExt}`)
+	shell.cp(
+		BACKEND_NAME + execFileExt,
+		`..${divider}${BACKEND_NAME}${execFileExt}`,
+	)
+	shell.rm(BACKEND_NAME + execFileExt)
+
+	shell.cd('..')
 }
 
 function distribute() {
 	frontend()
 	backend()
+	utility()
 
 	shell.mkdir('-p', `${distPath}`)
 	shell.mkdir('-p', `${distPath}${divider}build`)
 
-	shell.cp(execFileExt, distPath)
+	shell.cp(UTILITY_NAME + execFileExt, distPath)
+	shell.cp(BACKEND_NAME + execFileExt, distPath)
 	shell.cp('-r',  guiBuildPath, `${distPath}${divider}build`)
 }
 

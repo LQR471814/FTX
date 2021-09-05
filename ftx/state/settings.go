@@ -1,4 +1,4 @@
-package ftx
+package state
 
 import (
 	"encoding/json"

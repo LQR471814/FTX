@@ -1,4 +1,4 @@
-package ftx
+package files
 
 import (
 	"bufio"
@@ -10,6 +10,11 @@ import (
 
 	"github.com/gorilla/websocket"
 )
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
 
 const FILE_REQUEST_TYPE = "file_requests"
 const UPLOAD_CONFIRMATION_TYPE = "upload_confirmation"
@@ -38,7 +43,7 @@ type FileTransferStatus struct {
 	Payload string
 }
 
-func fileWriterWorker(filename string, fileSize int, datachan chan []byte) {
+func fileWriteWorker(filename string, fileSize int, datachan chan []byte) {
 	f, err := os.Create(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -61,7 +66,7 @@ func fileWriterWorker(filename string, fileSize int, datachan chan []byte) {
 	}
 }
 
-func recvFile(w http.ResponseWriter, r *http.Request) { //% State: Initial
+func FileHandler(w http.ResponseWriter, r *http.Request) { //% State: Initial
 	conn, err := upgrader.Upgrade(w, r, nil) //? Event: onpeerconnect
 	if err != nil {
 		log.Fatal(err)
@@ -114,7 +119,7 @@ func recvFile(w http.ResponseWriter, r *http.Request) { //% State: Initial
 					currentFile := requestFileList.Files[currentRecvFileIndex]
 
 					writeDataChannel = make(chan []byte, 1000)
-					go fileWriterWorker(
+					go fileWriteWorker(
 						currentFile.Filename,
 						currentFile.Size,
 						writeDataChannel,
