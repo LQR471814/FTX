@@ -1,9 +1,8 @@
-package main
+package ftx
 
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -195,6 +194,6 @@ func main() {
 	serveIp := "localhost:7777"
 
 	http.HandleFunc("/sendFile", handler)
-	fmt.Println("Serving on: " + serveIp)
+	log.Default().Println("Serving on: " + serveIp)
 	http.ListenAndServe(serveIp, nil)
 }

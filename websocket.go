@@ -1,9 +1,8 @@
-package main
+package ftx
 
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"runtime"
@@ -74,7 +73,7 @@ func resource(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Fatal("JSON UNMARSHAL FAILED: ", err)
 			}
-			fmt.Println(string(message))
+			log.Default().Println(string(message))
 
 			var getInterfacesResult [][3]string
 			var getOSResult string
@@ -116,7 +115,7 @@ func resource(w http.ResponseWriter, r *http.Request) {
 					},
 				},
 			)
-			fmt.Println(string(response))
+			log.Default().Println(string(response))
 			if err != nil {
 				log.Fatal("MARSHAL FAILED: ", err)
 			}

@@ -1,4 +1,4 @@
-package main
+package ftx
 
 import (
 	"encoding/json"
@@ -12,9 +12,8 @@ const settingsFileName = "settings.json"
 
 //Settings define the program settings
 type Settings struct {
-	InterfaceID int
-	Default     bool
-	mux         sync.Mutex
+	Interface int
+	mux       sync.Mutex
 }
 
 //Lock is a shorthand for s.mux.Lock
@@ -31,8 +30,7 @@ func (s *Settings) Unlock() {
 func (s *Settings) Defaults() {
 	s.Lock()
 
-	s.InterfaceID = 1
-	s.Default = true
+	s.Interface = -1
 
 	s.Unlock()
 }
@@ -43,6 +41,8 @@ func (s *Settings) Load() {
 	if errors.Is(err, os.ErrNotExist) {
 		s.Defaults()
 		s.Write()
+
+		return
 	}
 
 	data, err := os.ReadFile(settingsFileName)

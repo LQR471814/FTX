@@ -10,8 +10,6 @@
 /build
 /dist
 
-dist*/
-
 # misc
 .DS_Store
 .env.local
@@ -28,7 +26,6 @@ yarn-error.log*
 settings.json
 .eslintcache
 *.log
-go.sum
 
 yarn.lock
 

@@ -1,16 +1,24 @@
 <h1 align="center">FTX</h1>
 
-<p align="center">React.js Frontend + Golang Backend = File Transfer and Messaging Program</p>
+<h3 align="center">
+	<i>React.js Frontend + Golang Backend = File Transfer and Messaging Program</i>
+</h3>
 
-## Building
+### Building
 
-### Interface
+You will need
 
-`npm run build`
+- Node / npm cli
+- Go
+- gRPC + Protobuf tools
 
-### Backend
+Building everything can now be done in one command
+`node build.js`
+but requires you have everything setup already
 
-`go build`
+You can also build specific components of the app individually
+
+`node build.js <action 'frontend' | 'rpc' | 'backend' | 'distribution'>`
 
 ### Multicast Setup Utility (This is only required for Windows users)
 

@@ -1,0 +1,4 @@
+package ftx
+
+func Register() {
+}

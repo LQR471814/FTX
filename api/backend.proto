@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+option go_package = "main/api";
+package api;
+
+service Backend {
+	rpc GetSelf (SelfRequest) returns (SelfReply) {}
+
+	rpc GetSetup (GetSetupRequest) returns (GetSetupResponse) {}
+	rpc SetSetup (SetSetupRequest) returns (SetSetupResponse) {}
+
+	rpc GetUsers (UsersRequest) returns (UsersReply) {}
+	rpc SendMessage (MessageRequest) returns (MessageResponse) {}
+}
+
+message SelfRequest {}
+message SelfReply {
+	string hostname = 1;
+}
+
+message GetSetupRequest {}
+message GetSetupResponse {
+	bool required = 1;
+	repeated NetworkInterface interfaces = 2;
+}
+
+message SetSetupRequest {
+	NetworkInterface interface = 1;
+}
+message SetSetupResponse {}
+
+message MessageRequest {
+	string message = 1;
+	string destination = 2; //An IP
+}
+message MessageResponse {}
+
+message UsersRequest {}
+message UsersReply {
+	repeated User users = 1;
+}
+
+message NetworkInterface {
+	int32 Index = 1;
+	string Address = 2;
+	string Name = 3;
+}
+
+message User {
+	string IP = 1;
+	string Name = 2;
+}

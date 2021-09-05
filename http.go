@@ -1,6 +1,7 @@
-package main
+package ftx
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -10,6 +11,7 @@ type LimitHandler struct {
 }
 
 func (h LimitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Default().Println(r.RemoteAddr)
 	if isLocal(r.RemoteAddr) {
 		h.redirect.ServeHTTP(w, r)
 	} else {
