@@ -2,49 +2,35 @@ import * as jspb from 'google-protobuf'
 
 
 
-export class SelfRequest extends jspb.Message {
+export class Empty extends jspb.Message {
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): SelfRequest.AsObject;
-  static toObject(includeInstance: boolean, msg: SelfRequest): SelfRequest.AsObject;
-  static serializeBinaryToWriter(message: SelfRequest, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): SelfRequest;
-  static deserializeBinaryFromReader(message: SelfRequest, reader: jspb.BinaryReader): SelfRequest;
+  toObject(includeInstance?: boolean): Empty.AsObject;
+  static toObject(includeInstance: boolean, msg: Empty): Empty.AsObject;
+  static serializeBinaryToWriter(message: Empty, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Empty;
+  static deserializeBinaryFromReader(message: Empty, reader: jspb.BinaryReader): Empty;
 }
 
-export namespace SelfRequest {
+export namespace Empty {
   export type AsObject = {
   }
 }
 
-export class SelfReply extends jspb.Message {
+export class SelfResponse extends jspb.Message {
   getHostname(): string;
-  setHostname(value: string): SelfReply;
+  setHostname(value: string): SelfResponse;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): SelfReply.AsObject;
-  static toObject(includeInstance: boolean, msg: SelfReply): SelfReply.AsObject;
-  static serializeBinaryToWriter(message: SelfReply, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): SelfReply;
-  static deserializeBinaryFromReader(message: SelfReply, reader: jspb.BinaryReader): SelfReply;
+  toObject(includeInstance?: boolean): SelfResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: SelfResponse): SelfResponse.AsObject;
+  static serializeBinaryToWriter(message: SelfResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SelfResponse;
+  static deserializeBinaryFromReader(message: SelfResponse, reader: jspb.BinaryReader): SelfResponse;
 }
 
-export namespace SelfReply {
+export namespace SelfResponse {
   export type AsObject = {
     hostname: string,
-  }
-}
-
-export class GetSetupRequest extends jspb.Message {
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): GetSetupRequest.AsObject;
-  static toObject(includeInstance: boolean, msg: GetSetupRequest): GetSetupRequest.AsObject;
-  static serializeBinaryToWriter(message: GetSetupRequest, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): GetSetupRequest;
-  static deserializeBinaryFromReader(message: GetSetupRequest, reader: jspb.BinaryReader): GetSetupRequest;
-}
-
-export namespace GetSetupRequest {
-  export type AsObject = {
   }
 }
 
@@ -92,20 +78,6 @@ export namespace SetSetupRequest {
   }
 }
 
-export class SetSetupResponse extends jspb.Message {
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): SetSetupResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: SetSetupResponse): SetSetupResponse.AsObject;
-  static serializeBinaryToWriter(message: SetSetupResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): SetSetupResponse;
-  static deserializeBinaryFromReader(message: SetSetupResponse, reader: jspb.BinaryReader): SetSetupResponse;
-}
-
-export namespace SetSetupResponse {
-  export type AsObject = {
-  }
-}
-
 export class MessageRequest extends jspb.Message {
   getMessage(): string;
   setMessage(value: string): MessageRequest;
@@ -128,49 +100,21 @@ export namespace MessageRequest {
   }
 }
 
-export class MessageResponse extends jspb.Message {
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): MessageResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: MessageResponse): MessageResponse.AsObject;
-  static serializeBinaryToWriter(message: MessageResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): MessageResponse;
-  static deserializeBinaryFromReader(message: MessageResponse, reader: jspb.BinaryReader): MessageResponse;
-}
-
-export namespace MessageResponse {
-  export type AsObject = {
-  }
-}
-
-export class UsersRequest extends jspb.Message {
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): UsersRequest.AsObject;
-  static toObject(includeInstance: boolean, msg: UsersRequest): UsersRequest.AsObject;
-  static serializeBinaryToWriter(message: UsersRequest, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): UsersRequest;
-  static deserializeBinaryFromReader(message: UsersRequest, reader: jspb.BinaryReader): UsersRequest;
-}
-
-export namespace UsersRequest {
-  export type AsObject = {
-  }
-}
-
-export class UsersReply extends jspb.Message {
+export class UsersResponse extends jspb.Message {
   getUsersList(): Array<User>;
-  setUsersList(value: Array<User>): UsersReply;
-  clearUsersList(): UsersReply;
+  setUsersList(value: Array<User>): UsersResponse;
+  clearUsersList(): UsersResponse;
   addUsers(value?: User, index?: number): User;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): UsersReply.AsObject;
-  static toObject(includeInstance: boolean, msg: UsersReply): UsersReply.AsObject;
-  static serializeBinaryToWriter(message: UsersReply, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): UsersReply;
-  static deserializeBinaryFromReader(message: UsersReply, reader: jspb.BinaryReader): UsersReply;
+  toObject(includeInstance?: boolean): UsersResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: UsersResponse): UsersResponse.AsObject;
+  static serializeBinaryToWriter(message: UsersResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UsersResponse;
+  static deserializeBinaryFromReader(message: UsersResponse, reader: jspb.BinaryReader): UsersResponse;
 }
 
-export namespace UsersReply {
+export namespace UsersResponse {
   export type AsObject = {
     usersList: Array<User.AsObject>,
   }

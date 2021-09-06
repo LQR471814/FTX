@@ -1,3 +1,5 @@
+import { NetworkInterface } from "lib/backend_pb"
+
 type OverlayType = "networkInterfaces" | "commChoice" | "uploadRegion"
 type OverlayState = {
 	shown: boolean
@@ -15,7 +17,7 @@ type AppState = {
 	self: User
 
 	setupInfo: {
-		netInterfaces: NetInterface[]
+		interfaces: NetworkInterface[]
 	}
 
 	showOverlay: Record<OverlayType, OverlayState>
@@ -26,7 +28,7 @@ type ChangeBannerStyleAction = { type: "banner_style_change", bannerStyling: Ban
 
 type UpdateSelfAction = { type: "self_update", hostname: string }
 
-type UpdateNetInterfaces = { type: "setup_update_netintfs", interfaces: NetInterface[] }
+type UpdateInterfaces = { type: "setup_update_netintfs", interfaces: NetworkInterface[] }
 
 type NewPeerAction = { type: "user_add", user: User }
 type RemovePeerAction = { type: "user_remove", id: IP }
@@ -55,7 +57,7 @@ type AppAction =
 	| NewPeerAction
 	| RemovePeerAction
 	| UpdateSelfAction
-	| UpdateNetInterfaces
+	| UpdateInterfaces
 	| NewTransferAction
 	| UpdateTransferAction
 	| StopTransferAction

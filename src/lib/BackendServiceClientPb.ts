@@ -36,28 +36,28 @@ export class BackendClient {
   }
 
   methodInfoGetSelf = new grpcWeb.AbstractClientBase.MethodInfo(
-    backend_pb.SelfReply,
-    (request: backend_pb.SelfRequest) => {
+    backend_pb.SelfResponse,
+    (request: backend_pb.Empty) => {
       return request.serializeBinary();
     },
-    backend_pb.SelfReply.deserializeBinary
+    backend_pb.SelfResponse.deserializeBinary
   );
 
   getSelf(
-    request: backend_pb.SelfRequest,
-    metadata: grpcWeb.Metadata | null): Promise<backend_pb.SelfReply>;
+    request: backend_pb.Empty,
+    metadata: grpcWeb.Metadata | null): Promise<backend_pb.SelfResponse>;
 
   getSelf(
-    request: backend_pb.SelfRequest,
+    request: backend_pb.Empty,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: backend_pb.SelfReply) => void): grpcWeb.ClientReadableStream<backend_pb.SelfReply>;
+               response: backend_pb.SelfResponse) => void): grpcWeb.ClientReadableStream<backend_pb.SelfResponse>;
 
   getSelf(
-    request: backend_pb.SelfRequest,
+    request: backend_pb.Empty,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: backend_pb.SelfReply) => void) {
+               response: backend_pb.SelfResponse) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -77,24 +77,24 @@ export class BackendClient {
 
   methodInfoGetSetup = new grpcWeb.AbstractClientBase.MethodInfo(
     backend_pb.GetSetupResponse,
-    (request: backend_pb.GetSetupRequest) => {
+    (request: backend_pb.Empty) => {
       return request.serializeBinary();
     },
     backend_pb.GetSetupResponse.deserializeBinary
   );
 
   getSetup(
-    request: backend_pb.GetSetupRequest,
+    request: backend_pb.Empty,
     metadata: grpcWeb.Metadata | null): Promise<backend_pb.GetSetupResponse>;
 
   getSetup(
-    request: backend_pb.GetSetupRequest,
+    request: backend_pb.Empty,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
                response: backend_pb.GetSetupResponse) => void): grpcWeb.ClientReadableStream<backend_pb.GetSetupResponse>;
 
   getSetup(
-    request: backend_pb.GetSetupRequest,
+    request: backend_pb.Empty,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
                response: backend_pb.GetSetupResponse) => void) {
@@ -116,28 +116,28 @@ export class BackendClient {
   }
 
   methodInfoSetSetup = new grpcWeb.AbstractClientBase.MethodInfo(
-    backend_pb.SetSetupResponse,
+    backend_pb.Empty,
     (request: backend_pb.SetSetupRequest) => {
       return request.serializeBinary();
     },
-    backend_pb.SetSetupResponse.deserializeBinary
+    backend_pb.Empty.deserializeBinary
   );
 
   setSetup(
     request: backend_pb.SetSetupRequest,
-    metadata: grpcWeb.Metadata | null): Promise<backend_pb.SetSetupResponse>;
+    metadata: grpcWeb.Metadata | null): Promise<backend_pb.Empty>;
 
   setSetup(
     request: backend_pb.SetSetupRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: backend_pb.SetSetupResponse) => void): grpcWeb.ClientReadableStream<backend_pb.SetSetupResponse>;
+               response: backend_pb.Empty) => void): grpcWeb.ClientReadableStream<backend_pb.Empty>;
 
   setSetup(
     request: backend_pb.SetSetupRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: backend_pb.SetSetupResponse) => void) {
+               response: backend_pb.Empty) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -156,28 +156,28 @@ export class BackendClient {
   }
 
   methodInfoGetUsers = new grpcWeb.AbstractClientBase.MethodInfo(
-    backend_pb.UsersReply,
-    (request: backend_pb.UsersRequest) => {
+    backend_pb.UsersResponse,
+    (request: backend_pb.Empty) => {
       return request.serializeBinary();
     },
-    backend_pb.UsersReply.deserializeBinary
+    backend_pb.UsersResponse.deserializeBinary
   );
 
   getUsers(
-    request: backend_pb.UsersRequest,
-    metadata: grpcWeb.Metadata | null): Promise<backend_pb.UsersReply>;
+    request: backend_pb.Empty,
+    metadata: grpcWeb.Metadata | null): Promise<backend_pb.UsersResponse>;
 
   getUsers(
-    request: backend_pb.UsersRequest,
+    request: backend_pb.Empty,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: backend_pb.UsersReply) => void): grpcWeb.ClientReadableStream<backend_pb.UsersReply>;
+               response: backend_pb.UsersResponse) => void): grpcWeb.ClientReadableStream<backend_pb.UsersResponse>;
 
   getUsers(
-    request: backend_pb.UsersRequest,
+    request: backend_pb.Empty,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: backend_pb.UsersReply) => void) {
+               response: backend_pb.UsersResponse) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -196,28 +196,28 @@ export class BackendClient {
   }
 
   methodInfoSendMessage = new grpcWeb.AbstractClientBase.MethodInfo(
-    backend_pb.MessageResponse,
+    backend_pb.Empty,
     (request: backend_pb.MessageRequest) => {
       return request.serializeBinary();
     },
-    backend_pb.MessageResponse.deserializeBinary
+    backend_pb.Empty.deserializeBinary
   );
 
   sendMessage(
     request: backend_pb.MessageRequest,
-    metadata: grpcWeb.Metadata | null): Promise<backend_pb.MessageResponse>;
+    metadata: grpcWeb.Metadata | null): Promise<backend_pb.Empty>;
 
   sendMessage(
     request: backend_pb.MessageRequest,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.Error,
-               response: backend_pb.MessageResponse) => void): grpcWeb.ClientReadableStream<backend_pb.MessageResponse>;
+               response: backend_pb.Empty) => void): grpcWeb.ClientReadableStream<backend_pb.Empty>;
 
   sendMessage(
     request: backend_pb.MessageRequest,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.Error,
-               response: backend_pb.MessageResponse) => void) {
+               response: backend_pb.Empty) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +

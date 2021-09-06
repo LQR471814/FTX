@@ -1,3 +1,5 @@
+import { AppState, OverlayState } from "./State"
+
 const defaultField = "Loading..."
 
 export function transferStateDefaults(): TransferState {
@@ -46,7 +48,7 @@ export function appDefaults(): AppState {
 		},
 
 		setupInfo: {
-			netInterfaces: []
+			interfaces: []
 		},
 
 		showOverlay: {

@@ -12,46 +12,40 @@ import PendingTransfers from "components/PendingTransfers/PendingTransfers"
 import OverlayManager from "components/OverlayControllers/OverlayManager"
 import BannerController from "components/Banner/BannerController"
 
-import * as backendIntf from "lib/BackendController"
+import { initializeBackend } from "context/BackendContext"
+import { backend } from "context/BackendContext"
+import { Empty, GetSetupResponse, SelfResponse } from "lib/backend_pb"
 
-//? Initialize websockets
-backendIntf.initialize()
+initializeBackend(document.cookie)
 
 export default function App() {
   const ctx = useApp()
 
   useEffect(() => {
-    backendIntf.resourceSocket.request(
-      backendIntf.REQ_HOSTNAME, {}
-    )?.then((msg: any) => {
+    backend.getSelf(new Empty(), null).then((res: SelfResponse) => {
       ctx.dispatch({
         type: "self_update",
-        hostname: msg.Response.GetHostname
+        hostname: res.getHostname()
       })
     })
 
-    backendIntf.resourceSocket.request(
-      backendIntf.REQ_SETUP_REQUIREMENT, {}
-    )?.then((msg: any) => {
-      if (msg.Response.RequireSetup === true) {
-        backendIntf.resourceSocket.request(
-          backendIntf.REQ_INTERFACES, {}
-        )?.then((msg: any) => {
-          ctx.dispatch({
-            type: 'setup_update_netintfs',
-            interfaces: msg.Response.GetInterfaces
-          })
+    backend.getSetup(new Empty(), null).then((res: GetSetupResponse) => {
+      if (res.getRequired() === true) {
+        ctx.dispatch({
+          type: 'setup_update_netintfs',
+          interfaces: res.getInterfacesList()
         })
       }
     })
 
-    backendIntf.recvMessage.listen((msg) => {
-      ctx.dispatch({
-        type: "message_recv",
-        msg: msg.Message,
-        from: msg.User
-      })
-    })
+    //TODO: Come back to this later
+    // backendIntf.recvMessage.listen((msg) => {
+    //   ctx.dispatch({
+    //     type: "message_recv",
+    //     msg: msg.Message,
+    //     from: msg.User
+    //   })
+    // })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

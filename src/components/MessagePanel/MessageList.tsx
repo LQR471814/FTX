@@ -9,8 +9,8 @@ import Message from "./Message"
 import MessageInput from "./MessageInput"
 import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
-
-import * as backendIntf from "lib/BackendController"
+import { backend } from "context/BackendContext"
+import { MessageRequest } from "lib/backend_pb"
 
 type Props = {
   group: MessageGroup
@@ -88,14 +88,11 @@ function MessageList(props: Props) {
 
         <Message>
           <MessageInput onSubmit={(msg: string) => {
-            backendIntf.resourceSocket.request(
-              backendIntf.REQ_SEND_MESSAGE,
-              {
-                MessageDestination: props.ID,
-                Message: msg
-              }
-            )
+            const req = new MessageRequest()
+            req.setDestination(props.ID)
+            req.setMessage(msg)
 
+            backend.sendMessage(req, null)
 
             ctx.dispatch({
               type: 'message_send',

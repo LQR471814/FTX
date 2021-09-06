@@ -48,10 +48,11 @@ function utility() {
 }
 
 function rpc() {
-	shell.cd(`${BACKEND_NAME}${divider}api`)
-	shell.exec('protoc -I=. backend.proto --js_out=import_style=commonjs:. --grpc-web_out=import_style=typescript,mode=grpcweb:.')
-	shell.exec('protoc -I=. backend.proto --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative')
-	shell.cd(`..${divider}..`)
+	//? Frontend RPC
+	shell.exec(`protoc -I=. backend.proto --js_out=import_style=commonjs:src${divider}lib --grpc-web_out=import_style=typescript,mode=grpcweb:src${divider}lib`)
+
+	//? Backend RPC
+	shell.exec(`protoc -I=. backend.proto --go_out=${BACKEND_NAME}${divider}api --go_opt=paths=source_relative --go-grpc_out=${BACKEND_NAME}${divider}api --go-grpc_opt=paths=source_relative`)
 }
 
 function backend() {

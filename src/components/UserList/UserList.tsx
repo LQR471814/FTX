@@ -2,7 +2,6 @@ import "styling/Widget.css"
 import "./css/UserList.css"
 
 import User from "./User"
-import * as backendIntf from "lib/BackendController"
 import { useEffect } from "react"
 import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
@@ -23,35 +22,36 @@ export default function UserList() {
   }
 
   useEffect(() => {
-    backendIntf.userListUpdater.listen((msg) => {
-      const user = { name: msg.Name, ip: msg.IP }
+    //TODO: Fix this later
+    // backendIntf.userListUpdater.listen((msg) => {
+    //   const user = { name: msg.Name, ip: msg.IP }
 
-      switch (msg.MsgType) {
-        case "addUser":
-          //? Check if added user does not already exist in users
-          if (!Object.keys(users).some(
-            (user) => {
-              return users[user].name === msg.Name
-                && users[user] === msg.IP
-            }
-          )) {
-            ctx.dispatch({
-              type: 'user_add',
-              user: {
-                name: msg.Name,
-                ip: msg.IP
-              }
-            })
-          }
-          break
-        case "removeUser":
-          ctx.dispatch({
-            type: 'user_remove',
-            id: user.ip
-          })
-          break
-      }
-    })
+    //   switch (msg.MsgType) {
+    //     case "addUser":
+    //       //? Check if added user does not already exist in users
+    //       if (!Object.keys(users).some(
+    //         (user) => {
+    //           return users[user].name === msg.Name
+    //             && users[user] === msg.IP
+    //         }
+    //       )) {
+    //         ctx.dispatch({
+    //           type: 'user_add',
+    //           user: {
+    //             name: msg.Name,
+    //             ip: msg.IP
+    //           }
+    //         })
+    //       }
+    //       break
+    //     case "removeUser":
+    //       ctx.dispatch({
+    //         type: 'user_remove',
+    //         id: user.ip
+    //       })
+    //       break
+    //   }
+    // })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

@@ -1,5 +1,6 @@
 import { createContext, useReducer, useContext } from "react";
 import { appDefaults, messageGroupDefaults } from "./Defaults";
+import { AppAction, AppState } from "./State";
 
 const defaultState = appDefaults()
 
@@ -24,7 +25,7 @@ function appReducer(state: AppState, action: AppAction) {
 			break
 
 		case "setup_update_netintfs":
-			newState.setupInfo.netInterfaces = action.interfaces
+			newState.setupInfo.interfaces = action.interfaces
 			break
 
 		case 'transfer_new':

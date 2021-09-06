@@ -18,11 +18,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BackendClient interface {
-	GetSelf(ctx context.Context, in *SelfRequest, opts ...grpc.CallOption) (*SelfReply, error)
-	GetSetup(ctx context.Context, in *GetSetupRequest, opts ...grpc.CallOption) (*GetSetupResponse, error)
-	SetSetup(ctx context.Context, in *SetSetupRequest, opts ...grpc.CallOption) (*SetSetupResponse, error)
-	GetUsers(ctx context.Context, in *UsersRequest, opts ...grpc.CallOption) (*UsersReply, error)
-	SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	GetSelf(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*SelfResponse, error)
+	GetSetup(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetSetupResponse, error)
+	SetSetup(ctx context.Context, in *SetSetupRequest, opts ...grpc.CallOption) (*Empty, error)
+	GetUsers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*UsersResponse, error)
+	SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type backendClient struct {
@@ -33,8 +33,8 @@ func NewBackendClient(cc grpc.ClientConnInterface) BackendClient {
 	return &backendClient{cc}
 }
 
-func (c *backendClient) GetSelf(ctx context.Context, in *SelfRequest, opts ...grpc.CallOption) (*SelfReply, error) {
-	out := new(SelfReply)
+func (c *backendClient) GetSelf(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*SelfResponse, error) {
+	out := new(SelfResponse)
 	err := c.cc.Invoke(ctx, "/api.Backend/GetSelf", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func (c *backendClient) GetSelf(ctx context.Context, in *SelfRequest, opts ...gr
 	return out, nil
 }
 
-func (c *backendClient) GetSetup(ctx context.Context, in *GetSetupRequest, opts ...grpc.CallOption) (*GetSetupResponse, error) {
+func (c *backendClient) GetSetup(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetSetupResponse, error) {
 	out := new(GetSetupResponse)
 	err := c.cc.Invoke(ctx, "/api.Backend/GetSetup", in, out, opts...)
 	if err != nil {
@@ -51,8 +51,8 @@ func (c *backendClient) GetSetup(ctx context.Context, in *GetSetupRequest, opts 
 	return out, nil
 }
 
-func (c *backendClient) SetSetup(ctx context.Context, in *SetSetupRequest, opts ...grpc.CallOption) (*SetSetupResponse, error) {
-	out := new(SetSetupResponse)
+func (c *backendClient) SetSetup(ctx context.Context, in *SetSetupRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
 	err := c.cc.Invoke(ctx, "/api.Backend/SetSetup", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -60,8 +60,8 @@ func (c *backendClient) SetSetup(ctx context.Context, in *SetSetupRequest, opts 
 	return out, nil
 }
 
-func (c *backendClient) GetUsers(ctx context.Context, in *UsersRequest, opts ...grpc.CallOption) (*UsersReply, error) {
-	out := new(UsersReply)
+func (c *backendClient) GetUsers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*UsersResponse, error) {
+	out := new(UsersResponse)
 	err := c.cc.Invoke(ctx, "/api.Backend/GetUsers", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -69,8 +69,8 @@ func (c *backendClient) GetUsers(ctx context.Context, in *UsersRequest, opts ...
 	return out, nil
 }
 
-func (c *backendClient) SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
-	out := new(MessageResponse)
+func (c *backendClient) SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
 	err := c.cc.Invoke(ctx, "/api.Backend/SendMessage", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -82,11 +82,11 @@ func (c *backendClient) SendMessage(ctx context.Context, in *MessageRequest, opt
 // All implementations must embed UnimplementedBackendServer
 // for forward compatibility
 type BackendServer interface {
-	GetSelf(context.Context, *SelfRequest) (*SelfReply, error)
-	GetSetup(context.Context, *GetSetupRequest) (*GetSetupResponse, error)
-	SetSetup(context.Context, *SetSetupRequest) (*SetSetupResponse, error)
-	GetUsers(context.Context, *UsersRequest) (*UsersReply, error)
-	SendMessage(context.Context, *MessageRequest) (*MessageResponse, error)
+	GetSelf(context.Context, *Empty) (*SelfResponse, error)
+	GetSetup(context.Context, *Empty) (*GetSetupResponse, error)
+	SetSetup(context.Context, *SetSetupRequest) (*Empty, error)
+	GetUsers(context.Context, *Empty) (*UsersResponse, error)
+	SendMessage(context.Context, *MessageRequest) (*Empty, error)
 	mustEmbedUnimplementedBackendServer()
 }
 
@@ -94,19 +94,19 @@ type BackendServer interface {
 type UnimplementedBackendServer struct {
 }
 
-func (UnimplementedBackendServer) GetSelf(context.Context, *SelfRequest) (*SelfReply, error) {
+func (UnimplementedBackendServer) GetSelf(context.Context, *Empty) (*SelfResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSelf not implemented")
 }
-func (UnimplementedBackendServer) GetSetup(context.Context, *GetSetupRequest) (*GetSetupResponse, error) {
+func (UnimplementedBackendServer) GetSetup(context.Context, *Empty) (*GetSetupResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSetup not implemented")
 }
-func (UnimplementedBackendServer) SetSetup(context.Context, *SetSetupRequest) (*SetSetupResponse, error) {
+func (UnimplementedBackendServer) SetSetup(context.Context, *SetSetupRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetSetup not implemented")
 }
-func (UnimplementedBackendServer) GetUsers(context.Context, *UsersRequest) (*UsersReply, error) {
+func (UnimplementedBackendServer) GetUsers(context.Context, *Empty) (*UsersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUsers not implemented")
 }
-func (UnimplementedBackendServer) SendMessage(context.Context, *MessageRequest) (*MessageResponse, error) {
+func (UnimplementedBackendServer) SendMessage(context.Context, *MessageRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
 }
 func (UnimplementedBackendServer) mustEmbedUnimplementedBackendServer() {}
@@ -123,7 +123,7 @@ func RegisterBackendServer(s grpc.ServiceRegistrar, srv BackendServer) {
 }
 
 func _Backend_GetSelf_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SelfRequest)
+	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -135,13 +135,13 @@ func _Backend_GetSelf_Handler(srv interface{}, ctx context.Context, dec func(int
 		FullMethod: "/api.Backend/GetSelf",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BackendServer).GetSelf(ctx, req.(*SelfRequest))
+		return srv.(BackendServer).GetSelf(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Backend_GetSetup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetSetupRequest)
+	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func _Backend_GetSetup_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: "/api.Backend/GetSetup",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BackendServer).GetSetup(ctx, req.(*GetSetupRequest))
+		return srv.(BackendServer).GetSetup(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -177,7 +177,7 @@ func _Backend_SetSetup_Handler(srv interface{}, ctx context.Context, dec func(in
 }
 
 func _Backend_GetUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UsersRequest)
+	in := new(Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func _Backend_GetUsers_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: "/api.Backend/GetUsers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BackendServer).GetUsers(ctx, req.(*UsersRequest))
+		return srv.(BackendServer).GetUsers(ctx, req.(*Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }

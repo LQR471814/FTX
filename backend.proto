@@ -4,21 +4,21 @@ option go_package = "main/api";
 package api;
 
 service Backend {
-	rpc GetSelf (SelfRequest) returns (SelfReply) {}
+	rpc GetSelf (Empty) returns (SelfResponse) {}
 
-	rpc GetSetup (GetSetupRequest) returns (GetSetupResponse) {}
-	rpc SetSetup (SetSetupRequest) returns (SetSetupResponse) {}
+	rpc GetSetup (Empty) returns (GetSetupResponse) {}
+	rpc SetSetup (SetSetupRequest) returns (Empty) {}
 
-	rpc GetUsers (UsersRequest) returns (UsersReply) {}
-	rpc SendMessage (MessageRequest) returns (MessageResponse) {}
+	rpc GetUsers (Empty) returns (UsersResponse) {}
+	rpc SendMessage (MessageRequest) returns (Empty) {}
 }
 
-message SelfRequest {}
-message SelfReply {
+message Empty {}
+
+message SelfResponse {
 	string hostname = 1;
 }
 
-message GetSetupRequest {}
 message GetSetupResponse {
 	bool required = 1;
 	repeated NetworkInterface interfaces = 2;
@@ -27,16 +27,13 @@ message GetSetupResponse {
 message SetSetupRequest {
 	NetworkInterface interface = 1;
 }
-message SetSetupResponse {}
 
 message MessageRequest {
 	string message = 1;
 	string destination = 2; //An IP
 }
-message MessageResponse {}
 
-message UsersRequest {}
-message UsersReply {
+message UsersResponse {
 	repeated User users = 1;
 }
 
