@@ -25,15 +25,15 @@ type BackendServer struct {
 	state *state.State
 }
 
-func (*BackendServer) GetSelf(ctx context.Context, req *api.SelfRequest) (*api.SelfReply, error) {
+func (*BackendServer) GetSelf(ctx context.Context, req *api.Empty) (*api.SelfResponse, error) {
 	host, err := os.Hostname()
 
-	return &api.SelfReply{
+	return &api.SelfResponse{
 		Hostname: host,
 	}, err
 }
 
-func (s *BackendServer) GetSetup(ctx context.Context, req *api.GetSetupRequest) (*api.GetSetupResponse, error) {
+func (s *BackendServer) GetSetup(ctx context.Context, req *api.Empty) (*api.GetSetupResponse, error) {
 	multicastWorks, err := multicast.Check()
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (s *BackendServer) GetSetup(ctx context.Context, req *api.GetSetupRequest) 
 	}, nil
 }
 
-func (*BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) (*api.SetSetupResponse, error) {
+func (*BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) (*api.Empty, error) {
 	execpath, err := os.Executable()
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func (*BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) (*
 	return nil, nil
 }
 
-func (s *BackendServer) GetUsers(ctx context.Context, req *api.UsersRequest) (*api.UsersReply, error) {
+func (s *BackendServer) GetUsers(ctx context.Context, req *api.Empty) (*api.UsersResponse, error) {
 	result := []*api.User{}
 	for _, peer := range s.state.Peers {
 		result = append(result, &api.User{
@@ -84,12 +84,12 @@ func (s *BackendServer) GetUsers(ctx context.Context, req *api.UsersRequest) (*a
 		})
 	}
 
-	return &api.UsersReply{
+	return &api.UsersResponse{
 		Users: result,
 	}, nil
 }
 
-func (s *BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest) (*api.MessageResponse, error) {
+func (s *BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest) (*api.Empty, error) {
 	peers.Message(s.state.Group, req.Destination, req.Message)
 	return nil, nil
 }
