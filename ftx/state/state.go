@@ -1,14 +1,15 @@
 package state
 
 import (
-	"ftx/peers"
+	"ftx/common"
 	"net"
 )
 
 type State struct {
 	Settings  *Settings
-	Peers     []*peers.Peer
+	Peers     map[string]common.Peer
 	Listeners map[string]net.Listener
+	Group     *net.UDPAddr
 }
 
 var LISTENER_IDENTIFIERS = []string{
@@ -17,10 +18,14 @@ var LISTENER_IDENTIFIERS = []string{
 	"file",
 }
 
-var state = &State{}
-
-func init() {
+func CreateState(group string) (*State, error) {
 	var err error
+
+	state := State{}
+	state.Group, err = net.ResolveUDPAddr("udp", group)
+	if err != nil {
+		return nil, err
+	}
 
 	state.Settings.Load()
 	state.Listeners = make(map[string]net.Listener)
@@ -28,15 +33,13 @@ func init() {
 	for _, id := range LISTENER_IDENTIFIERS {
 		state.Listeners[id], err = net.Listen("tcp", ":0")
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 	}
+
+	return &state, nil
 }
 
-func ListenerPort(id string) int {
-	return state.Listeners[id].Addr().(*net.TCPAddr).Port
-}
-
-func Current() *State {
-	return state
+func (s *State) ListenerPort(id string) int {
+	return (*s).Listeners[id].Addr().(*net.TCPAddr).Port
 }

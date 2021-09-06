@@ -36,7 +36,7 @@ func (h LimitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func ServeGUI(listener net.Listener) {
+func ServeGUI(state *state.State, listener net.Listener) {
 	guiPath, err := paths.WithDirectory("build")
 	if err != nil {
 		panic(err)
@@ -49,10 +49,8 @@ func ServeGUI(listener net.Listener) {
 				redirect: fs,
 			},
 			cookie: &http.Cookie{
-				Name: "GRPC_PORT",
-				Value: strconv.Itoa(
-					state.ListenerPort("grpc"),
-				),
+				Name:  "GRPC_PORT",
+				Value: strconv.Itoa(state.ListenerPort("grpc")),
 			},
 		},
 	}

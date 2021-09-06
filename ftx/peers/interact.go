@@ -1,39 +1,34 @@
 package peers
 
 import (
-	"log"
 	"net"
 
 	"github.com/LQR471814/multicast"
 )
 
-var group *net.UDPAddr
+const (
+	USER_REGISTRATION_FLAG = 0
+	KEEP_ALIVE_FLAG        = 1
+	USER_QUIT_FLAG         = 2
+	USER_MESSAGE_FLAG      = 3
+)
 
-func init() {
-	var err error
-
-	group, err = net.ResolveUDPAddr("udp", MULTICAST_GROUP)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-func Register(name string) {
+func Register(group *net.UDPAddr, name string) {
 	message := append([]byte{USER_REGISTRATION_FLAG}, []byte(name)...)
 	multicast.Ping(group, message)
 }
 
-func KeepAlive() {
+func KeepAlive(group *net.UDPAddr) {
 	message := []byte{KEEP_ALIVE_FLAG}
 	multicast.Ping(group, message)
 }
 
-func Quit() {
+func Quit(group *net.UDPAddr) {
 	message := []byte{USER_QUIT_FLAG}
 	multicast.Ping(group, message)
 }
 
-func Message(ip string, msg string) {
+func Message(group *net.UDPAddr, ip string, msg string) {
 	message := append([]byte{USER_MESSAGE_FLAG}, []byte(ip)...)
 	message = append(message, 0)
 	message = append(message, []byte(msg)...)

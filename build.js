@@ -49,7 +49,8 @@ function utility() {
 
 function rpc() {
 	shell.cd(`${BACKEND_NAME}${divider}api`)
-	shell.exec('protoc -I . --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative backend.proto')
+	shell.exec('protoc -I=. backend.proto --js_out=import_style=commonjs:. --grpc-web_out=import_style=typescript,mode=grpcweb:.')
+	shell.exec('protoc -I=. backend.proto --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative')
 	shell.cd(`..${divider}..`)
 }
 

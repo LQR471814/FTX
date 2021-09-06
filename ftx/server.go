@@ -1,3 +1,5 @@
+//TODO: Get rid of state package and pass state with type casting instead
+
 package ftx
 
 import (
@@ -20,6 +22,7 @@ import (
 
 type BackendServer struct {
 	api.UnimplementedBackendServer
+	state *state.State
 }
 
 func (*BackendServer) GetSelf(ctx context.Context, req *api.SelfRequest) (*api.SelfReply, error) {
@@ -30,7 +33,7 @@ func (*BackendServer) GetSelf(ctx context.Context, req *api.SelfRequest) (*api.S
 	}, err
 }
 
-func (*BackendServer) GetSetup(ctx context.Context, req *api.GetSetupRequest) (*api.GetSetupResponse, error) {
+func (s *BackendServer) GetSetup(ctx context.Context, req *api.GetSetupRequest) (*api.GetSetupResponse, error) {
 	multicastWorks, err := multicast.Check()
 	if err != nil {
 		return nil, err
@@ -43,7 +46,7 @@ func (*BackendServer) GetSetup(ctx context.Context, req *api.GetSetupRequest) (*
 
 	return &api.GetSetupResponse{
 		Required: !multicastWorks ||
-			(*state.Current()).Settings.Interface < 0,
+			(*s.state).Settings.Interface < 0,
 		Interfaces: interfaces,
 	}, nil
 }
@@ -72,9 +75,9 @@ func (*BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) (*
 	return nil, nil
 }
 
-func (*BackendServer) GetUsers(ctx context.Context, req *api.UsersRequest) (*api.UsersReply, error) {
+func (s *BackendServer) GetUsers(ctx context.Context, req *api.UsersRequest) (*api.UsersReply, error) {
 	result := []*api.User{}
-	for _, peer := range state.Current().Peers {
+	for _, peer := range s.state.Peers {
 		result = append(result, &api.User{
 			IP:   peer.IP,
 			Name: peer.Name,
@@ -86,14 +89,19 @@ func (*BackendServer) GetUsers(ctx context.Context, req *api.UsersRequest) (*api
 	}, nil
 }
 
-func (*BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest) (*api.MessageResponse, error) {
-	peers.Message(req.Destination, req.Message)
+func (s *BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest) (*api.MessageResponse, error) {
+	peers.Message(s.state.Group, req.Destination, req.Message)
 	return nil, nil
 }
 
-func ServeGRPC(listener net.Listener) {
+func ServeGRPC(state *state.State, listener net.Listener) {
 	gRPCServer := grpc.NewServer()
-	api.RegisterBackendServer(gRPCServer, &BackendServer{})
+	api.RegisterBackendServer(
+		gRPCServer,
+		&BackendServer{
+			state: state,
+		},
+	)
 
 	wrappedServer := grpcweb.WrapServer(gRPCServer)
 
