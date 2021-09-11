@@ -10,8 +10,10 @@ const execFileExt = `${isWin ? ".exe" : ""}`
 const divider = isWin ? "\\" : "/"
 
 //? Constants
-const UTILITY_NAME = "multicast-utility"
-const BACKEND_NAME = "ftx"
+const UTILITY_DIR = "multicast-utility"
+const UTILITY_EXEC_NAME = "mcast-utility"
+const BACKEND_DIR = "backend"
+const BACKEND_EXEC_NAME = "ftx"
 
 const args = process.argv.slice(2)
 const nameMap = {
@@ -31,20 +33,20 @@ function frontend() {
 }
 
 function utility() {
-	shell.cd(`${BACKEND_NAME}${divider}${UTILITY_NAME}`)
+	shell.cd(UTILITY_DIR)
 
-	const executableName = UTILITY_NAME + execFileExt
+	const executableName = UTILITY_EXEC_NAME + execFileExt
 
 	shell.exec(`go build -o ${executableName}`)
 
 	shell.cp(
 		executableName,
-		`..${divider}..${divider}${executableName}`,
+		`..${divider}${executableName}`,
 	)
 
 	shell.rm(executableName)
 
-	shell.cd(`..${divider}..`)
+	shell.cd(`..`)
 }
 
 function rpc() {
@@ -52,19 +54,21 @@ function rpc() {
 	shell.exec(`protoc -I=. backend.proto --js_out=import_style=commonjs:src${divider}lib --grpc-web_out=import_style=typescript,mode=grpcweb:src${divider}lib`)
 
 	//? Backend RPC
-	shell.exec(`protoc -I=. backend.proto --go_out=${BACKEND_NAME}${divider}api --go_opt=paths=source_relative --go-grpc_out=${BACKEND_NAME}${divider}api --go-grpc_opt=paths=source_relative`)
+	shell.exec(`protoc -I=. backend.proto --go_out=${BACKEND_DIR}${divider}api --go_opt=paths=source_relative --go-grpc_out=${BACKEND_DIR}${divider}api --go-grpc_opt=paths=source_relative`)
 }
 
 function backend() {
 	rpc()
-	shell.cd(BACKEND_NAME)
+	shell.cd(BACKEND_DIR)
 
-	shell.exec(`go build -o ${BACKEND_NAME}${execFileExt}`)
+	const executableName = BACKEND_EXEC_NAME + execFileExt
+
+	shell.exec(`go build -o ${executableName}`)
 	shell.cp(
-		BACKEND_NAME + execFileExt,
-		`..${divider}${BACKEND_NAME}${execFileExt}`,
+		BACKEND_EXEC_NAME + execFileExt,
+		`..${divider}${executableName}`,
 	)
-	shell.rm(BACKEND_NAME + execFileExt)
+	shell.rm(executableName)
 
 	shell.cd('..')
 }
@@ -77,8 +81,8 @@ function distribute() {
 	shell.mkdir('-p', `${distPath}`)
 	shell.mkdir('-p', `${distPath}${divider}build`)
 
-	shell.cp(UTILITY_NAME + execFileExt, distPath)
-	shell.cp(BACKEND_NAME + execFileExt, distPath)
+	shell.cp(UTILITY_DIR + execFileExt, distPath)
+	shell.cp(BACKEND_DIR + execFileExt, distPath)
 	shell.cp('-r',  guiBuildPath, `${distPath}${divider}build`)
 
 	console.log("All builds complete")

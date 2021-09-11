@@ -2,9 +2,10 @@ package main
 
 import (
 	"bytes"
-	"main/api"
-	"main/peers"
-	"main/state"
+	"ftx/backend/api"
+	"ftx/backend/peers"
+	"ftx/backend/state"
+	"log"
 
 	"github.com/LQR471814/multicast"
 	"github.com/LQR471814/multicast/operations"
@@ -21,7 +22,7 @@ func updatePeerChannels(s *state.State) {
 	for _, p := range s.Peers {
 		peers = append(peers, &api.User{
 			Name: p.Name,
-			IP:   p.IP,
+			IP:   p.Addr.String(),
 		})
 	}
 
@@ -36,24 +37,31 @@ func PeerListen(s *state.State) {
 	multicast.Listen(s.Group, func(packet operations.MulticastPacket) {
 		packetType := packet.Contents[0]
 		content := packet.Contents[1:]
-		from := packet.Src.String()
+
+		fromStr := packet.Src.String()
+		log.Println("From", fromStr, "of type", packetType, "with content", content)
 
 		switch packetType {
 		case peers.USER_REGISTRATION_FLAG:
+			if s.Peers[fromStr] != (state.Peer{}) {
+				break
+			}
+
 			name := string(content)
-			s.Peers[from] = state.Peer{
+			s.Peers[fromStr] = state.Peer{
 				Name: name,
-				IP:   from,
+				Addr: packet.Src,
 			}
 
 			updatePeerChannels(s)
+			peers.Register(s.Group, s.Name)
 		case peers.USER_MESSAGE_FLAG:
 			payloadFragments := bytes.Split(content, []byte{0}) //? Split by null byte
 
 			destination := string(payloadFragments[0])
 			message := string(payloadFragments[1])
 
-			author := s.Peers[from]
+			author := s.Peers[fromStr]
 
 			destAddr, err := StringToUDPAddr(destination)
 			if err != nil {
@@ -69,7 +77,7 @@ func PeerListen(s *state.State) {
 				updateMessageChannels(s, &api.Message{
 					Author: &api.User{
 						Name: author.Name,
-						IP:   author.IP,
+						IP:   fromStr,
 					},
 					Contents: message,
 				})

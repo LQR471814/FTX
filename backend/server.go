@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"main/api"
-	"main/peers"
-	"main/state"
+	"ftx/backend/api"
+	"ftx/backend/peers"
+	"ftx/backend/state"
 
 	"github.com/LQR471814/multicast"
 )
@@ -53,7 +53,7 @@ func (*BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) (*
 
 	utilitypath := filepath.Join(
 		filepath.Dir(execpath),
-		"multicast-utility.exe",
+		"mcast-utility.exe",
 	)
 
 	err = exec.Command(
@@ -83,7 +83,7 @@ func (s *BackendServer) GetUsers(ctx context.Context, req *api.Empty) (*api.User
 	result := []*api.User{}
 	for _, peer := range s.state.Peers {
 		result = append(result, &api.User{
-			IP:   peer.IP,
+			IP:   peer.Addr.String(),
 			Name: peer.Name,
 		})
 	}

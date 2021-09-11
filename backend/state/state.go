@@ -1,14 +1,15 @@
 package state
 
 import (
-	"main/api"
+	"ftx/backend/api"
 	"net"
+	"os"
 )
 
 //? There is a separate type def here instead of directly using "api.User" because api.User contains some extra things that aren't pure data
 type Peer struct {
 	Name string
-	IP   string
+	Addr *net.UDPAddr
 }
 
 type State struct {
@@ -18,6 +19,7 @@ type State struct {
 	Peers                 map[string]Peer
 	Listeners             map[string]net.Listener
 	Group                 *net.UDPAddr
+	Name                  string
 }
 
 var LISTENER_IDENTIFIERS = []string{
@@ -30,6 +32,11 @@ func CreateState(group string) (*State, error) {
 
 	state := State{}
 	state.Group, err = net.ResolveUDPAddr("udp", group)
+	if err != nil {
+		return nil, err
+	}
+
+	state.Name, err = os.Hostname()
 	if err != nil {
 		return nil, err
 	}
