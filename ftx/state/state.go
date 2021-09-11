@@ -39,6 +39,9 @@ func CreateState(group string) (*State, error) {
 		return nil, err
 	}
 
+	state.PeerUpdateChannels = &[]api.Backend_ListenUsersServer{}
+	state.MessageUpdateChannels = &[]api.Backend_ListenMessagesServer{}
+
 	state.Listeners = make(map[string]net.Listener)
 
 	for _, id := range LISTENER_IDENTIFIERS {

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"main/api"
 	"main/files"
 	"main/paths"
@@ -21,7 +20,6 @@ type LimitHandler struct {
 }
 
 func (h LimitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println(r.RemoteAddr)
 	trueAddr, err := net.ResolveTCPAddr("tcp", r.RemoteAddr)
 	if err != nil {
 		panic(err)
@@ -66,10 +64,7 @@ func ServeGUI(state *state.State, listener net.Listener) {
 		},
 	)
 
-	wrappedServer := grpcweb.WrapServer(
-		gRPCServer,
-		grpcweb.WithWebsockets(true),
-	)
+	wrappedServer := grpcweb.WrapServer(gRPCServer)
 
 	server := http.Server{
 		Handler: LimitHandler{
