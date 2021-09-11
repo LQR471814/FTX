@@ -5,6 +5,7 @@ import "styling/Widget.css"
 import "styling/Root.css"
 
 import MessageList from "./MessageList"
+import { MessageGroup } from "lib/apptypes"
 
 type Props = {
   groups: Record<string, MessageGroup>
@@ -29,7 +30,7 @@ function MessageComponent(props: Props) {
           return (
             <MessageList
               group={props.groups[ID]}
-              ID={ID}
+              IP={ID}
               key={ID}
             />
           )

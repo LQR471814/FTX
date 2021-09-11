@@ -1,5 +1,6 @@
 import "./css/Banner.css"
 import { ReactComponent as CloseIcon } from "styling/assets/close.svg"
+import { BannerStyle } from "lib/apptypes"
 
 type Props = {
   show: boolean

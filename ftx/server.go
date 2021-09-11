@@ -1,23 +1,17 @@
-//TODO: Get rid of state package and pass state with type casting instead
-
-package ftx
+package main
 
 import (
 	"context"
-	"net"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strconv"
 
-	"ftx/api"
-	"ftx/peers"
-	"ftx/state"
+	"main/api"
+	"main/peers"
+	"main/state"
 
 	"github.com/LQR471814/multicast"
-	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	"google.golang.org/grpc"
 )
 
 type BackendServer struct {
@@ -75,6 +69,16 @@ func (*BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) (*
 	return nil, nil
 }
 
+func (s *BackendServer) ListenMessages(_ *api.Empty, stream api.Backend_ListenMessagesServer) error {
+	*s.state.MessageUpdateChannels = append(*s.state.MessageUpdateChannels, stream)
+	return nil
+}
+
+func (s *BackendServer) ListenUsers(_ *api.Empty, stream api.Backend_ListenUsersServer) error {
+	*s.state.PeerUpdateChannels = append(*s.state.PeerUpdateChannels, stream)
+	return nil
+}
+
 func (s *BackendServer) GetUsers(ctx context.Context, req *api.Empty) (*api.UsersResponse, error) {
 	result := []*api.User{}
 	for _, peer := range s.state.Peers {
@@ -90,28 +94,6 @@ func (s *BackendServer) GetUsers(ctx context.Context, req *api.Empty) (*api.User
 }
 
 func (s *BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest) (*api.Empty, error) {
-	peers.Message(s.state.Group, req.Destination, req.Message)
+	peers.Message(s.state.Group, req.Message.Author.IP, req.Message.Contents)
 	return nil, nil
-}
-
-func ServeGRPC(state *state.State, listener net.Listener) {
-	gRPCServer := grpc.NewServer()
-	api.RegisterBackendServer(
-		gRPCServer,
-		&BackendServer{
-			state: state,
-		},
-	)
-
-	wrappedServer := grpcweb.WrapServer(gRPCServer)
-
-	handler := func(resp http.ResponseWriter, req *http.Request) {
-		wrappedServer.ServeHTTP(resp, req)
-	}
-
-	server := http.Server{
-		Handler: http.HandlerFunc(handler),
-	}
-
-	server.Serve(listener)
 }

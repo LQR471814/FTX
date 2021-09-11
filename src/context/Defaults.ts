@@ -1,3 +1,5 @@
+import { BannerStyle, MessageGroup, TransferState } from "lib/apptypes"
+import { User } from "lib/backend_pb"
 import { AppState, OverlayState } from "./State"
 
 const defaultField = "Loading..."
@@ -34,6 +36,10 @@ export function messageGroupDefaults(user: User): MessageGroup {
 }
 
 export function appDefaults(): AppState {
+	const self = new User()
+	self.setName(defaultField)
+	self.setIp(defaultField)
+
 	return {
 		showBanner: false,
 		bannerStyling: bannerStylingDefaults(),
@@ -42,11 +48,7 @@ export function appDefaults(): AppState {
 		messageGroups: {},
 
 		users: {},
-		self: {
-			name: defaultField,
-			ip: defaultField
-		},
-
+		self: self,
 		setupInfo: {
 			interfaces: []
 		},

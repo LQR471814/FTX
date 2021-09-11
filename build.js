@@ -80,6 +80,8 @@ function distribute() {
 	shell.cp(UTILITY_NAME + execFileExt, distPath)
 	shell.cp(BACKEND_NAME + execFileExt, distPath)
 	shell.cp('-r',  guiBuildPath, `${distPath}${divider}build`)
+
+	console.log("All builds complete")
 }
 
 if (args.length === 0) {

@@ -21,7 +21,7 @@ function appReducer(state: AppState, action: AppAction) {
 			break
 
 		case "self_update":
-			newState.self.name = action.hostname
+			newState.self.setName(action.hostname)
 			break
 
 		case "setup_update_netintfs":
@@ -62,7 +62,7 @@ function appReducer(state: AppState, action: AppAction) {
 				action.from
 			].messages.push({
 				content: action.msg,
-				author: newState.users[action.from].name
+				author: newState.users[action.from].getName()
 			})
 			break
 

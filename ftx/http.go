@@ -1,25 +1,19 @@
-package ftx
+package main
 
 import (
-	"ftx/files"
-	"ftx/paths"
-	"ftx/state"
 	"log"
+	"main/api"
+	"main/files"
+	"main/paths"
+	"main/state"
 	"net"
 	"net/http"
-	"strconv"
+	"strings"
+
+	"github.com/gorilla/websocket"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"google.golang.org/grpc"
 )
-
-//WithCookie adds a cookie to the response of the request
-type WithCookie struct {
-	redirect http.Handler
-	cookie   *http.Cookie
-}
-
-func (h WithCookie) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	http.SetCookie(w, h.cookie)
-	h.redirect.ServeHTTP(w, r)
-}
 
 //LimitHandler limits requests incoming to the given redirect to localhost
 type LimitHandler struct {
@@ -27,31 +21,59 @@ type LimitHandler struct {
 }
 
 func (h LimitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Default().Println(r.RemoteAddr)
+	log.Println(r.RemoteAddr)
+	trueAddr, err := net.ResolveTCPAddr("tcp", r.RemoteAddr)
+	if err != nil {
+		panic(err)
+	}
 
-	if isLocal(r.RemoteAddr) {
+	if trueAddr.IP.IsLoopback() {
 		h.redirect.ServeHTTP(w, r)
 	} else {
 		w.Write([]byte("Access denied"))
 	}
 }
 
+func SplitGRPCTraffic(fallback http.HandlerFunc, grpcHandler http.Handler) http.HandlerFunc {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if strings.Contains(r.Header.Get("Content-Type"), "application/grpc") ||
+				websocket.IsWebSocketUpgrade(r) {
+				grpcHandler.ServeHTTP(w, r)
+				return
+			}
+
+			fallback(w, r)
+		},
+	)
+}
+
 func ServeGUI(state *state.State, listener net.Listener) {
+	//? GUI Folder Setup
 	guiPath, err := paths.WithDirectory("build")
 	if err != nil {
 		panic(err)
 	}
 
 	fs := http.FileServer(http.Dir(guiPath))
+
+	//? GRPC Setup
+	gRPCServer := grpc.NewServer()
+	api.RegisterBackendServer(
+		gRPCServer,
+		&BackendServer{
+			state: state,
+		},
+	)
+
+	wrappedServer := grpcweb.WrapServer(
+		gRPCServer,
+		grpcweb.WithWebsockets(true),
+	)
+
 	server := http.Server{
-		Handler: WithCookie{
-			redirect: LimitHandler{
-				redirect: fs,
-			},
-			cookie: &http.Cookie{
-				Name:  "GRPC_PORT",
-				Value: strconv.Itoa(state.ListenerPort("grpc")),
-			},
+		Handler: LimitHandler{
+			redirect: SplitGRPCTraffic(fs.ServeHTTP, wrappedServer),
 		},
 	}
 

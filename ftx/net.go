@@ -1,7 +1,7 @@
-package ftx
+package main
 
 import (
-	"ftx/api"
+	"main/api"
 	"net"
 )
 
@@ -58,4 +58,34 @@ func GetInterfaces() ([]*api.NetworkInterface, error) {
 	}
 
 	return result, nil
+}
+
+func StringToUDPAddr(s string) (*net.UDPAddr, error) {
+	ip := net.ParseIP(s)
+	addr, err := net.ResolveUDPAddr("udp", ip.String())
+	if err != nil {
+		return nil, err
+	}
+
+	return addr, nil
+}
+
+func AddrInInterface(index int, addr *net.UDPAddr) (bool, error) {
+	intf, err := net.InterfaceByIndex(index)
+	if err != nil {
+		return false, err
+	}
+
+	addrs, err := intf.Addrs()
+	if err != nil {
+		return false, err
+	}
+
+	for _, a := range addrs {
+		if a.String() == addr.String() {
+			return true, nil
+		}
+	}
+
+	return false, nil
 }

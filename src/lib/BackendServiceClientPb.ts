@@ -155,7 +155,7 @@ export class BackendClient {
     this.methodInfoSetSetup);
   }
 
-  methodInfoGetUsers = new grpcWeb.AbstractClientBase.MethodInfo(
+  methodInfoListenUsers = new grpcWeb.AbstractClientBase.MethodInfo(
     backend_pb.UsersResponse,
     (request: backend_pb.Empty) => {
       return request.serializeBinary();
@@ -163,36 +163,34 @@ export class BackendClient {
     backend_pb.UsersResponse.deserializeBinary
   );
 
-  getUsers(
+  listenUsers(
     request: backend_pb.Empty,
-    metadata: grpcWeb.Metadata | null): Promise<backend_pb.UsersResponse>;
+    metadata?: grpcWeb.Metadata) {
+    return this.client_.serverStreaming(
+      this.hostname_ +
+        '/api.Backend/ListenUsers',
+      request,
+      metadata || {},
+      this.methodInfoListenUsers);
+  }
 
-  getUsers(
-    request: backend_pb.Empty,
-    metadata: grpcWeb.Metadata | null,
-    callback: (err: grpcWeb.Error,
-               response: backend_pb.UsersResponse) => void): grpcWeb.ClientReadableStream<backend_pb.UsersResponse>;
+  methodInfoListenMessages = new grpcWeb.AbstractClientBase.MethodInfo(
+    backend_pb.Message,
+    (request: backend_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    backend_pb.Message.deserializeBinary
+  );
 
-  getUsers(
+  listenMessages(
     request: backend_pb.Empty,
-    metadata: grpcWeb.Metadata | null,
-    callback?: (err: grpcWeb.Error,
-               response: backend_pb.UsersResponse) => void) {
-    if (callback !== undefined) {
-      return this.client_.rpcCall(
-        this.hostname_ +
-          '/api.Backend/GetUsers',
-        request,
-        metadata || {},
-        this.methodInfoGetUsers,
-        callback);
-    }
-    return this.client_.unaryCall(
-    this.hostname_ +
-      '/api.Backend/GetUsers',
-    request,
-    metadata || {},
-    this.methodInfoGetUsers);
+    metadata?: grpcWeb.Metadata) {
+    return this.client_.serverStreaming(
+      this.hostname_ +
+        '/api.Backend/ListenMessages',
+      request,
+      metadata || {},
+      this.methodInfoListenMessages);
   }
 
   methodInfoSendMessage = new grpcWeb.AbstractClientBase.MethodInfo(

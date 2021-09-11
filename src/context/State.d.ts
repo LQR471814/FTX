@@ -1,4 +1,4 @@
-import { NetworkInterface } from "lib/backend_pb"
+import { NetworkInterface, User } from "lib/backend_pb"
 
 type OverlayType = "networkInterfaces" | "commChoice" | "uploadRegion"
 type OverlayState = {
@@ -30,8 +30,7 @@ type UpdateSelfAction = { type: "self_update", hostname: string }
 
 type UpdateInterfaces = { type: "setup_update_netintfs", interfaces: NetworkInterface[] }
 
-type NewPeerAction = { type: "user_add", user: User }
-type RemovePeerAction = { type: "user_remove", id: IP }
+type SetPeersAction = { type: "peers_set", users: User[] }
 
 //TODO: Update with more sound state later
 type NewTransferAction = { type: "transfer_new", id: IP, initial: Transfer }
@@ -54,8 +53,7 @@ type DisplayOverlayAction = {
 type AppAction =
 	| DisplayBannerAction
 	| ChangeBannerStyleAction
-	| NewPeerAction
-	| RemovePeerAction
+	| SetPeersAction
 	| UpdateSelfAction
 	| UpdateInterfaces
 	| NewTransferAction

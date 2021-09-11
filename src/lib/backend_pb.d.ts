@@ -2,6 +2,52 @@ import * as jspb from 'google-protobuf'
 
 
 
+export class User extends jspb.Message {
+  getIp(): string;
+  setIp(value: string): User;
+
+  getName(): string;
+  setName(value: string): User;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): User.AsObject;
+  static toObject(includeInstance: boolean, msg: User): User.AsObject;
+  static serializeBinaryToWriter(message: User, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): User;
+  static deserializeBinaryFromReader(message: User, reader: jspb.BinaryReader): User;
+}
+
+export namespace User {
+  export type AsObject = {
+    ip: string,
+    name: string,
+  }
+}
+
+export class Message extends jspb.Message {
+  getAuthor(): User | undefined;
+  setAuthor(value?: User): Message;
+  hasAuthor(): boolean;
+  clearAuthor(): Message;
+
+  getContents(): string;
+  setContents(value: string): Message;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Message.AsObject;
+  static toObject(includeInstance: boolean, msg: Message): Message.AsObject;
+  static serializeBinaryToWriter(message: Message, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Message;
+  static deserializeBinaryFromReader(message: Message, reader: jspb.BinaryReader): Message;
+}
+
+export namespace Message {
+  export type AsObject = {
+    author?: User.AsObject,
+    contents: string,
+  }
+}
+
 export class Empty extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Empty.AsObject;
@@ -79,11 +125,10 @@ export namespace SetSetupRequest {
 }
 
 export class MessageRequest extends jspb.Message {
-  getMessage(): string;
-  setMessage(value: string): MessageRequest;
-
-  getDestination(): string;
-  setDestination(value: string): MessageRequest;
+  getMessage(): Message | undefined;
+  setMessage(value?: Message): MessageRequest;
+  hasMessage(): boolean;
+  clearMessage(): MessageRequest;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): MessageRequest.AsObject;
@@ -95,8 +140,7 @@ export class MessageRequest extends jspb.Message {
 
 export namespace MessageRequest {
   export type AsObject = {
-    message: string,
-    destination: string,
+    message?: Message.AsObject,
   }
 }
 
@@ -142,28 +186,6 @@ export namespace NetworkInterface {
   export type AsObject = {
     index: number,
     address: string,
-    name: string,
-  }
-}
-
-export class User extends jspb.Message {
-  getIp(): string;
-  setIp(value: string): User;
-
-  getName(): string;
-  setName(value: string): User;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): User.AsObject;
-  static toObject(includeInstance: boolean, msg: User): User.AsObject;
-  static serializeBinaryToWriter(message: User, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): User;
-  static deserializeBinaryFromReader(message: User, reader: jspb.BinaryReader): User;
-}
-
-export namespace User {
-  export type AsObject = {
-    ip: string,
     name: string,
   }
 }

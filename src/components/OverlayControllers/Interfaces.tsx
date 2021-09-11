@@ -8,7 +8,8 @@ import { ReactComponent as WifiIcon } from "styling/assets/interfaceLogos/wifi.s
 import { ReactComponent as EthernetIcon } from "styling/assets/interfaceLogos/ethernet.svg"
 
 import { NetworkInterface, SetSetupRequest } from "lib/backend_pb"
-import { backend } from "context/BackendContext"
+import { backend } from "lib/Backend"
+import { Primitive } from "lib/apptypes"
 
 const wifiKeywords = [
   "wi-fi",

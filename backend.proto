@@ -9,8 +9,19 @@ service Backend {
 	rpc GetSetup (Empty) returns (GetSetupResponse) {}
 	rpc SetSetup (SetSetupRequest) returns (Empty) {}
 
-	rpc GetUsers (Empty) returns (UsersResponse) {}
+	rpc ListenUsers (Empty) returns (stream UsersResponse) {}
+	rpc ListenMessages (Empty) returns (stream Message) {}
 	rpc SendMessage (MessageRequest) returns (Empty) {}
+}
+
+message User {
+	string IP = 1;
+	string Name = 2;
+}
+
+message Message {
+	User author = 1;
+	string contents = 2;
 }
 
 message Empty {}
@@ -29,8 +40,7 @@ message SetSetupRequest {
 }
 
 message MessageRequest {
-	string message = 1;
-	string destination = 2; //An IP
+	Message message = 1;
 }
 
 message UsersResponse {
@@ -41,9 +51,4 @@ message NetworkInterface {
 	int32 Index = 1;
 	string Address = 2;
 	string Name = 3;
-}
-
-message User {
-	string IP = 1;
-	string Name = 2;
 }

@@ -6,6 +6,7 @@ import Choice from "./Choice"
 import { refToHTMLElement, transitionEffectOffset } from "lib/Utils"
 import { uniqueId } from "lib/Utils"
 import CancelButton from "components/Misc/CancelButton"
+import { Primitive } from "lib/apptypes"
 
 type Item = {
   label: string

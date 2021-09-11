@@ -1,9 +1,10 @@
+import { Transfer as TransferType } from 'lib/apptypes'
 import { uniqueId } from 'lib/Utils'
 import 'styling/Widget.css'
 import Transfer from './Transfer'
 
 type Props = {
-  activeTransfers: Transfer[]
+  activeTransfers: TransferType[]
 }
 
 export default function TransferStatus(props: Props) {

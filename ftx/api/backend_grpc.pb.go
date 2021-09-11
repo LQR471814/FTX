@@ -21,7 +21,8 @@ type BackendClient interface {
 	GetSelf(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*SelfResponse, error)
 	GetSetup(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*GetSetupResponse, error)
 	SetSetup(ctx context.Context, in *SetSetupRequest, opts ...grpc.CallOption) (*Empty, error)
-	GetUsers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*UsersResponse, error)
+	ListenUsers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenUsersClient, error)
+	ListenMessages(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenMessagesClient, error)
 	SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
@@ -60,13 +61,68 @@ func (c *backendClient) SetSetup(ctx context.Context, in *SetSetupRequest, opts 
 	return out, nil
 }
 
-func (c *backendClient) GetUsers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*UsersResponse, error) {
-	out := new(UsersResponse)
-	err := c.cc.Invoke(ctx, "/api.Backend/GetUsers", in, out, opts...)
+func (c *backendClient) ListenUsers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenUsersClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Backend_ServiceDesc.Streams[0], "/api.Backend/ListenUsers", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &backendListenUsersClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Backend_ListenUsersClient interface {
+	Recv() (*UsersResponse, error)
+	grpc.ClientStream
+}
+
+type backendListenUsersClient struct {
+	grpc.ClientStream
+}
+
+func (x *backendListenUsersClient) Recv() (*UsersResponse, error) {
+	m := new(UsersResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *backendClient) ListenMessages(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenMessagesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Backend_ServiceDesc.Streams[1], "/api.Backend/ListenMessages", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &backendListenMessagesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Backend_ListenMessagesClient interface {
+	Recv() (*Message, error)
+	grpc.ClientStream
+}
+
+type backendListenMessagesClient struct {
+	grpc.ClientStream
+}
+
+func (x *backendListenMessagesClient) Recv() (*Message, error) {
+	m := new(Message)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *backendClient) SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error) {
@@ -85,7 +141,8 @@ type BackendServer interface {
 	GetSelf(context.Context, *Empty) (*SelfResponse, error)
 	GetSetup(context.Context, *Empty) (*GetSetupResponse, error)
 	SetSetup(context.Context, *SetSetupRequest) (*Empty, error)
-	GetUsers(context.Context, *Empty) (*UsersResponse, error)
+	ListenUsers(*Empty, Backend_ListenUsersServer) error
+	ListenMessages(*Empty, Backend_ListenMessagesServer) error
 	SendMessage(context.Context, *MessageRequest) (*Empty, error)
 	mustEmbedUnimplementedBackendServer()
 }
@@ -103,8 +160,11 @@ func (UnimplementedBackendServer) GetSetup(context.Context, *Empty) (*GetSetupRe
 func (UnimplementedBackendServer) SetSetup(context.Context, *SetSetupRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetSetup not implemented")
 }
-func (UnimplementedBackendServer) GetUsers(context.Context, *Empty) (*UsersResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUsers not implemented")
+func (UnimplementedBackendServer) ListenUsers(*Empty, Backend_ListenUsersServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListenUsers not implemented")
+}
+func (UnimplementedBackendServer) ListenMessages(*Empty, Backend_ListenMessagesServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListenMessages not implemented")
 }
 func (UnimplementedBackendServer) SendMessage(context.Context, *MessageRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
@@ -176,22 +236,46 @@ func _Backend_SetSetup_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Backend_GetUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
-	if err := dec(in); err != nil {
-		return nil, err
+func _Backend_ListenUsers_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(BackendServer).GetUsers(ctx, in)
+	return srv.(BackendServer).ListenUsers(m, &backendListenUsersServer{stream})
+}
+
+type Backend_ListenUsersServer interface {
+	Send(*UsersResponse) error
+	grpc.ServerStream
+}
+
+type backendListenUsersServer struct {
+	grpc.ServerStream
+}
+
+func (x *backendListenUsersServer) Send(m *UsersResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Backend_ListenMessages_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/api.Backend/GetUsers",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BackendServer).GetUsers(ctx, req.(*Empty))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(BackendServer).ListenMessages(m, &backendListenMessagesServer{stream})
+}
+
+type Backend_ListenMessagesServer interface {
+	Send(*Message) error
+	grpc.ServerStream
+}
+
+type backendListenMessagesServer struct {
+	grpc.ServerStream
+}
+
+func (x *backendListenMessagesServer) Send(m *Message) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _Backend_SendMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -232,14 +316,21 @@ var Backend_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Backend_SetSetup_Handler,
 		},
 		{
-			MethodName: "GetUsers",
-			Handler:    _Backend_GetUsers_Handler,
-		},
-		{
 			MethodName: "SendMessage",
 			Handler:    _Backend_SendMessage_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "ListenUsers",
+			Handler:       _Backend_ListenUsers_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "ListenMessages",
+			Handler:       _Backend_ListenMessages_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "backend.proto",
 }

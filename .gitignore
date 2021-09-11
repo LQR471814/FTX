@@ -23,7 +23,7 @@ yarn-error.log*
 
 # Workspace IDE stuff
 *.exe
-settings.json
+/settings.json
 .eslintcache
 *.log
 

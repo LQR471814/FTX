@@ -12,11 +12,11 @@ import PendingTransfers from "components/PendingTransfers/PendingTransfers"
 import OverlayManager from "components/OverlayControllers/OverlayManager"
 import BannerController from "components/Banner/BannerController"
 
-import { initializeBackend } from "context/BackendContext"
-import { backend } from "context/BackendContext"
-import { Empty, GetSetupResponse, SelfResponse } from "lib/backend_pb"
+import { initializeBackend } from "lib/Backend"
+import { backend } from "lib/Backend"
+import { Empty, GetSetupResponse, Message, SelfResponse, User } from "lib/backend_pb"
 
-initializeBackend(document.cookie)
+initializeBackend()
 
 export default function App() {
   const ctx = useApp()
@@ -38,14 +38,25 @@ export default function App() {
       }
     })
 
-    //TODO: Come back to this later
-    // backendIntf.recvMessage.listen((msg) => {
-    //   ctx.dispatch({
-    //     type: "message_recv",
-    //     msg: msg.Message,
-    //     from: msg.User
-    //   })
-    // })
+    const messageStream = backend.listenMessages(new Empty())
+    messageStream.on('data', (response) => {
+      const msg = response as Message
+
+      ctx.dispatch({
+        type: "message_recv",
+        from: msg.getAuthor(),
+        msg: msg.getContents(),
+      })
+    })
+
+    const userStream = backend.listenUsers(new Empty())
+    userStream.on('data', (response) => {
+      ctx.dispatch({
+        type: "peers_set",
+        users: response as User[]
+      })
+    })
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

@@ -9,12 +9,13 @@ import Message from "./Message"
 import MessageInput from "./MessageInput"
 import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
-import { backend } from "context/BackendContext"
-import { MessageRequest } from "lib/backend_pb"
+import { backend } from "lib/Backend"
+import { MessageRequest, Message as MessageType } from "lib/backend_pb"
+import { MessageGroup } from "lib/apptypes"
 
 type Props = {
   group: MessageGroup
-  ID: IP
+  IP: string
 }
 
 function MessageList(props: Props) {
@@ -27,7 +28,7 @@ function MessageList(props: Props) {
     ctx.dispatch({
       type: 'group_display',
       display: !props.group.displayed,
-      id: props.ID
+      id: props.IP
     })
   }
 
@@ -68,7 +69,7 @@ function MessageList(props: Props) {
         onClick={onToggleCollapse}
         ref={messageGroupCollapsibleRef}
       >
-        <span className="MessageGroupUser">{props.group.user.name}</span>
+        <span className="MessageGroupUser">{props.group.user.getName()}</span>
       </div>
 
       <div
@@ -87,17 +88,20 @@ function MessageList(props: Props) {
         })}
 
         <Message>
-          <MessageInput onSubmit={(msg: string) => {
+          <MessageInput onSubmit={(contents: string) => {
             const req = new MessageRequest()
-            req.setDestination(props.ID)
-            req.setMessage(msg)
 
+            const msg = new MessageType()
+            msg.setContents(contents)
+            msg.setAuthor(ctx.state.self)
+
+            req.setMessage(msg)
             backend.sendMessage(req, null)
 
             ctx.dispatch({
               type: 'message_send',
-              msg: msg,
-              destination: props.ID
+              msg: contents,
+              destination: props.IP
             })
           }} />
         </Message>

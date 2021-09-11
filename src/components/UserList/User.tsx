@@ -1,26 +1,24 @@
+import { User as UserType } from 'lib/backend_pb'
 import { createRef } from "react"
 
 import "./css/UserList.css"
 
 type Props = {
-  click: (user: User) => void,
-  user: User
+  click: (user: UserType) => void,
+  user: UserType
 }
 
 export default function User(props: Props) {
   const userRef = createRef<HTMLDivElement>()
 
-  const onClick = () => {
-    props.click({
-      name: props.user.name,
-      ip: props.user.ip
-    })
-  }
-
   return (
-    <div ref={userRef} className="User" onClick={onClick}>
-      <p className="UserName">{props.user.name}</p>
-      <p className="Ip">{props.user.ip}</p>
+    <div ref={userRef} className="User"
+      onClick={() => {
+        props.click(props.user)
+      }}
+    >
+      <p className="UserName">{props.user.getName()}</p>
+      <p className="Ip">{props.user.getIp()}</p>
     </div>
   )
 }

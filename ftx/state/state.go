@@ -1,20 +1,27 @@
 package state
 
 import (
-	"ftx/common"
+	"main/api"
 	"net"
 )
 
+//? There is a separate type def here instead of directly using "api.User" because api.User contains some extra things that aren't pure data
+type Peer struct {
+	Name string
+	IP   string
+}
+
 type State struct {
-	Settings  *Settings
-	Peers     map[string]common.Peer
-	Listeners map[string]net.Listener
-	Group     *net.UDPAddr
+	Settings              *Settings
+	PeerUpdateChannels    *[]api.Backend_ListenUsersServer
+	MessageUpdateChannels *[]api.Backend_ListenMessagesServer
+	Peers                 map[string]Peer
+	Listeners             map[string]net.Listener
+	Group                 *net.UDPAddr
 }
 
 var LISTENER_IDENTIFIERS = []string{
 	"gui",
-	"grpc",
 	"file",
 }
 
@@ -27,7 +34,11 @@ func CreateState(group string) (*State, error) {
 		return nil, err
 	}
 
-	state.Settings.Load()
+	state.Settings, err = LoadSettings()
+	if err != nil {
+		return nil, err
+	}
+
 	state.Listeners = make(map[string]net.Listener)
 
 	for _, id := range LISTENER_IDENTIFIERS {

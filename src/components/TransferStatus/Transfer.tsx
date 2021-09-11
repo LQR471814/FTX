@@ -1,4 +1,5 @@
 import ProgressBar from "components/Misc/ProgressBar"
+import { TransferState } from "lib/apptypes"
 import "./css/Transfer.css"
 
 type Props = {

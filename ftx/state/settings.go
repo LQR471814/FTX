@@ -26,34 +26,36 @@ func (s *Settings) Unlock() {
 	s.mux.Unlock()
 }
 
-//Defaults restores Settings to defaults
-func (s *Settings) Defaults() {
-	s.Lock()
-
-	s.Interface = -1
-
-	s.Unlock()
+//Defaults creates a set of default Settings
+func Defaults() Settings {
+	return Settings{
+		Interface: -1,
+		mux:       sync.Mutex{},
+	}
 }
 
-//Load loads settings data from a file, will create the file if it doesn't exist
-func (s *Settings) Load() {
+func LoadSettings() (*Settings, error) {
+	s := &Settings{}
+
 	_, err := os.Open(settingsFileName)
 	if errors.Is(err, os.ErrNotExist) {
-		s.Defaults()
+		*s = Defaults()
 		s.Write()
 
-		return
+		return s, nil
 	}
 
 	data, err := os.ReadFile(settingsFileName)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	err = json.Unmarshal(data, s)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
+
+	return s, nil
 }
 
 //Write writes settings to a file
