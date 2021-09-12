@@ -8,7 +8,6 @@ import (
 	"syscall"
 
 	"github.com/LQR471814/multicast"
-	"github.com/LQR471814/multicast/action"
 	"golang.org/x/sys/windows"
 )
 
@@ -42,7 +41,7 @@ func main() {
 		log.Fatal("Interface index passed was not valid")
 	}
 
-	if !action.IsAdmin() {
+	if !multicast.IsAdmin() {
 		rerunElevated()
 	}
 

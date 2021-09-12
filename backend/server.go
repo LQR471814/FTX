@@ -10,8 +10,6 @@ import (
 	"ftx/backend/api"
 	"ftx/backend/peers"
 	"ftx/backend/state"
-
-	"github.com/LQR471814/multicast"
 )
 
 type BackendServer struct {
@@ -28,19 +26,13 @@ func (*BackendServer) GetSelf(ctx context.Context, req *api.Empty) (*api.SelfRes
 }
 
 func (s *BackendServer) GetSetup(ctx context.Context, req *api.Empty) (*api.GetSetupResponse, error) {
-	multicastWorks, err := multicast.Check()
-	if err != nil {
-		return nil, err
-	}
-
 	interfaces, err := GetInterfaces()
 	if err != nil {
 		return nil, err
 	}
 
 	return &api.GetSetupResponse{
-		Required: !multicastWorks ||
-			(*s.state).Settings.Interface < 0,
+		Required:   (*s.state).Settings.Interface < 0,
 		Interfaces: interfaces,
 	}, nil
 }
