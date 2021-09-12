@@ -53,7 +53,7 @@ func (*BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) (*
 
 	utilitypath := filepath.Join(
 		filepath.Dir(execpath),
-		"multicast-utility.exe",
+		"mcast-utility.exe",
 	)
 
 	err = exec.Command(
