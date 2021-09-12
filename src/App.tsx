@@ -23,6 +23,8 @@ export default function App() {
 
   useEffect(() => {
     backend.getSelf(new Empty(), null).then((res: SelfResponse) => {
+      console.log(res)
+
       ctx.dispatch({
         type: "self_update",
         hostname: res.getHostname()
@@ -30,7 +32,14 @@ export default function App() {
     })
 
     backend.getSetup(new Empty(), null).then((res: GetSetupResponse) => {
+      console.log(res)
+
       if (res.getRequired() === true) {
+        ctx.dispatch({
+          type: "banner_display",
+          display: true
+        })
+
         ctx.dispatch({
           type: 'setup_update_netintfs',
           interfaces: res.getInterfacesList()
@@ -42,6 +51,8 @@ export default function App() {
     messageStream.on('data', (response) => {
       const msg = response as Message
 
+      console.log(msg)
+
       ctx.dispatch({
         type: "message_recv",
         from: msg.getAuthor(),
@@ -51,6 +62,8 @@ export default function App() {
 
     const userStream = backend.listenUsers(new Empty())
     userStream.on('data', (response) => {
+      console.log(response)
+
       ctx.dispatch({
         type: "peers_set",
         users: response as User[]

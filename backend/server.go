@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,13 +32,15 @@ func (s *BackendServer) GetSetup(ctx context.Context, req *api.Empty) (*api.GetS
 		return nil, err
 	}
 
+	log.Println(s.state.Settings)
+
 	return &api.GetSetupResponse{
-		Required:   (*s.state).Settings.Interface < 0,
+		Required:   s.state.Settings.Interface < 0,
 		Interfaces: interfaces,
 	}, nil
 }
 
-func (*BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) (*api.Empty, error) {
+func (s *BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) (*api.Empty, error) {
 	execpath, err := os.Executable()
 	if err != nil {
 		return nil, err
@@ -54,11 +57,12 @@ func (*BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) (*
 		"-Path", execpath,
 	).Run()
 
-	if err != nil {
-		return nil, err
-	}
+	s.state.Settings.Lock()
+	s.state.Settings.Interface = int(req.Interface.Index)
+	s.state.Settings.Write()
+	s.state.Settings.Unlock()
 
-	return nil, nil
+	return nil, err
 }
 
 func (s *BackendServer) ListenMessages(_ *api.Empty, stream api.Backend_ListenMessagesServer) error {

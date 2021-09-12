@@ -3,7 +3,7 @@ module ftx/backend
 go 1.17
 
 require (
-	github.com/LQR471814/multicast v0.1.6
+	github.com/LQR471814/multicast v0.1.7
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/gorilla/websocket v1.4.2
 	github.com/improbable-eng/grpc-web v0.14.1

@@ -7,11 +7,14 @@ import (
 
 func GetIPv4(addrs []net.Addr) net.IP {
 	for _, a := range addrs {
-		ip := net.ParseIP(a.String())
-		as4 := ip.To4()
+		ip, _, err := net.ParseCIDR(a.String())
+		if err != nil {
+			return nil
+		}
 
-		if as4 != nil {
-			return as4
+		as := ip.To4()
+		if as != nil {
+			return as
 		}
 	}
 
@@ -20,11 +23,14 @@ func GetIPv4(addrs []net.Addr) net.IP {
 
 func GetIPv6(addrs []net.Addr) net.IP {
 	for _, a := range addrs {
-		ip := net.ParseIP(a.String())
-		as4 := ip.To16()
+		ip, _, err := net.ParseCIDR(a.String())
+		if err != nil {
+			return nil
+		}
 
-		if as4 != nil {
-			return as4
+		as := ip.To16()
+		if as != nil {
+			return as
 		}
 	}
 
