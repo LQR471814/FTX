@@ -11,7 +11,7 @@ const divider = isWin ? "\\" : "/"
 
 //? Constants
 const UTILITY_NAME = "multicast-utility"
-const BACKEND_NAME = "ftx"
+const BACKEND_NAME = "backend"
 
 const args = process.argv.slice(2)
 const nameMap = {
