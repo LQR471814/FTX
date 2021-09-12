@@ -1,10 +1,10 @@
 package main
 
 import (
-	"main/api"
-	"main/files"
-	"main/paths"
-	"main/state"
+	"ftx/backend/api"
+	"ftx/backend/files"
+	"ftx/backend/paths"
+	"ftx/backend/state"
 	"net"
 	"net/http"
 	"strings"

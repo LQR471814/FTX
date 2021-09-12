@@ -2,9 +2,9 @@ package main
 
 import (
 	"bytes"
-	"main/api"
-	"main/peers"
-	"main/state"
+	"ftx/backend/api"
+	"ftx/backend/peers"
+	"ftx/backend/state"
 
 	"github.com/LQR471814/multicast"
 	"github.com/LQR471814/multicast/operations"

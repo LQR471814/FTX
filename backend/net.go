@@ -1,7 +1,7 @@
 package main
 
 import (
-	"main/api"
+	"ftx/backend/api"
 	"net"
 )
 

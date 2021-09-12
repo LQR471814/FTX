@@ -1,8 +1,8 @@
 package main
 
 import (
+	"ftx/backend/state"
 	"log"
-	"main/state"
 )
 
 //lint:ignore U1000 main should be used

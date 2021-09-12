@@ -31,7 +31,7 @@ function frontend() {
 }
 
 function utility() {
-	shell.cd(`${BACKEND_NAME}${divider}${UTILITY_NAME}`)
+	shell.cd(UTILITY_NAME)
 
 	const executableName = UTILITY_NAME + execFileExt
 
@@ -39,12 +39,12 @@ function utility() {
 
 	shell.cp(
 		executableName,
-		`..${divider}..${divider}${executableName}`,
+		`..${divider}${executableName}`,
 	)
 
 	shell.rm(executableName)
 
-	shell.cd(`..${divider}..`)
+	shell.cd(`..`)
 }
 
 function rpc() {

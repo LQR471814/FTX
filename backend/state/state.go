@@ -1,7 +1,7 @@
 package state
 
 import (
-	"main/api"
+	"ftx/backend/api"
 	"net"
 )
 

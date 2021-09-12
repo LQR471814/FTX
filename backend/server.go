@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"main/api"
-	"main/peers"
-	"main/state"
+	"ftx/backend/api"
+	"ftx/backend/peers"
+	"ftx/backend/state"
 
 	"github.com/LQR471814/multicast"
 )
