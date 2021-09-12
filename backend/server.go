@@ -83,7 +83,7 @@ func (s *BackendServer) GetUsers(ctx context.Context, req *api.Empty) (*api.User
 	result := []*api.User{}
 	for _, peer := range s.state.Peers {
 		result = append(result, &api.User{
-			IP:   peer.IP,
+			IP:   peer.Addr.String(),
 			Name: peer.Name,
 		})
 	}
