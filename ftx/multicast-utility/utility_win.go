@@ -4,12 +4,11 @@ import (
 	"flag"
 	"log"
 	"os"
-	"runtime"
 	"strings"
 	"syscall"
 
 	"github.com/LQR471814/multicast"
-	"github.com/LQR471814/multicast/win"
+	"github.com/LQR471814/multicast/action"
 	"golang.org/x/sys/windows"
 )
 
@@ -43,24 +42,21 @@ func main() {
 		log.Fatal("Interface index passed was not valid")
 	}
 
-	switch runtime.GOOS {
-	case "windows":
-		if !win.IsAdmin() {
-			rerunElevated()
-		}
+	if !action.IsAdmin() {
+		rerunElevated()
+	}
 
-		if *reset {
-			err := multicast.Reset()
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			return
-		}
-
-		err := multicast.Setup(*exec, *intf)
+	if *reset {
+		err := multicast.Reset()
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		return
+	}
+
+	err := multicast.Setup(*exec, *intf)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
