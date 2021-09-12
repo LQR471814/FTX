@@ -7,6 +7,7 @@
     "grpcweb",
     "ifaces",
     "intf",
+    "mcast",
     "netintfs",
     "protoc",
     "Uncollapsed",

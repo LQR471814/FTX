@@ -33,7 +33,7 @@ function frontend() {
 function utility() {
 	shell.cd(UTILITY_NAME)
 
-	const executableName = UTILITY_NAME + execFileExt
+	const executableName = "mcast_utility" + execFileExt
 
 	shell.exec(`go build -o ${executableName}`)
 
@@ -59,10 +59,10 @@ function backend() {
 	rpc()
 	shell.cd(BACKEND_NAME)
 
-	shell.exec(`go build -o ${BACKEND_NAME}${execFileExt}`)
+	shell.exec(`go build -o ftx${execFileExt}`)
 	shell.cp(
-		BACKEND_NAME + execFileExt,
-		`..${divider}${BACKEND_NAME}${execFileExt}`,
+		"ftx" + execFileExt,
+		`..${divider}ftx${execFileExt}`,
 	)
 	shell.rm(BACKEND_NAME + execFileExt)
 
