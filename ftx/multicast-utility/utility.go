@@ -4,11 +4,12 @@ import (
 	"flag"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 	"syscall"
 
 	"github.com/LQR471814/multicast"
-	"github.com/LQR471814/multicast/common"
+	"github.com/LQR471814/multicast/win"
 	"golang.org/x/sys/windows"
 )
 
@@ -27,7 +28,7 @@ func rerunElevated() {
 
 	err := windows.ShellExecute(0, verbPtr, exePtr, argPtr, cwdPtr, showCmd)
 	if err != nil {
-		log.Default().Println(err)
+		log.Fatal(err)
 	}
 }
 
@@ -42,20 +43,24 @@ func main() {
 		log.Fatal("Interface index passed was not valid")
 	}
 
-	if *reset {
-		err := multicast.Reset()
+	switch runtime.GOOS {
+	case "windows":
+		if !win.IsAdmin() {
+			rerunElevated()
+		}
+
+		if *reset {
+			err := multicast.Reset()
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			return
+		}
+
+		err := multicast.Setup(*exec, *intf)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		return
-	}
-
-	err := multicast.Setup(*exec, *intf)
-
-	if common.IsMissingPrivilegeError(err) {
-		rerunElevated()
-	} else {
-		log.Fatal(err)
 	}
 }
