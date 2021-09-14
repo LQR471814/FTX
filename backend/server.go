@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -31,8 +30,6 @@ func (s *BackendServer) GetSetup(ctx context.Context, req *api.Empty) (*api.GetS
 	if err != nil {
 		return nil, err
 	}
-
-	log.Println(s.state.Settings)
 
 	return &api.GetSetupResponse{
 		Required:   s.state.Settings.Interface < 0,

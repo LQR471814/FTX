@@ -3,7 +3,6 @@ package main
 import (
 	"ftx/backend/peers"
 	"ftx/backend/state"
-	"log"
 )
 
 //lint:ignore U1000 main should be used
@@ -15,9 +14,6 @@ func main() {
 
 	guiListener := s.Listeners["gui"]
 	fileListener := s.Listeners["file"]
-
-	log.Println("Serving filerecv on", s.ListenerPort("file"))
-	log.Println("Serving gui on", s.ListenerPort("gui"))
 
 	peers.Register(s.Group, s.Name)
 	defer peers.Quit(s.Group)
