@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"ftx/backend/peers"
 	"ftx/backend/state"
+
+	"github.com/LQR471814/marionette"
 )
 
 //lint:ignore U1000 main should be used
@@ -20,5 +23,14 @@ func main() {
 
 	go PeerListen(s)
 	go ServeFile(fileListener)
-	ServeGUI(s, guiListener)
+	go ServeGUI(s, guiListener)
+
+	marionette.OpenBrowser(
+		fmt.Sprintf(
+			"--app=http://localhost:%v",
+			s.ListenerPort("gui"),
+		), "--guest",
+	)
+
+	<-s.Context.Done()
 }

@@ -1,5 +1,6 @@
 const shell = require('shelljs')
 const fs = require('fs')
+const path = require('path')
 
 const distPath = "dist"
 const guiBuildPath = "build"
@@ -7,11 +8,11 @@ const guiBuildPath = "build"
 //? OS Specifics
 const isWin = process.platform === "win32"
 const execFileExt = `${isWin ? ".exe" : ""}`
-const divider = isWin ? "\\" : "/"
 
 //? Constants
 const UTILITY_DIR = "multicast-utility"
 const UTILITY_EXEC_NAME = "mcast-utility"
+
 const BACKEND_DIR = "backend"
 const BACKEND_EXEC_NAME = "ftx"
 
@@ -41,7 +42,7 @@ function utility() {
 
 	shell.cp(
 		executableName,
-		`..${divider}${executableName}`,
+		path.join('..', executableName)
 	)
 
 	shell.rm(executableName)
@@ -50,11 +51,14 @@ function utility() {
 }
 
 function rpc() {
+	const rpcFrontendOut = path.join("src", "lib")
+	const rpcBackendOut = path.join(BACKEND_DIR, "api")
+
 	//? Frontend RPC
-	shell.exec(`protoc -I=. backend.proto --js_out=import_style=commonjs:src${divider}lib --grpc-web_out=import_style=typescript,mode=grpcweb:src${divider}lib`)
+	shell.exec(`protoc -I=. backend.proto --js_out=import_style=commonjs:${rpcFrontendOut} --grpc-web_out=import_style=typescript,mode=grpcweb:${rpcFrontendOut}`)
 
 	//? Backend RPC
-	shell.exec(`protoc -I=. backend.proto --go_out=${BACKEND_DIR}${divider}api --go_opt=paths=source_relative --go-grpc_out=${BACKEND_DIR}${divider}api --go-grpc_opt=paths=source_relative`)
+	shell.exec(`protoc -I=. backend.proto --go_out=${rpcBackendOut} --go_opt=paths=source_relative --go-grpc_out=${rpcBackendOut} --go-grpc_opt=paths=source_relative`)
 }
 
 function backend() {
@@ -66,7 +70,7 @@ function backend() {
 	shell.exec(`go build -o ${executableName}`)
 	shell.cp(
 		BACKEND_EXEC_NAME + execFileExt,
-		`..${divider}${executableName}`,
+		path.join("..", executableName),
 	)
 	shell.rm(executableName)
 
@@ -78,12 +82,12 @@ function distribute() {
 	backend()
 	utility()
 
-	shell.mkdir('-p', `${distPath}`)
-	shell.mkdir('-p', `${distPath}${divider}build`)
+	shell.mkdir('-p', distPath)
+	shell.mkdir('-p', path.join(distPath, "build"))
 
 	shell.cp(UTILITY_DIR + execFileExt, distPath)
 	shell.cp(BACKEND_DIR + execFileExt, distPath)
-	shell.cp('-r',  guiBuildPath, `${distPath}${divider}build`)
+	shell.cp('-r',  guiBuildPath, path.join(distPath, "build"))
 
 	console.log("All builds complete")
 }

@@ -1,6 +1,7 @@
 package state
 
 import (
+	"context"
 	"ftx/backend/api"
 	"net"
 	"os"
@@ -13,13 +14,18 @@ type Peer struct {
 }
 
 type State struct {
-	Settings              *Settings
+	Settings *Settings
+
 	PeerUpdateChannels    *[]api.Backend_ListenUsersServer
 	MessageUpdateChannels *[]api.Backend_ListenMessagesServer
 	Peers                 map[string]Peer
 	Listeners             map[string]net.Listener
-	Group                 *net.UDPAddr
-	Name                  string
+
+	Group *net.UDPAddr
+	Name  string
+
+	Context  context.Context
+	ExitFunc context.CancelFunc
 }
 
 var LISTENER_IDENTIFIERS = []string{
@@ -50,6 +56,7 @@ func CreateState(group string) (*State, error) {
 	state.MessageUpdateChannels = &[]api.Backend_ListenMessagesServer{}
 
 	state.Listeners = make(map[string]net.Listener)
+	state.Context, state.ExitFunc = context.WithCancel(context.Background())
 
 	for _, id := range LISTENER_IDENTIFIERS {
 		state.Listeners[id], err = net.Listen("tcp", ":0")
