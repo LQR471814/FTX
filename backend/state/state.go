@@ -71,3 +71,19 @@ func CreateState(group string) (*State, error) {
 func (s *State) ListenerPort(id string) int {
 	return (*s).Listeners[id].Addr().(*net.TCPAddr).Port
 }
+
+func (s *State) UpdatePeerChannels() {
+	peers := []*api.User{}
+	for _, p := range s.Peers {
+		peers = append(peers, &api.User{
+			Name: p.Name,
+			IP:   p.Addr.String(),
+		})
+	}
+
+	for _, peerUpdateChannel := range *s.PeerUpdateChannels {
+		peerUpdateChannel.Send(&api.UsersResponse{
+			Users: peers,
+		})
+	}
+}

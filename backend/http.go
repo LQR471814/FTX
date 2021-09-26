@@ -5,7 +5,6 @@ import (
 	"ftx/backend/files"
 	"ftx/backend/paths"
 	"ftx/backend/state"
-	"log"
 	"net"
 	"net/http"
 	"strings"
@@ -72,9 +71,6 @@ func ServeGUI(state *state.State, listener net.Listener) {
 			redirect: SplitGRPCTraffic(fs.ServeHTTP, wrappedServer),
 		},
 	}
-
-	log.Println("Serving filerecv on", state.ListenerPort("file"))
-	log.Println("Serving gui on", state.ListenerPort("gui"))
 
 	server.Serve(listener)
 }
