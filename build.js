@@ -1,5 +1,6 @@
 const shell = require('shelljs')
 const path = require('path')
+const fs = require('fs')
 
 const distPath = "dist"
 
@@ -10,7 +11,7 @@ const execFileExt = `${isWin ? ".exe" : ""}`
 const command = {
 	frontend: {
 		type: "cmd",
-		within: "src",
+		within: ".",
 		cmds: ["yarn build"]
 	},
 	backend: {
@@ -67,9 +68,19 @@ const clean = {
 	]
 }
 
+const scaffold = {
+	type: "scaffold",
+	directories: [
+		distPath,
+		path.join(distPath, "build"),
+		path.join("backend", "api"),
+		path.join("src", "lib", "api")
+	]
+}
 
 const buildOrder = [
 	clean,
+	scaffold,
 	command.rpc,
 	move.frontendRPC,
 	command.frontend,
@@ -93,7 +104,6 @@ function build(actions) {
 				shell.cd(path.join(__dirname, action.within))
 				for (const f of shell.ls()) {
 					if (f.match(action.from))
-					console.log(path.join(__dirname, action.destination, f))
 						shell.mv(f, path.join(__dirname, action.destination, f))
 				}
 				break
@@ -103,10 +113,20 @@ function build(actions) {
 				shell.mv(action.from, action.to)
 				break
 
+			case "scaffold":
+				for (const d of action.directories) {
+					const dir = path.join(__dirname, d)
+					if (!fs.existsSync(dir)) {
+						fs.mkdirSync(dir)
+					}
+				}
+
+				break
+
 			case "clean":
 				for (const dir of action.directories) {
 					shell.cd(path.join(__dirname, dir))
-					shell.rm("*")
+					shell.rm("-rf", "*")
 				}
 				break
 
