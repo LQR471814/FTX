@@ -1,108 +1,122 @@
 const shell = require('shelljs')
-const fs = require('fs')
 const path = require('path')
 
 const distPath = "dist"
-const guiBuildPath = "build"
 
 //? OS Specifics
 const isWin = process.platform === "win32"
 const execFileExt = `${isWin ? ".exe" : ""}`
 
-//? Constants
-const UTILITY_DIR = "multicast-utility"
-const UTILITY_EXEC_NAME = "mcast-utility"
-
-const BACKEND_DIR = "backend"
-const BACKEND_EXEC_NAME = "ftx"
-
-const args = process.argv.slice(2)
-const nameMap = {
-	utility, frontend,
-	rpc, backend,
-	distribution: distribute,
-}
-
-function frontend() {
-	if (fs.existsSync('./yarn.lock')) {
-		shell.exec('yarn build')
-	} else if (fs.existsSync('./package-lock.json')) {
-		shell.exec('npm run build')
-	} else {
-		console.log("You must run 'npm install' or 'yarn install' (if you have yarn) first!")
+const command = {
+	frontend: {
+		type: "cmd",
+		within: "src",
+		cmds: ["yarn build"]
+	},
+	backend: {
+		type: "cmd",
+		within: "backend",
+		cmds: ["go build -o BACKEND_BUILD_RESULT"]
+	},
+	rpc: {
+		type: "cmd",
+		within: path.join("backend", "api"),
+		cmds: [
+			`protoc --proto_path="${__dirname}" --js_out=import_style=commonjs:. --grpc-web_out=import_style=typescript,mode=grpcwebtext:. ${path.join(__dirname, "backend.proto")}`,
+			`protoc --proto_path="${__dirname}" --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative ${path.join(__dirname, "backend.proto")}`
+		]
 	}
 }
 
-function utility() {
-	shell.cd(UTILITY_DIR)
-
-	const executableName = UTILITY_EXEC_NAME + execFileExt
-
-	shell.exec(`go build -o ${executableName}`)
-
-	shell.cp(
-		executableName,
-		path.join('..', executableName)
-	)
-
-	shell.rm(executableName)
-
-	shell.cd(`..`)
+const move = { //? Move should not change filenames, that's why rename is a different "action"
+	frontendRPC: {
+		type: "move",
+		within: command.rpc.within,
+		from: /.+\.(t|j)s/,
+		destination: path.join("src", "lib", "api")
+	},
+	frontend: {
+		type: "move",
+		within: "build",
+		from: /.*/,
+		destination: path.join(distPath, "build")
+	},
+	backend: {
+		type: "move",
+		within: command.backend.within,
+		from: "BACKEND_BUILD_RESULT",
+		destination: distPath
+	},
 }
 
-function rpc() {
-	const rpcFrontendOut = path.join("src", "lib")
-	const rpcBackendOut = path.join(BACKEND_DIR, "api")
-
-	//? Frontend RPC
-	shell.exec(`protoc -I=. backend.proto --js_out=import_style=commonjs:${rpcFrontendOut} --grpc-web_out=import_style=typescript,mode=grpcweb:${rpcFrontendOut}`)
-
-	//? Backend RPC
-	shell.exec(`protoc -I=. backend.proto --go_out=${rpcBackendOut} --go_opt=paths=source_relative --go-grpc_out=${rpcBackendOut} --go-grpc_opt=paths=source_relative`)
-}
-
-function backend() {
-	rpc()
-	shell.cd(BACKEND_DIR)
-
-	const executableName = BACKEND_EXEC_NAME + execFileExt
-
-	shell.exec(`go build -o ${executableName}`)
-	shell.cp(
-		BACKEND_EXEC_NAME + execFileExt,
-		path.join("..", executableName),
-	)
-	shell.rm(executableName)
-
-	shell.cd('..')
-}
-
-function distribute() {
-	frontend()
-	backend()
-	utility()
-
-	shell.mkdir('-p', distPath)
-	shell.mkdir('-p', path.join(distPath, "build"))
-
-	shell.cp(UTILITY_DIR + execFileExt, distPath)
-	shell.cp(BACKEND_DIR + execFileExt, distPath)
-	shell.cp('-r',  guiBuildPath, path.join(distPath, "build"))
-
-	console.log("All builds complete")
-}
-
-if (args.length === 0) {
-	distribute()
-} else {
-	//? To build specific just pass name of function
-	//? frontend | rpc | backend | distribute
-	const buildFunc = nameMap[args[0]]
-
-	if (buildFunc) {
-		console.log('Running build action', args[0])
-		buildFunc()
-	} else {
-		console.log('That action does not exist! Valid actions:', Object.keys(nameMap))
+const rename = {
+	backend: {
+		type: "rename",
+		within: distPath,
+		from: "BACKEND_BUILD_RESULT",
+		to: "ftx" + execFileExt
 	}
 }
+
+const clean = {
+	type: "clean",
+	directories: [
+		distPath,
+		command.rpc.within,
+		move.frontendRPC.destination
+	]
+}
+
+
+const buildOrder = [
+	clean,
+	command.rpc,
+	move.frontendRPC,
+	command.frontend,
+	command.backend,
+	move.frontend,
+	move.backend,
+	rename.backend,
+]
+
+function build(actions) {
+	for (const action of actions) {
+		switch (action.type) {
+			case "cmd":
+				shell.cd(path.join(__dirname, action.within))
+				for (const cmd of action.cmds) {
+					shell.exec(cmd)
+				}
+				break
+
+			case "move":
+				shell.cd(path.join(__dirname, action.within))
+				for (const f of shell.ls()) {
+					if (f.match(action.from))
+					console.log(path.join(__dirname, action.destination, f))
+						shell.mv(f, path.join(__dirname, action.destination, f))
+				}
+				break
+
+			case "rename":
+				shell.cd(path.join(__dirname, action.within))
+				shell.mv(action.from, action.to)
+				break
+
+			case "clean":
+				for (const dir of action.directories) {
+					shell.cd(path.join(__dirname, dir))
+					shell.rm("*")
+				}
+				break
+
+			default:
+				console.log("Got unexpected action!", action)
+				break
+		}
+	}
+
+	console.log("All builds finished successfully!")
+}
+
+build(buildOrder)

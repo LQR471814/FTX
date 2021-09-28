@@ -1,4 +1,4 @@
-import { User as UserType } from 'lib/backend_pb'
+import { User as UserType } from 'lib/api/backend_pb'
 import { createRef } from "react"
 
 import "./css/UserList.css"

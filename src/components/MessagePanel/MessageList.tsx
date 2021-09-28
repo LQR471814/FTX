@@ -10,7 +10,7 @@ import MessageInput from "./MessageInput"
 import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
 import { backend } from "lib/Backend"
-import { MessageRequest, Message as MessageType } from "lib/backend_pb"
+import { MessageRequest, Message as MessageType } from "lib/api/backend_pb"
 import { MessageGroup } from "lib/apptypes"
 
 type Props = {

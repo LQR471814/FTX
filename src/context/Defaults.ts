@@ -1,5 +1,5 @@
 import { BannerStyle, MessageGroup, TransferState } from "lib/apptypes"
-import { User } from "lib/backend_pb"
+import { User } from "lib/api/backend_pb"
 import { AppState, OverlayState } from "./State"
 
 const defaultField = "Loading..."

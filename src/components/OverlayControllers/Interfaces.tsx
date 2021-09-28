@@ -7,7 +7,7 @@ import { ReactComponent as OtherIcon } from "styling/assets/other.svg"
 import { ReactComponent as WifiIcon } from "styling/assets/interfaceLogos/wifi.svg"
 import { ReactComponent as EthernetIcon } from "styling/assets/interfaceLogos/ethernet.svg"
 
-import { NetworkInterface, SetSetupRequest } from "lib/backend_pb"
+import { NetworkInterface, SetSetupRequest } from "lib/api/backend_pb"
 import { backend } from "lib/Backend"
 import { Primitive } from "lib/apptypes"
 

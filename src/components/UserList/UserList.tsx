@@ -4,7 +4,7 @@ import "./css/UserList.css"
 import User from "./User"
 import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
-import { User as UserType } from "lib/backend_pb"
+import { User as UserType } from "lib/api/backend_pb"
 
 export default function UserList() {
   const ctx = useApp()

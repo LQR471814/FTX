@@ -1,4 +1,4 @@
-import { BackendClient } from 'lib/BackendServiceClientPb'
+import { BackendClient } from 'lib/api/BackendServiceClientPb'
 
 export let backend: BackendClient
 
