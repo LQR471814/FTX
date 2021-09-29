@@ -46,12 +46,25 @@ func main() {
 	log.Println("Serving filerecv on", s.ListenerPort("file"))
 	log.Println("Serving gui on", s.ListenerPort("gui"))
 
-	marionette.OpenBrowser(
-		fmt.Sprintf(
-			"--app=http://localhost:%v",
-			s.ListenerPort("gui"),
-		), "--guest",
-	)
+	go openGUI(s.ListenerPort("gui"))
 
 	<-s.Context.Done()
+}
+
+func openGUI(port int) error {
+	browser, err := marionette.DefaultBrowser()
+	if err != nil {
+		return err
+	}
+
+	openURL := fmt.Sprintf("http://localhost:%v", port)
+
+	switch browser {
+	case marionette.CHROME, marionette.EDGE:
+		marionette.OpenBrowser("--app="+openURL, "--guest")
+	case marionette.FIREFOX:
+		marionette.OpenBrowser("-P", "default", openURL)
+	}
+
+	return nil
 }

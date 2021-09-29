@@ -10,9 +10,10 @@ require (
 )
 
 require (
-	github.com/LQR471814/marionette v0.0.2
+	github.com/LQR471814/marionette v0.0.3
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/grandcat/zeroconf v1.0.0
 	github.com/klauspost/compress v1.13.5 // indirect
 	github.com/rs/cors v1.8.0 // indirect
 	golang.org/x/net v0.0.0-20210924151903-3ad01bbaa167 // indirect
@@ -24,7 +25,6 @@ require (
 
 require (
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
-	github.com/grandcat/zeroconf v1.0.0 // indirect
 	github.com/miekg/dns v1.1.27 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
 )
