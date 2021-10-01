@@ -78,11 +78,22 @@ const scaffold = {
 	]
 }
 
+const inject = {
+	backend_pb: {
+		type: "inject",
+		file: path.join(move.frontendRPC.destination, "backend_pb.js"),
+		handler: (contents) => process.platform === "linux" ?
+			"/* eslint-disable */\n" + contents :
+			contents
+	}
+}
+
 const buildOrder = [
 	clean,
 	scaffold,
 	command.rpc,
 	move.frontendRPC,
+	inject.backend_pb,
 	command.frontend,
 	command.backend,
 	move.frontend,
@@ -130,6 +141,14 @@ function build(actions) {
 
 					shell.rm("-rf", "*")
 				}
+				break
+
+			case "inject":
+				const injectPath = path.join(__dirname, action.file)
+
+				const f = fs.readFileSync(injectPath, "utf8")
+				const newContents = action.handler(f)
+				fs.writeFileSync(injectPath, newContents, "utf8")
 				break
 
 			default:
