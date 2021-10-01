@@ -88,18 +88,43 @@ const inject = {
 	}
 }
 
-const buildOrder = [
-	clean,
-	scaffold,
-	command.rpc,
-	move.frontendRPC,
-	inject.backend_pb,
-	command.frontend,
-	command.backend,
-	move.frontend,
-	move.backend,
-	rename.backend,
-]
+const buildConfigurations = {
+	distribute: [
+		clean,
+		scaffold,
+		command.rpc,
+		move.frontendRPC,
+		inject.backend_pb,
+		command.frontend,
+		move.frontend,
+		command.backend,
+		move.backend,
+		rename.backend,
+	],
+	rpc: [
+		scaffold,
+		command.rpc,
+		move.frontendRPC,
+		inject.backend_pb,
+	],
+	frontend: [
+		scaffold,
+		command.rpc,
+		move.frontendRPC,
+		inject.backend_pb,
+		command.frontend,
+		move.frontend,
+	],
+	backend: [
+		scaffold,
+		command.rpc,
+		move.frontendRPC,
+		inject.backend_pb,
+		command.backend,
+		move.backend,
+		rename.backend,
+	]
+}
 
 function build(actions) {
 	for (const action of actions) {
@@ -160,4 +185,10 @@ function build(actions) {
 	console.log("All builds finished successfully!")
 }
 
-build(buildOrder)
+let configStr = "distribute"
+const arg = process.argv.slice(2)[0]
+if (arg && Object.keys(buildConfigurations).includes(arg)) {
+	configStr = arg
+}
+
+build(buildConfigurations[configStr])

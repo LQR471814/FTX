@@ -9,7 +9,7 @@ import (
 	"github.com/LQR471814/marionette"
 )
 
-//lint:ignore U1000 main should be used
+//lint:ignore U1000 main is used (duh)
 func main() {
 	s, err := state.CreateState("224.0.0.248:5001")
 	if err != nil {
@@ -26,6 +26,7 @@ func main() {
 		s.Context,
 		peers.MDNS_ACTIVE_SERVICE_STR,
 		func(p state.Peer) {
+			log.Println(p)
 			s.Peers[p.Addr.String()] = p
 			s.UpdatePeerChannels()
 		},
@@ -42,19 +43,18 @@ func main() {
 
 	go ServeFile(fileListener)
 	go ServeGUI(s, guiListener)
+	go openGUI(s.ListenerPort("gui"))
 
 	log.Println("Serving filerecv on", s.ListenerPort("file"))
 	log.Println("Serving gui on", s.ListenerPort("gui"))
 
-	go openGUI(s.ListenerPort("gui"))
-
 	<-s.Context.Done()
 }
 
-func openGUI(port int) error {
+func openGUI(port int) {
 	browser, err := marionette.DefaultBrowser()
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	openURL := fmt.Sprintf("http://localhost:%v", port)
@@ -65,6 +65,4 @@ func openGUI(port int) error {
 	case marionette.FIREFOX:
 		marionette.OpenBrowser("-P", "default", openURL)
 	}
-
-	return nil
 }
