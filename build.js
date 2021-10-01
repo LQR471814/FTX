@@ -126,6 +126,8 @@ function build(actions) {
 			case "clean":
 				for (const dir of action.directories) {
 					shell.cd(path.join(__dirname, dir))
+					if (shell.error()) continue
+
 					shell.rm("-rf", "*")
 				}
 				break
