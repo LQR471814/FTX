@@ -84,8 +84,8 @@ func (s *State) UpdatePeerChannels() {
 
 	log.Println(s.PeerUpdateChannels)
 
-	for _, peerUpdateChannel := range s.PeerUpdateChannels {
-		peerUpdateChannel.Send(&api.UsersResponse{
+	for _, stream := range s.PeerUpdateChannels {
+		stream.Send(&api.UsersResponse{
 			Users: peers,
 		})
 	}

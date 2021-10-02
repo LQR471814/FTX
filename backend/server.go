@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -18,6 +19,9 @@ type BackendServer struct {
 
 func (*BackendServer) GetSelf(ctx context.Context, req *api.Empty) (*api.SelfResponse, error) {
 	host, err := os.Hostname()
+	if err != nil {
+		log.Println("ERROR:", err)
+	}
 
 	return &api.SelfResponse{
 		Hostname: host,
@@ -27,6 +31,7 @@ func (*BackendServer) GetSelf(ctx context.Context, req *api.Empty) (*api.SelfRes
 func (s *BackendServer) GetSetup(ctx context.Context, req *api.Empty) (*api.GetSetupResponse, error) {
 	interfaces, err := GetInterfaces()
 	if err != nil {
+		log.Println("ERROR:", err)
 		return nil, err
 	}
 
@@ -39,6 +44,7 @@ func (s *BackendServer) GetSetup(ctx context.Context, req *api.Empty) (*api.GetS
 func (s *BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) (*api.Empty, error) {
 	execpath, err := os.Executable()
 	if err != nil {
+		log.Println("ERROR:", err)
 		return nil, err
 	}
 
@@ -69,6 +75,8 @@ func (s *BackendServer) ListenMessages(_ *api.Empty, stream api.Backend_ListenMe
 func (s *BackendServer) ListenUsers(_ *api.Empty, stream api.Backend_ListenUsersServer) error {
 	s.state.PeerUpdateChannels = append(s.state.PeerUpdateChannels, stream)
 	s.state.UpdatePeerChannels()
+
+	<-s.state.Context.Done()
 	return nil
 }
 
