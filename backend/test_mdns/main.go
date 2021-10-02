@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	MDNS_SERVICE_STR = "test.main"
+	MDNS_SERVICE_STR = "_test._tcp"
 
 	MDNS_DESCRIPTOR = "An mdns testing service"
 )
@@ -37,7 +37,7 @@ func ListenService(ctx context.Context, service string, callback func(*zeroconf.
 		}
 	}()
 
-	resolver.Browse(ctx, service, "", entries)
+	resolver.Browse(ctx, service, "local", entries)
 }
 
 func CancelOnSignal(cancel context.CancelFunc) {
