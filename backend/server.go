@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -10,6 +11,7 @@ import (
 
 	"ftx/backend/api"
 	"ftx/backend/netutils"
+	"ftx/backend/peers"
 	"ftx/backend/state"
 )
 
@@ -96,6 +98,14 @@ func (s *BackendServer) GetUsers(ctx context.Context, req *api.Empty) (*api.User
 }
 
 func (s *BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest) (*api.Empty, error) {
-	// peers.Message(s.state.Group, req.Message.Author.IP, req.Message.Contents)
-	return nil, nil
+	addr, err := net.ResolveUDPAddr("udp", req.To.IP)
+	if err != nil {
+		return &api.Empty{}, nil
+	}
+
+	peers.Message(state.Peer{
+		Addr: addr,
+	}, req.Message.Contents)
+
+	return &api.Empty{}, nil
 }

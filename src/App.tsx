@@ -15,6 +15,7 @@ import BannerController from "components/Banner/BannerController"
 import { initializeBackend } from "lib/Backend"
 import { backend } from "lib/Backend"
 import { Empty, GetSetupResponse, Message, SelfResponse, UsersResponse } from "lib/api/backend_pb"
+import { User } from "context/State"
 
 initializeBackend()
 
@@ -62,9 +63,18 @@ export default function App() {
     const userStream = backend.listenUsers(new Empty())
     userStream.on('data', (r: any) => {
       const response = r as UsersResponse
+
+			const users: Record<string, User> = {}
+			for (const u of response.getUsersList()) {
+				users[u.getIp()] = {
+					name: u.getName(),
+					ip: u.getIp(),
+				}
+			}
+
       ctx.dispatch({
         type: "peers_set",
-        users: response.getUsersList()
+        users: users
       })
     })
 

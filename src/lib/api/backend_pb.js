@@ -1158,6 +1158,7 @@ proto.api.MessageRequest.prototype.toObject = function(opt_includeInstance) {
  */
 proto.api.MessageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
+    to: (f = msg.getTo()) && proto.api.User.toObject(includeInstance, f),
     message: (f = msg.getMessage()) && proto.api.Message.toObject(includeInstance, f)
   };
 
@@ -1196,6 +1197,11 @@ proto.api.MessageRequest.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
+      var value = new proto.api.User;
+      reader.readMessage(value,proto.api.User.deserializeBinaryFromReader);
+      msg.setTo(value);
+      break;
+    case 2:
       var value = new proto.api.Message;
       reader.readMessage(value,proto.api.Message.deserializeBinaryFromReader);
       msg.setMessage(value);
@@ -1229,10 +1235,18 @@ proto.api.MessageRequest.prototype.serializeBinary = function() {
  */
 proto.api.MessageRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getMessage();
+  f = message.getTo();
   if (f != null) {
     writer.writeMessage(
       1,
+      f,
+      proto.api.User.serializeBinaryToWriter
+    );
+  }
+  f = message.getMessage();
+  if (f != null) {
+    writer.writeMessage(
+      2,
       f,
       proto.api.Message.serializeBinaryToWriter
     );
@@ -1241,12 +1255,49 @@ proto.api.MessageRequest.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional Message message = 1;
+ * optional User to = 1;
+ * @return {?proto.api.User}
+ */
+proto.api.MessageRequest.prototype.getTo = function() {
+  return /** @type{?proto.api.User} */ (
+    jspb.Message.getWrapperField(this, proto.api.User, 1));
+};
+
+
+/**
+ * @param {?proto.api.User|undefined} value
+ * @return {!proto.api.MessageRequest} returns this
+*/
+proto.api.MessageRequest.prototype.setTo = function(value) {
+  return jspb.Message.setWrapperField(this, 1, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.api.MessageRequest} returns this
+ */
+proto.api.MessageRequest.prototype.clearTo = function() {
+  return this.setTo(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.api.MessageRequest.prototype.hasTo = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional Message message = 2;
  * @return {?proto.api.Message}
  */
 proto.api.MessageRequest.prototype.getMessage = function() {
   return /** @type{?proto.api.Message} */ (
-    jspb.Message.getWrapperField(this, proto.api.Message, 1));
+    jspb.Message.getWrapperField(this, proto.api.Message, 2));
 };
 
 
@@ -1255,7 +1306,7 @@ proto.api.MessageRequest.prototype.getMessage = function() {
  * @return {!proto.api.MessageRequest} returns this
 */
 proto.api.MessageRequest.prototype.setMessage = function(value) {
-  return jspb.Message.setWrapperField(this, 1, value);
+  return jspb.Message.setWrapperField(this, 2, value);
 };
 
 
@@ -1273,7 +1324,7 @@ proto.api.MessageRequest.prototype.clearMessage = function() {
  * @return {boolean}
  */
 proto.api.MessageRequest.prototype.hasMessage = function() {
-  return jspb.Message.getField(this, 1) != null;
+  return jspb.Message.getField(this, 2) != null;
 };
 
 

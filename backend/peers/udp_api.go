@@ -1,6 +1,9 @@
 package peers
 
-import "net"
+import (
+	"log"
+	"net"
+)
 
 const (
 	LEAVING_PACKET byte = iota
@@ -21,6 +24,8 @@ func packetHandler(addr *net.UDPAddr, buff []byte, h ServerHandlers) {
 	if !(len(buff) > 0) {
 		return
 	}
+
+	log.Println(buff)
 
 	packetType := buff[0]
 	payload := buff[1:]

@@ -10,7 +10,7 @@ import MessageInput from "./MessageInput"
 import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
 import { backend } from "lib/Backend"
-import { MessageRequest, Message as MessageType } from "lib/api/backend_pb"
+import { MessageRequest, Message as MessageType, User } from "lib/api/backend_pb"
 import { MessageGroup } from "lib/apptypes"
 
 type Props = {
@@ -69,7 +69,7 @@ function MessageList(props: Props) {
         onClick={onToggleCollapse}
         ref={messageGroupCollapsibleRef}
       >
-        <span className="MessageGroupUser">{props.group.user.getName()}</span>
+        <span className="MessageGroupUser">{props.group.user.name}</span>
       </div>
 
       <div
@@ -91,11 +91,19 @@ function MessageList(props: Props) {
           <MessageInput onSubmit={(contents: string) => {
             const req = new MessageRequest()
 
+            const author = new User()
+            author.setName(ctx.state.self.name)
+            author.setIp(ctx.state.self.ip)
+
             const msg = new MessageType()
             msg.setContents(contents)
-            msg.setAuthor(ctx.state.self)
+            msg.setAuthor(author)
+
+            const to = new User()
+            to.setIp(props.IP)
 
             req.setMessage(msg)
+            req.setTo(to)
             backend.sendMessage(req, null)
 
             ctx.dispatch({

@@ -1,4 +1,4 @@
-import { User as UserType } from 'lib/api/backend_pb'
+import { User as UserType } from 'context/State'
 import { createRef } from "react"
 
 import "./css/UserList.css"
@@ -17,8 +17,8 @@ export default function User(props: Props) {
         props.click(props.user)
       }}
     >
-      <p className="UserName">{props.user.getName()}</p>
-      <p className="Ip">{props.user.getIp()}</p>
+      <p className="UserName">{props.user.name}</p>
+      <p className="Ip">{props.user.ip}</p>
     </div>
   )
 }

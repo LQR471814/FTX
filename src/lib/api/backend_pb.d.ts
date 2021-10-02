@@ -125,6 +125,11 @@ export namespace SetSetupRequest {
 }
 
 export class MessageRequest extends jspb.Message {
+  getTo(): User | undefined;
+  setTo(value?: User): MessageRequest;
+  hasTo(): boolean;
+  clearTo(): MessageRequest;
+
   getMessage(): Message | undefined;
   setMessage(value?: Message): MessageRequest;
   hasMessage(): boolean;
@@ -140,6 +145,7 @@ export class MessageRequest extends jspb.Message {
 
 export namespace MessageRequest {
   export type AsObject = {
+    to?: User.AsObject,
     message?: Message.AsObject,
   }
 }

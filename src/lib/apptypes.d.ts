@@ -1,4 +1,4 @@
-import { User } from "./backend_pb"
+import { User } from "context/State"
 
 type Primitive = string | number | bigint | boolean | symbol
 

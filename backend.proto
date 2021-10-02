@@ -40,7 +40,8 @@ message SetSetupRequest {
 }
 
 message MessageRequest {
-	Message message = 1;
+	User to = 1;
+	Message message = 2;
 }
 
 message UsersResponse {

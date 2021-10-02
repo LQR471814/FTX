@@ -10,6 +10,7 @@ import { ReactComponent as EthernetIcon } from "styling/assets/interfaceLogos/et
 import { NetworkInterface, SetSetupRequest } from "lib/api/backend_pb"
 import { backend } from "lib/Backend"
 import { Primitive } from "lib/apptypes"
+import { Interface } from "context/State"
 
 const wifiKeywords = [
   "wi-fi",
@@ -40,12 +41,22 @@ export default function Interfaces() {
     if (intf !== undefined) {
       const req = new SetSetupRequest()
       const chosenInterface = ctx.state.setupInfo.interfaces.find(
-        (i: NetworkInterface) => {
-          return i.getIndex() === (intf as number)
+        (i: Interface) => {
+          return i.index === (intf as number)
         }
       )
 
-      req.setInterface(chosenInterface)
+      if (!chosenInterface) {
+        console.error("Chosen interface cannot be found in state")
+        return
+      }
+
+      const reqIntf = new NetworkInterface()
+      reqIntf.setIndex(chosenInterface.index)
+      reqIntf.setName(chosenInterface.name)
+      reqIntf.setAddress(chosenInterface.address)
+
+      req.setInterface(reqIntf)
       backend.setSetup(req, null)
 
       ctx.dispatch({
@@ -67,16 +78,16 @@ export default function Interfaces() {
       mainLabel="Choose a network interface"
       items={
         ctx.state.setupInfo.interfaces.map(
-          (intf: NetworkInterface) => {
+          (intf: Interface) => {
             const item = {
-              label: `${intf.getName()} [${intf.getAddress()}]`,
+              label: `${intf.name} [${intf.address}]`,
               icon: OtherIcon,
-              identifier: intf.getIndex(),
+              identifier: intf.index,
             }
 
-            if (containsKeywords(intf.getName(), wifiKeywords)) {
+            if (containsKeywords(intf.name, wifiKeywords)) {
               item.icon = WifiIcon
-            } else if (containsKeywords(intf.getName(), lanKeywords)) {
+            } else if (containsKeywords(intf.name, lanKeywords)) {
               item.icon = EthernetIcon
             }
 
