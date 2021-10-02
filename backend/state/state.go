@@ -33,7 +33,7 @@ var LISTENER_IDENTIFIERS = []string{
 	"file",
 }
 
-func CreateState(group string) (*State, error) {
+func CreateState() (*State, error) {
 	var err error
 
 	state := State{}
@@ -54,8 +54,9 @@ func CreateState(group string) (*State, error) {
 	state.PeerUpdateChannels = &[]api.Backend_ListenUsersServer{}
 	state.MessageUpdateChannels = &[]api.Backend_ListenMessagesServer{}
 
-	state.Listeners = make(map[string]net.Listener)
 	state.Context, state.ExitFunc = context.WithCancel(context.Background())
+	state.Peers = make(map[string]Peer)
+	state.Listeners = make(map[string]net.Listener)
 
 	for _, id := range LISTENER_IDENTIFIERS {
 		state.Listeners[id], err = net.Listen("tcp", ":0")

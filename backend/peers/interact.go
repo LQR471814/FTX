@@ -4,6 +4,7 @@ import (
 	"ftx/backend/state"
 	"log"
 	"net"
+	"strconv"
 
 	"github.com/grandcat/zeroconf"
 )
@@ -38,13 +39,15 @@ func Quit(s *state.State) error {
 	return nil
 }
 
-func Register(name string, port int) error {
+func Register(name string, port int) {
 	_, err := zeroconf.Register(
-		name, MDNS_SERVICE_STR, "", port,
+		name, MDNS_SERVICE_STR, "local.", port,
 		[]string{MDNS_DESCRIPTOR}, nil,
 	)
 
-	return err
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func Discover(s *state.State, callback func(state.Peer)) {
@@ -57,7 +60,11 @@ func Discover(s *state.State, callback func(state.Peer)) {
 
 	go func() {
 		for entry := range entries {
-			addr, err := net.ResolveUDPAddr("udp", entry.AddrIPv4[0].String())
+			addr, err := net.ResolveUDPAddr(
+				"udp",
+				entry.AddrIPv4[0].String()+":"+strconv.Itoa(entry.Port),
+			)
+
 			if err != nil {
 				log.Fatal(err)
 			}

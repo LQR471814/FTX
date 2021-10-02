@@ -18,6 +18,10 @@ func constructMessagePacket(message string) []byte {
 }
 
 func packetHandler(addr *net.UDPAddr, buff []byte, h ServerHandlers) {
+	if !(len(buff) > 0) {
+		return
+	}
+
 	packetType := buff[0]
 	payload := buff[1:]
 

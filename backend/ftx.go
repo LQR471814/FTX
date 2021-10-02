@@ -31,7 +31,9 @@ func (h PeersHandler) OnMessage(from *net.UDPAddr, message string) {
 
 //lint:ignore U1000 main is used (duh)
 func main() {
-	s, err := state.CreateState("224.0.0.248:5001")
+	log.SetFlags(log.Lshortfile | log.Ltime)
+
+	s, err := state.CreateState()
 	if err != nil {
 		log.Fatal(err)
 	}

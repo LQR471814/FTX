@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net"
+	"os"
 	"time"
 )
 
@@ -15,20 +16,18 @@ type ServerHandlers interface {
 	OnMessage(from *net.UDPAddr, contents string)
 }
 
-func StartServer(h ServerHandlers) error {
+func StartServer(h ServerHandlers) {
 	addr, err := net.ResolveUDPAddr("udp", ":0")
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
 	conn, err := net.ListenUDP("udp", addr)
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
 
 	go listen(conn, h)
-
-	return nil
 }
 
 func listen(c *net.UDPConn, h ServerHandlers) {
@@ -42,7 +41,7 @@ listen:
 
 			buff := make([]byte, buffsize)
 			r, addr, err := c.ReadFromUDP(buff)
-			if err != nil {
+			if err != nil && !os.IsTimeout(err) {
 				log.Fatal(err)
 			}
 
