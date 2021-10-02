@@ -62,12 +62,13 @@ func (s *BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) 
 }
 
 func (s *BackendServer) ListenMessages(_ *api.Empty, stream api.Backend_ListenMessagesServer) error {
-	*s.state.MessageUpdateChannels = append(*s.state.MessageUpdateChannels, stream)
+	s.state.MessageUpdateChannels = append(s.state.MessageUpdateChannels, stream)
 	return nil
 }
 
 func (s *BackendServer) ListenUsers(_ *api.Empty, stream api.Backend_ListenUsersServer) error {
-	*s.state.PeerUpdateChannels = append(*s.state.PeerUpdateChannels, stream)
+	s.state.PeerUpdateChannels = append(s.state.PeerUpdateChannels, stream)
+	s.state.UpdatePeerChannels()
 	return nil
 }
 

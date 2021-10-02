@@ -3,6 +3,7 @@ package state
 import (
 	"context"
 	"ftx/backend/api"
+	"log"
 	"net"
 	"os"
 )
@@ -16,8 +17,8 @@ type Peer struct {
 type State struct {
 	Settings *Settings
 
-	PeerUpdateChannels    *[]api.Backend_ListenUsersServer
-	MessageUpdateChannels *[]api.Backend_ListenMessagesServer
+	PeerUpdateChannels    []api.Backend_ListenUsersServer
+	MessageUpdateChannels []api.Backend_ListenMessagesServer
 	Peers                 map[string]Peer
 	Listeners             map[string]net.Listener
 
@@ -51,8 +52,8 @@ func CreateState() (*State, error) {
 		return nil, err
 	}
 
-	state.PeerUpdateChannels = &[]api.Backend_ListenUsersServer{}
-	state.MessageUpdateChannels = &[]api.Backend_ListenMessagesServer{}
+	state.PeerUpdateChannels = []api.Backend_ListenUsersServer{}
+	state.MessageUpdateChannels = []api.Backend_ListenMessagesServer{}
 
 	state.Context, state.ExitFunc = context.WithCancel(context.Background())
 	state.Peers = make(map[string]Peer)
@@ -81,7 +82,9 @@ func (s *State) UpdatePeerChannels() {
 		})
 	}
 
-	for _, peerUpdateChannel := range *s.PeerUpdateChannels {
+	log.Println(s.PeerUpdateChannels)
+
+	for _, peerUpdateChannel := range s.PeerUpdateChannels {
 		peerUpdateChannel.Send(&api.UsersResponse{
 			Users: peers,
 		})

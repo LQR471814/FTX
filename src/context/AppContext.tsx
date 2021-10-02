@@ -28,6 +28,10 @@ function appReducer(state: AppState, action: AppAction) {
 			newState.setupInfo.interfaces = action.interfaces
 			break
 
+		case "peers_set":
+			newState.users = action.users
+			break
+
 		case 'transfer_new':
 			newState.activeTransfers[action.id] = action.initial
 			break
