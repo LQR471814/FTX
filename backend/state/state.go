@@ -21,14 +21,14 @@ type State struct {
 	Peers                 map[string]Peer
 	Listeners             map[string]net.Listener
 
-	Group *net.UDPAddr
-	Name  string
+	Name string
 
 	Context  context.Context
 	ExitFunc context.CancelFunc
 }
 
 var LISTENER_IDENTIFIERS = []string{
+	"mdns",
 	"gui",
 	"file",
 }
@@ -37,7 +37,6 @@ func CreateState(group string) (*State, error) {
 	var err error
 
 	state := State{}
-	state.Group, err = net.ResolveUDPAddr("udp", group)
 	if err != nil {
 		return nil, err
 	}

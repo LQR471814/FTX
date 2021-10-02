@@ -5,6 +5,7 @@ import (
 	"ftx/backend/files"
 	"ftx/backend/paths"
 	"ftx/backend/state"
+	"log"
 	"net"
 	"net/http"
 	"strings"
@@ -22,7 +23,7 @@ type LimitHandler struct {
 func (h LimitHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	trueAddr, err := net.ResolveTCPAddr("tcp", r.RemoteAddr)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	if trueAddr.IP.IsLoopback() {
@@ -50,7 +51,7 @@ func ServeGUI(state *state.State, listener net.Listener) {
 	//? GUI Folder Setup
 	guiPath, err := paths.WithDirectory("build")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	fs := http.FileServer(http.Dir(guiPath))

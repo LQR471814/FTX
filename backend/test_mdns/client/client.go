@@ -21,7 +21,7 @@ func main() {
 	// Discover all services on the network (e.g. _workstation._tcp)
 	resolver, err := zeroconf.NewResolver(nil)
 	if err != nil {
-		log.Fatalln("Failed to initialize resolver:", err.Error())
+		log.Fatal("Failed to initialize resolver:", err.Error())
 	}
 
 	entries := make(chan *zeroconf.ServiceEntry)
@@ -36,7 +36,7 @@ func main() {
 	defer cancel()
 	err = resolver.Browse(ctx, *service, *domain, entries)
 	if err != nil {
-		log.Fatalln("Failed to browse:", err.Error())
+		log.Fatal("Failed to browse:", err.Error())
 	}
 
 	<-ctx.Done()

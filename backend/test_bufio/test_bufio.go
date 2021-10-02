@@ -3,6 +3,7 @@ package ftx
 import (
 	"bufio"
 	"fmt"
+	"log"
 )
 
 // Writer type used to initialize buffer writer
@@ -29,7 +30,7 @@ func main() {
 	bw.Write([]byte{'5'})
 	err := bw.Flush() // forcefully write remaining
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	// Case 3: (too) large write for buffer

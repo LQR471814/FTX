@@ -1,42 +1,53 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"ftx/backend/peers"
 	"ftx/backend/state"
 	"log"
+	"net"
 
 	"github.com/LQR471814/marionette"
 )
+
+type PeersHandler struct {
+	state *state.State
+}
+
+func (h PeersHandler) Context() context.Context {
+	return h.state.Context
+}
+
+func (h PeersHandler) OnLeave(from *net.UDPAddr) {
+	delete(h.state.Peers, from.String())
+	h.state.UpdatePeerChannels()
+}
+
+func (h PeersHandler) OnMessage(from *net.UDPAddr, message string) {
+	p := h.state.Peers[from.String()]
+	log.Println("Received message", message, "from", p.Name)
+}
 
 //lint:ignore U1000 main is used (duh)
 func main() {
 	s, err := state.CreateState("224.0.0.248:5001")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	guiListener := s.Listeners["gui"]
 	fileListener := s.Listeners["file"]
 
-	peers.Register(s.Name)
-	defer peers.Quit()
+	peers.Register(s.Name, s.ListenerPort("mdns"))
+	defer peers.Quit(s)
 
-	go peers.ListenService(
-		s.Context,
-		peers.MDNS_ACTIVE_SERVICE_STR,
-		func(p state.Peer) {
+	peers.StartServer(PeersHandler{s})
+
+	peers.Discover(
+		s, func(p state.Peer) {
 			log.Println(p)
 			s.Peers[p.Addr.String()] = p
-			s.UpdatePeerChannels()
-		},
-	)
-
-	go peers.ListenService(
-		s.Context,
-		peers.MDNS_QUIT_SERVICE_STR,
-		func(p state.Peer) {
-			delete(s.Peers, p.Addr.String())
 			s.UpdatePeerChannels()
 		},
 	)
@@ -54,7 +65,7 @@ func main() {
 func openGUI(port int) {
 	browser, err := marionette.DefaultBrowser()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	openURL := fmt.Sprintf("http://localhost:%v", port)
