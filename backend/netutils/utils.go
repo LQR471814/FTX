@@ -1,4 +1,4 @@
-package main
+package netutils
 
 import (
 	"ftx/backend/api"
@@ -94,4 +94,22 @@ func AddrInInterface(index int, addr *net.UDPAddr) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func CheckLocal(target net.IP) (bool, error) {
+	intfs, err := GetInterfaces()
+	if err != nil {
+		return false, nil
+	}
+
+	local := false
+	for _, i := range intfs {
+		ip := net.ParseIP(i.Address)
+		if target.Equal(ip) {
+			local = true
+			break
+		}
+	}
+
+	return local, nil
 }

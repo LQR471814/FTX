@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"ftx/backend/api"
+	"ftx/backend/netutils"
 	"ftx/backend/state"
 )
 
@@ -29,7 +30,7 @@ func (*BackendServer) GetSelf(ctx context.Context, req *api.Empty) (*api.SelfRes
 }
 
 func (s *BackendServer) GetSetup(ctx context.Context, req *api.Empty) (*api.GetSetupResponse, error) {
-	interfaces, err := GetInterfaces()
+	interfaces, err := netutils.GetInterfaces()
 	if err != nil {
 		log.Println("ERROR:", err)
 		return nil, err

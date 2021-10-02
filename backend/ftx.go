@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"ftx/backend/netutils"
 	"ftx/backend/peers"
 	"ftx/backend/state"
 	"log"
@@ -51,9 +52,16 @@ func main() {
 	peers.StartServer(PeersHandler{s})
 	peers.Discover(
 		s, func(p state.Peer) {
-			log.Println(p)
-			s.Peers[p.Addr.String()] = p
-			s.UpdatePeerChannels()
+			local, err := netutils.CheckLocal(p.Addr.IP)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			if !local {
+				s.Peers[p.Addr.String()] = p
+				s.UpdatePeerChannels()
+				log.Println(p)
+			}
 		},
 	)
 
