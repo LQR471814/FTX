@@ -10,14 +10,18 @@ import (
 )
 
 const (
-	MDNS_SERVICE_STR = "ftx.active._udp"
+	MDNS_SERVICE_STR  = "ftx.active._udp"
+	DESCRIPTOR_LENGTH = 2 //TODO: Remember to update this every time the length of the port index enum is changed
+)
 
-	MDNS_DESCRIPTOR = "FTX, the universal file transfer service"
+const (
+	FILE_PORT_INDEX int = iota
+	INTERACT_PORT_INDEX
 )
 
 func Message(to state.Peer, message string) error {
 	msg := constructMessagePacket(message)
-	conn, err := net.Dial("udp", to.Addr.String())
+	conn, err := net.Dial("udp", to.Addr.String()+":"+strconv.Itoa(to.InteractPort))
 	if err != nil {
 		return err
 	}
@@ -39,10 +43,15 @@ func Quit(s *state.State) error {
 	return nil
 }
 
-func Register(name string, port int) {
+func Register(s *state.State) {
+	descriptor := make([]string, DESCRIPTOR_LENGTH)
+	descriptor[FILE_PORT_INDEX] = strconv.Itoa(s.ListenerPort(state.FILE_LISTENER_ID))
+	descriptor[INTERACT_PORT_INDEX] = strconv.Itoa(s.ListenerPort(state.INTERACT_LISTENER_ID))
+
 	_, err := zeroconf.Register(
-		name, MDNS_SERVICE_STR, "local.", port,
-		[]string{MDNS_DESCRIPTOR}, nil,
+		s.Name, MDNS_SERVICE_STR, "local.",
+		s.ListenerPort(state.MDNS_LISTENER_ID),
+		descriptor, nil,
 	)
 
 	if err != nil {
@@ -64,14 +73,25 @@ func Discover(s *state.State, callback func(state.Peer)) {
 				"udp",
 				entry.AddrIPv4[0].String()+":"+strconv.Itoa(entry.Port),
 			)
+			if err != nil {
+				log.Fatal(err)
+			}
 
+			filePort, err := strconv.Atoi(entry.Text[FILE_PORT_INDEX])
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			interactPort, err := strconv.Atoi(entry.Text[INTERACT_PORT_INDEX])
 			if err != nil {
 				log.Fatal(err)
 			}
 
 			callback(state.Peer{
-				Name: entry.Instance,
-				Addr: addr,
+				Name:         entry.Instance,
+				Addr:         addr,
+				FilePort:     filePort,
+				InteractPort: interactPort,
 			})
 		}
 	}()

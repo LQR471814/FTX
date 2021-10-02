@@ -10,8 +10,10 @@ import (
 
 //? There is a separate type def here instead of directly using "api.User" because api.User contains some extra things that aren't pure data
 type Peer struct {
-	Name string
-	Addr *net.UDPAddr
+	Name         string
+	Addr         *net.UDPAddr
+	InteractPort int
+	FilePort     int
 }
 
 type State struct {
@@ -20,7 +22,7 @@ type State struct {
 	PeerUpdateChannels    []api.Backend_ListenUsersServer
 	MessageUpdateChannels []api.Backend_ListenMessagesServer
 	Peers                 map[string]Peer
-	Listeners             map[string]net.Listener
+	Listeners             map[int]net.Listener
 
 	Name string
 
@@ -28,10 +30,18 @@ type State struct {
 	ExitFunc context.CancelFunc
 }
 
-var LISTENER_IDENTIFIERS = []string{
-	"mdns",
-	"gui",
-	"file",
+const (
+	MDNS_LISTENER_ID int = iota
+	GUI_LISTENER_ID
+	FILE_LISTENER_ID
+	INTERACT_LISTENER_ID
+)
+
+var LISTENER_IDENTIFIERS = []int{
+	MDNS_LISTENER_ID,
+	GUI_LISTENER_ID,
+	FILE_LISTENER_ID,
+	INTERACT_LISTENER_ID,
 }
 
 func CreateState() (*State, error) {
@@ -57,7 +67,7 @@ func CreateState() (*State, error) {
 
 	state.Context, state.ExitFunc = context.WithCancel(context.Background())
 	state.Peers = make(map[string]Peer)
-	state.Listeners = make(map[string]net.Listener)
+	state.Listeners = make(map[int]net.Listener)
 
 	for _, id := range LISTENER_IDENTIFIERS {
 		state.Listeners[id], err = net.Listen("tcp", ":0")
@@ -69,7 +79,7 @@ func CreateState() (*State, error) {
 	return &state, nil
 }
 
-func (s *State) ListenerPort(id string) int {
+func (s *State) ListenerPort(id int) int {
 	return (*s).Listeners[id].Addr().(*net.TCPAddr).Port
 }
 

@@ -39,14 +39,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	go ServeFile(s.Listeners["file"])
-	go ServeGUI(s, s.Listeners["gui"])
-	go openGUI(s.ListenerPort("gui"))
-
-	log.Println("Serving filerecv on", s.ListenerPort("file"))
-	log.Println("Serving gui on", s.ListenerPort("gui"))
-
-	peers.Register(s.Name, s.ListenerPort("mdns"))
+	peers.Register(s)
 	defer peers.Quit(s)
 
 	peers.StartServer(PeersHandler{s})
@@ -64,6 +57,13 @@ func main() {
 			}
 		},
 	)
+
+	go ServeFile(s.Listeners[state.FILE_LISTENER_ID])
+	go ServeGUI(s, s.Listeners[state.GUI_LISTENER_ID])
+	go openGUI(s.ListenerPort(state.GUI_LISTENER_ID))
+
+	log.Println("Serving filerecv on", s.ListenerPort(state.FILE_LISTENER_ID))
+	log.Println("Serving gui on", s.ListenerPort(state.GUI_LISTENER_ID))
 
 	<-s.Context.Done()
 }

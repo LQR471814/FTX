@@ -100,12 +100,16 @@ func (s *BackendServer) GetUsers(ctx context.Context, req *api.Empty) (*api.User
 func (s *BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest) (*api.Empty, error) {
 	addr, err := net.ResolveUDPAddr("udp", req.To.IP)
 	if err != nil {
-		return &api.Empty{}, nil
+		return nil, err
 	}
 
-	peers.Message(state.Peer{
-		Addr: addr,
-	}, req.Message.Contents)
+	err = peers.Message(
+		state.Peer{Addr: addr},
+		req.Message.Contents,
+	)
+	if err != nil {
+		return nil, err
+	}
 
 	return &api.Empty{}, nil
 }
