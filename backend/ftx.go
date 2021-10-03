@@ -9,6 +9,9 @@ import (
 	"ftx/backend/state"
 	"log"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/LQR471814/marionette"
 )
@@ -22,13 +25,16 @@ func (h PeersHandler) Context() context.Context {
 }
 
 func (h PeersHandler) OnLeave(from net.IP) {
+	p := h.state.Peers[from.String()]
+	log.Println(p.Name, "left")
+
 	delete(h.state.Peers, from.String())
 	h.state.UpdatePeerChannels()
 }
 
 func (h PeersHandler) OnMessage(from net.IP, message string) {
 	p := h.state.Peers[from.String()]
-	log.Println("Received message", message, "from", p.Name)
+	log.Println("Received message", fmt.Sprintf("\"%v\"", message), "from", p.Name)
 
 	h.state.UpdateMessageChannels(&api.Message{
 		Author: &api.User{
@@ -49,7 +55,6 @@ func main() {
 	}
 
 	peers.Register(s)
-	defer peers.Quit(s)
 
 	peers.StartServer(PeersHandler{s}, s.ListenerPort(state.INTERACT_LISTENER_ID))
 	peers.Discover(
@@ -66,6 +71,14 @@ func main() {
 			}
 		},
 	)
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() { //? Quit on signal interrupt
+		<-c
+		peers.Quit(s)
+		os.Exit(0)
+	}()
 
 	go ServeFile(s.Listeners[state.FILE_LISTENER_ID])
 	go ServeGUI(s, s.Listeners[state.GUI_LISTENER_ID])

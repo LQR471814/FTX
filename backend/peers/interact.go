@@ -21,10 +21,7 @@ const (
 	INTERACT_PORT_INDEX
 )
 
-func Message(to state.Peer, message string) error {
-	msg := constructMessagePacket(message)
-
-	log.Println("Send", fmt.Sprintf("\"%v\"", message), "to", netutils.ConstructAddrStr(to.IP, to.InteractPort))
+func SendToPeer(to state.Peer, buf []byte) error {
 	addr, err := net.ResolveUDPAddr("udp", netutils.ConstructAddrStr(to.IP, to.InteractPort))
 	if err != nil {
 		return err
@@ -35,7 +32,7 @@ func Message(to state.Peer, message string) error {
 		return err
 	}
 
-	_, err = conn.Write(msg)
+	_, err = conn.Write(buf)
 	if err != nil {
 		return err
 	}
@@ -43,16 +40,29 @@ func Message(to state.Peer, message string) error {
 	return nil
 }
 
+func Message(to state.Peer, message string) error {
+	msg := constructMessagePacket(message)
+
+	err := SendToPeer(to, msg)
+	if err != nil {
+		return err
+	}
+
+	log.Println("Send", fmt.Sprintf("\"%v\"", message), "to", netutils.ConstructAddrStr(to.IP, to.InteractPort))
+	return nil
+}
+
 func Quit(s *state.State) error {
 	msg := constructLeavePacket()
 	for _, p := range s.Peers {
-		conn, err := net.Dial("udp", p.IP.String())
+		err := SendToPeer(p, msg)
 		if err != nil {
 			return err
 		}
-
-		conn.Write(msg)
 	}
+
+	log.Println("Sending leave notification")
+
 	return nil
 }
 

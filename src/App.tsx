@@ -32,8 +32,6 @@ export default function App() {
     })
 
     backend.getSetup(new Empty(), null).then((res: GetSetupResponse) => {
-      console.log(res)
-
       if (res.getRequired() === true) {
         ctx.dispatch({
           type: "banner_display",
@@ -58,7 +56,6 @@ export default function App() {
     const messageStream = backend.listenMessages(new Empty())
     messageStream.on('data', (r: any) => {
       const msg = r as Message
-      console.log(msg)
 
       ctx.dispatch({
         type: "message_recv",
