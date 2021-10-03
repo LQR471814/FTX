@@ -5,7 +5,6 @@ import "styling/Widget.css"
 import "styling/Root.css"
 
 import MessageList from "./MessageList"
-import { MessageGroup } from "lib/apptypes"
 
 type Props = {
   groups: Record<string, MessageGroup>

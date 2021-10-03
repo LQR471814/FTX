@@ -1,7 +1,3 @@
-import { BannerStyle, MessageGroup, TransferState } from "lib/apptypes"
-import { User } from './State'
-import { AppState, OverlayState } from "./State"
-
 const defaultField = "Loading..."
 
 export function transferStateDefaults(): TransferState {

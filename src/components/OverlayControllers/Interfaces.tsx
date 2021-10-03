@@ -9,8 +9,6 @@ import { ReactComponent as EthernetIcon } from "styling/assets/interfaceLogos/et
 
 import { NetworkInterface, SetSetupRequest } from "lib/api/backend_pb"
 import { backend } from "lib/Backend"
-import { Primitive } from "lib/apptypes"
-import { Interface } from "context/State"
 
 const wifiKeywords = [
   "wi-fi",

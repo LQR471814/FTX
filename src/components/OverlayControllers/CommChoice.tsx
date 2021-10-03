@@ -5,7 +5,6 @@ import { ReactComponent as MessageIcon } from "styling/assets/message.svg"
 
 import { uniqueId } from "lib/Utils";
 import { useApp } from "context/AppContext";
-import { Primitive } from "lib/apptypes";
 
 type Props = {
 	context: CommunicateContext

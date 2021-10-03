@@ -11,7 +11,6 @@ import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
 import { backend } from "lib/Backend"
 import { MessageRequest, Message as MessageType, User } from "lib/api/backend_pb"
-import { MessageGroup } from "lib/apptypes"
 
 type Props = {
   group: MessageGroup

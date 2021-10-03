@@ -1,6 +1,5 @@
 import { createContext, useReducer, useContext } from "react";
 import { appDefaults, messageGroupDefaults } from "./Defaults";
-import { AppAction, AppState } from "./State";
 
 const defaultState = appDefaults()
 

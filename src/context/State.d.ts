@@ -1,23 +1,3 @@
-import { NetworkInterface } from "lib/backend_pb"
-import { MessageGroup } from "lib/apptypes"
-
-type OverlayType = "networkInterfaces" | "commChoice" | "uploadRegion"
-type OverlayState = {
-	shown: boolean
-	context: CascadingContext | null
-}
-
-type User = {
-	name: string
-	ip: string
-}
-
-type Interface = {
-	index: number
-	address: string
-	name: string
-}
-
 type AppState = {
 	showBanner: boolean
 	bannerStyling: BannerStyle
@@ -40,7 +20,7 @@ type ChangeBannerStyleAction = { type: "banner_style_change", bannerStyling: Ban
 
 type UpdateSelfAction = { type: "self_update", hostname: string }
 
-type UpdateInterfaces = { type: "setup_update_netintfs", interfaces: NetworkInterface[] }
+type UpdateInterfaces = { type: "setup_update_netintfs", interfaces: Interface[] }
 
 type SetPeersAction = { type: "peers_set", users: Record<IP, User> }
 

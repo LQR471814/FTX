@@ -15,7 +15,6 @@ import BannerController from "components/Banner/BannerController"
 import { initializeBackend } from "lib/Backend"
 import { backend } from "lib/Backend"
 import { Empty, GetSetupResponse, Message, SelfResponse, UsersResponse } from "lib/api/backend_pb"
-import { User } from "context/State"
 
 initializeBackend()
 
@@ -41,9 +40,17 @@ export default function App() {
           display: true
         })
 
+        const intfList: Interface[] = res.getInterfacesList().map(i => {
+          return {
+            index: i.getIndex(),
+            name: i.getName(),
+            address: i.getAddress()
+          }
+        })
+
         ctx.dispatch({
           type: 'setup_update_netintfs',
-          interfaces: res.getInterfacesList()
+          interfaces: intfList
         })
       }
     })
@@ -55,7 +62,7 @@ export default function App() {
 
       ctx.dispatch({
         type: "message_recv",
-        from: msg.getAuthor(),
+        from: msg.getAuthor()!.getIp(),
         msg: msg.getContents(),
       })
     })

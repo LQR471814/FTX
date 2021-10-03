@@ -1,14 +1,13 @@
-import { User as UserType } from 'context/State'
 import { createRef } from "react"
 
 import "./css/UserList.css"
 
 type Props = {
-  click: (user: UserType) => void,
-  user: UserType
+  click: (user: User) => void,
+  user: User
 }
 
-export default function User(props: Props) {
+export default function UserComponent(props: Props) {
   const userRef = createRef<HTMLDivElement>()
 
   return (

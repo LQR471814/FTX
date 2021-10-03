@@ -3,7 +3,6 @@ import "./css/ChoiceOverlay.css"
 import "./css/Choice.css"
 import "styling/Root.css"
 import { setWithoutTransition } from "lib/Utils"
-import { Primitive } from "lib/apptypes"
 
 type Props = {
   icon: any

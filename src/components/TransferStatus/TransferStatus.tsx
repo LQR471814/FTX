@@ -1,10 +1,9 @@
-import { Transfer as TransferType } from 'lib/apptypes'
 import { uniqueId } from 'lib/Utils'
 import 'styling/Widget.css'
-import Transfer from './Transfer'
+import TransferComponent from './Transfer'
 
 type Props = {
-  activeTransfers: TransferType[]
+  activeTransfers: Transfer[]
 }
 
 export default function TransferStatus(props: Props) {
@@ -15,7 +14,7 @@ export default function TransferStatus(props: Props) {
     >
       {
         props.activeTransfers.map((t) => {
-          return <Transfer
+          return <TransferComponent
             key={uniqueId('Transfer')}
             state={t.state}
           />

@@ -1,6 +1,22 @@
-import { User } from "context/State"
-
+type IP = string
 type Primitive = string | number | bigint | boolean | symbol
+
+type User = {
+	name: string
+	ip: string
+}
+
+type OverlayType = "networkInterfaces" | "commChoice" | "uploadRegion"
+type OverlayState = {
+	shown: boolean
+	context: CascadingContext | null
+}
+
+type Interface = {
+	index: number
+	address: string
+	name: string
+}
 
 type BannerStyle = {
 	text: string

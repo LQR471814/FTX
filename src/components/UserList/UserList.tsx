@@ -1,16 +1,15 @@
 import "styling/Widget.css"
 import "./css/UserList.css"
 
-import User from "./User"
+import UserComponent from "./User"
 import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
-import { User as UserType } from "context/State"
 
 export default function UserList() {
   const ctx = useApp()
   const users = ctx.state.users
 
-  const onStartCommunication = (user: UserType) => {
+  const onStartCommunication = (user: User) => {
     ctx.dispatch({
       type: 'overlay_display',
       overlay: 'commChoice',
@@ -25,7 +24,7 @@ export default function UserList() {
     <div className="ComponentContainer">
       {Object.values(users).map((user) => {
         return (
-          <User
+          <UserComponent
             key={uniqueId('DisplayUser')}
             user={user}
             click={onStartCommunication}
