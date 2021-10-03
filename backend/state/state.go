@@ -100,3 +100,9 @@ func (s *State) UpdatePeerChannels() {
 		})
 	}
 }
+
+func (s *State) UpdateMessageChannels(message *api.Message) {
+	for _, stream := range s.MessageUpdateChannels {
+		stream.Send(message)
+	}
+}

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"ftx/backend/api"
 	"ftx/backend/netutils"
 	"ftx/backend/peers"
 	"ftx/backend/state"
@@ -28,6 +29,14 @@ func (h PeersHandler) OnLeave(from net.IP) {
 func (h PeersHandler) OnMessage(from net.IP, message string) {
 	p := h.state.Peers[from.String()]
 	log.Println("Received message", message, "from", p.Name)
+
+	h.state.UpdateMessageChannels(&api.Message{
+		Author: &api.User{
+			Name: p.Name,
+			IP:   p.IP.String(),
+		},
+		Contents: message,
+	})
 }
 
 //lint:ignore U1000 main is used (duh)
