@@ -2,6 +2,7 @@ package peers
 
 import (
 	"context"
+	"ftx/backend/netutils"
 	"log"
 	"net"
 	"os"
@@ -12,12 +13,12 @@ const buffsize = 8192
 
 type ServerHandlers interface {
 	Context() context.Context
-	OnLeave(from *net.UDPAddr)
-	OnMessage(from *net.UDPAddr, contents string)
+	OnLeave(from net.IP)
+	OnMessage(from net.IP, contents string)
 }
 
-func StartServer(h ServerHandlers) {
-	addr, err := net.ResolveUDPAddr("udp", ":0")
+func StartServer(h ServerHandlers, port int) {
+	addr, err := net.ResolveUDPAddr("udp", netutils.ConstructAddrStr(nil, port))
 	if err != nil {
 		log.Fatal(err)
 	}

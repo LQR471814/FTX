@@ -32,9 +32,9 @@ func packetHandler(addr *net.UDPAddr, buff []byte, h ServerHandlers) {
 
 	switch packetType {
 	case LEAVING_PACKET:
-		h.OnLeave(addr)
+		h.OnLeave(addr.IP)
 	case MESSAGE_PACKET:
 		msg := string(payload)
-		h.OnMessage(addr, msg)
+		h.OnMessage(addr.IP, msg)
 	}
 }

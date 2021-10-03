@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"net"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -87,7 +86,7 @@ func (s *BackendServer) GetUsers(ctx context.Context, req *api.Empty) (*api.User
 	result := []*api.User{}
 	for _, peer := range s.state.Peers {
 		result = append(result, &api.User{
-			IP:   peer.Addr.String(),
+			IP:   peer.IP.String(),
 			Name: peer.Name,
 		})
 	}
@@ -98,13 +97,8 @@ func (s *BackendServer) GetUsers(ctx context.Context, req *api.Empty) (*api.User
 }
 
 func (s *BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest) (*api.Empty, error) {
-	addr, err := net.ResolveUDPAddr("udp", req.To.IP)
-	if err != nil {
-		return nil, err
-	}
-
-	err = peers.Message(
-		state.Peer{Addr: addr},
+	err := peers.Message(
+		s.state.Peers[req.To.IP],
 		req.Message.Contents,
 	)
 	if err != nil {

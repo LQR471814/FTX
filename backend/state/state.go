@@ -11,7 +11,7 @@ import (
 //? There is a separate type def here instead of directly using "api.User" because api.User contains some extra things that aren't pure data
 type Peer struct {
 	Name         string
-	Addr         *net.UDPAddr
+	IP           net.IP
 	InteractPort int
 	FilePort     int
 }
@@ -88,7 +88,7 @@ func (s *State) UpdatePeerChannels() {
 	for _, p := range s.Peers {
 		peers = append(peers, &api.User{
 			Name: p.Name,
-			IP:   p.Addr.String(),
+			IP:   p.IP.String(),
 		})
 	}
 

@@ -20,12 +20,12 @@ func (h PeersHandler) Context() context.Context {
 	return h.state.Context
 }
 
-func (h PeersHandler) OnLeave(from *net.UDPAddr) {
+func (h PeersHandler) OnLeave(from net.IP) {
 	delete(h.state.Peers, from.String())
 	h.state.UpdatePeerChannels()
 }
 
-func (h PeersHandler) OnMessage(from *net.UDPAddr, message string) {
+func (h PeersHandler) OnMessage(from net.IP, message string) {
 	p := h.state.Peers[from.String()]
 	log.Println("Received message", message, "from", p.Name)
 }
@@ -42,16 +42,16 @@ func main() {
 	peers.Register(s)
 	defer peers.Quit(s)
 
-	peers.StartServer(PeersHandler{s})
+	peers.StartServer(PeersHandler{s}, s.ListenerPort(state.INTERACT_LISTENER_ID))
 	peers.Discover(
 		s, func(p state.Peer) {
-			local, err := netutils.CheckLocal(p.Addr.IP)
+			local, err := netutils.CheckLocal(p.IP)
 			if err != nil {
 				log.Fatal(err)
 			}
 
 			if !local {
-				s.Peers[p.Addr.String()] = p
+				s.Peers[p.IP.String()] = p
 				s.UpdatePeerChannels()
 				log.Println(p)
 			}
@@ -63,6 +63,7 @@ func main() {
 	go openGUI(s.ListenerPort(state.GUI_LISTENER_ID))
 
 	log.Println("Serving filerecv on", s.ListenerPort(state.FILE_LISTENER_ID))
+	log.Println("Serving interact on", s.ListenerPort(state.INTERACT_LISTENER_ID))
 	log.Println("Serving gui on", s.ListenerPort(state.GUI_LISTENER_ID))
 
 	<-s.Context.Done()

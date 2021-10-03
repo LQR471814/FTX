@@ -1,9 +1,19 @@
 package netutils
 
 import (
+	"fmt"
 	"ftx/backend/api"
 	"net"
+	"strconv"
 )
+
+func ConstructAddrStr(ip net.IP, port int) string {
+	if ip == nil {
+		return ":" + strconv.Itoa(port)
+	}
+
+	return fmt.Sprintf("%v:%v", ip.String(), strconv.Itoa(port))
+}
 
 func GetIPv4(addrs []net.Addr) net.IP {
 	for _, a := range addrs {

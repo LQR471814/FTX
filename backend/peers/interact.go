@@ -1,6 +1,8 @@
 package peers
 
 import (
+	"fmt"
+	"ftx/backend/netutils"
 	"ftx/backend/state"
 	"log"
 	"net"
@@ -21,19 +23,30 @@ const (
 
 func Message(to state.Peer, message string) error {
 	msg := constructMessagePacket(message)
-	conn, err := net.Dial("udp", to.Addr.String()+":"+strconv.Itoa(to.InteractPort))
+
+	log.Println("Send", fmt.Sprintf("\"%v\"", message), "to", netutils.ConstructAddrStr(to.IP, to.InteractPort))
+	addr, err := net.ResolveUDPAddr("udp", netutils.ConstructAddrStr(to.IP, to.InteractPort))
 	if err != nil {
 		return err
 	}
 
-	conn.Write(msg)
+	conn, err := net.DialUDP("udp", nil, addr)
+	if err != nil {
+		return err
+	}
+
+	_, err = conn.Write(msg)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func Quit(s *state.State) error {
 	msg := constructLeavePacket()
 	for _, p := range s.Peers {
-		conn, err := net.Dial("udp", p.Addr.String())
+		conn, err := net.Dial("udp", p.IP.String())
 		if err != nil {
 			return err
 		}
@@ -69,14 +82,6 @@ func Discover(s *state.State, callback func(state.Peer)) {
 
 	go func() {
 		for entry := range entries {
-			addr, err := net.ResolveUDPAddr(
-				"udp",
-				entry.AddrIPv4[0].String()+":"+strconv.Itoa(entry.Port),
-			)
-			if err != nil {
-				log.Fatal(err)
-			}
-
 			filePort, err := strconv.Atoi(entry.Text[FILE_PORT_INDEX])
 			if err != nil {
 				log.Fatal(err)
@@ -89,7 +94,7 @@ func Discover(s *state.State, callback func(state.Peer)) {
 
 			callback(state.Peer{
 				Name:         entry.Instance,
-				Addr:         addr,
+				IP:           entry.AddrIPv4[0],
 				FilePort:     filePort,
 				InteractPort: interactPort,
 			})
