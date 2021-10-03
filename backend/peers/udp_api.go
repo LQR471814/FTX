@@ -1,7 +1,6 @@
 package peers
 
 import (
-	"log"
 	"net"
 )
 
@@ -24,8 +23,6 @@ func packetHandler(addr *net.UDPAddr, buff []byte, h ServerHandlers) {
 	if !(len(buff) > 0) {
 		return
 	}
-
-	log.Println(buff)
 
 	packetType := buff[0]
 	payload := buff[1:]

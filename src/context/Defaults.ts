@@ -41,7 +41,21 @@ export function appDefaults(): AppState {
 		bannerStyling: bannerStylingDefaults(),
 
 		activeTransfers: {},
-		messageGroups: {},
+		messageGroups: {
+			"127.0.0.1": {
+				user: {
+					name: "LQR471814",
+					ip: "127.0.0.1"
+				},
+				messages: [
+					{
+						author: "gaming",
+						content: "gaming I am"
+					}
+				],
+				displayed: true,
+			}
+		},
 
 		users: {},
 		self: {

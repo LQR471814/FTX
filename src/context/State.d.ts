@@ -1,4 +1,5 @@
 import { NetworkInterface } from "lib/backend_pb"
+import { MessageGroup } from "lib/apptypes"
 
 type OverlayType = "networkInterfaces" | "commChoice" | "uploadRegion"
 type OverlayState = {

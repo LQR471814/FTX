@@ -62,6 +62,8 @@ function appReducer(state: AppState, action: AppAction) {
 			})
 			break
 		case 'message_recv':
+			console.log(action, newState.users)
+
 			newState.messageGroups[
 				action.from
 			].messages.push({
