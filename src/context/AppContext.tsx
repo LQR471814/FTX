@@ -61,14 +61,20 @@ function appReducer(state: AppState, action: AppAction) {
 			})
 			break
 		case 'message_recv':
-			console.log(action, newState.users)
+			console.log(action, newState.messageGroups)
+			const user = newState.users[action.from]
 
-			newState.messageGroups[
-				action.from
-			].messages.push({
+			let newGroup = newState.messageGroups[action.from]
+			if (!newGroup) {
+				newGroup = messageGroupDefaults(user)
+			}
+
+			newGroup.messages.push({
 				content: action.msg,
-				author: newState.users[action.from].name
+				author: user.name,
 			})
+
+			newState.messageGroups[action.from] = newGroup
 			break
 
 		case 'overlay_display':
