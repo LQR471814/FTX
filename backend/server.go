@@ -71,6 +71,7 @@ func (s *BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) 
 
 func (s *BackendServer) ListenMessages(_ *api.Empty, stream api.Backend_ListenMessagesServer) error {
 	s.state.MessageUpdateChannels = append(s.state.MessageUpdateChannels, stream)
+	<-s.state.Context.Done()
 	return nil
 }
 
