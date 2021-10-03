@@ -18,6 +18,10 @@ import { Empty, GetSetupResponse, Message, SelfResponse, UsersResponse } from "l
 
 initializeBackend()
 
+window.addEventListener("beforeunload", () => {
+  backend.quit(new Empty(), null)
+})
+
 export default function App() {
   const ctx = useApp()
 

@@ -108,3 +108,8 @@ func (s *BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest
 
 	return &api.Empty{}, nil
 }
+
+func (s *BackendServer) Quit(ctx context.Context, _ *api.Empty) (*api.Empty, error) {
+	s.state.ExitFunc()
+	return &api.Empty{}, nil
+}

@@ -233,5 +233,45 @@ export class BackendClient {
     this.methodInfoSendMessage);
   }
 
+  methodInfoQuit = new grpcWeb.AbstractClientBase.MethodInfo(
+    backend_pb.Empty,
+    (request: backend_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    backend_pb.Empty.deserializeBinary
+  );
+
+  quit(
+    request: backend_pb.Empty,
+    metadata: grpcWeb.Metadata | null): Promise<backend_pb.Empty>;
+
+  quit(
+    request: backend_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: backend_pb.Empty) => void): grpcWeb.ClientReadableStream<backend_pb.Empty>;
+
+  quit(
+    request: backend_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: backend_pb.Empty) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/api.Backend/Quit',
+        request,
+        metadata || {},
+        this.methodInfoQuit,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/api.Backend/Quit',
+    request,
+    metadata || {},
+    this.methodInfoQuit);
+  }
+
 }
 

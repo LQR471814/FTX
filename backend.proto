@@ -12,6 +12,8 @@ service Backend {
 	rpc ListenUsers (Empty) returns (stream UsersResponse) {}
 	rpc ListenMessages (Empty) returns (stream Message) {}
 	rpc SendMessage (MessageRequest) returns (Empty) {}
+
+	rpc Quit (Empty) returns (Empty) {}
 }
 
 message User {

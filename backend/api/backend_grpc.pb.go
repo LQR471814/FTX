@@ -24,6 +24,7 @@ type BackendClient interface {
 	ListenUsers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenUsersClient, error)
 	ListenMessages(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenMessagesClient, error)
 	SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error)
+	Quit(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type backendClient struct {
@@ -134,6 +135,15 @@ func (c *backendClient) SendMessage(ctx context.Context, in *MessageRequest, opt
 	return out, nil
 }
 
+func (c *backendClient) Quit(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/api.Backend/Quit", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // BackendServer is the server API for Backend service.
 // All implementations must embed UnimplementedBackendServer
 // for forward compatibility
@@ -144,6 +154,7 @@ type BackendServer interface {
 	ListenUsers(*Empty, Backend_ListenUsersServer) error
 	ListenMessages(*Empty, Backend_ListenMessagesServer) error
 	SendMessage(context.Context, *MessageRequest) (*Empty, error)
+	Quit(context.Context, *Empty) (*Empty, error)
 	mustEmbedUnimplementedBackendServer()
 }
 
@@ -168,6 +179,9 @@ func (UnimplementedBackendServer) ListenMessages(*Empty, Backend_ListenMessagesS
 }
 func (UnimplementedBackendServer) SendMessage(context.Context, *MessageRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
+}
+func (UnimplementedBackendServer) Quit(context.Context, *Empty) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Quit not implemented")
 }
 func (UnimplementedBackendServer) mustEmbedUnimplementedBackendServer() {}
 
@@ -296,6 +310,24 @@ func _Backend_SendMessage_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Backend_Quit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BackendServer).Quit(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Backend/Quit",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BackendServer).Quit(ctx, req.(*Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Backend_ServiceDesc is the grpc.ServiceDesc for Backend service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -318,6 +350,10 @@ var Backend_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendMessage",
 			Handler:    _Backend_SendMessage_Handler,
+		},
+		{
+			MethodName: "Quit",
+			Handler:    _Backend_Quit_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

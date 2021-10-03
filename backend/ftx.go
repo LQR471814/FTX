@@ -53,9 +53,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer onQuit(s)
 
 	peers.Register(s)
-
 	peers.StartServer(PeersHandler{s}, s.ListenerPort(state.INTERACT_LISTENER_ID))
 	peers.Discover(
 		s, func(p state.Peer) {
@@ -76,8 +76,7 @@ func main() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() { //? Quit on signal interrupt
 		<-c
-		peers.Quit(s)
-		os.Exit(0)
+		s.ExitFunc()
 	}()
 
 	go ServeFile(s.Listeners[state.FILE_LISTENER_ID])
@@ -89,6 +88,11 @@ func main() {
 	log.Println("Serving gui on", s.ListenerPort(state.GUI_LISTENER_ID))
 
 	<-s.Context.Done()
+}
+
+func onQuit(s *state.State) {
+	peers.Quit(s)
+	os.Exit(0)
 }
 
 func openGUI(port int) {
