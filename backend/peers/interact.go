@@ -104,7 +104,7 @@ func Discover(s *state.State, callback func(state.Peer)) {
 
 			callback(state.Peer{
 				Name:         entry.Instance,
-				IP:           entry.TrueAddr.(*net.UDPAddr).IP.To4(),
+				IP:           entry.TrueAddr.(*net.UDPAddr).IP,
 				FilePort:     filePort,
 				InteractPort: interactPort,
 			})
