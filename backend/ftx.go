@@ -34,6 +34,7 @@ func (h PeersHandler) OnLeave(from net.IP) {
 
 func (h PeersHandler) OnMessage(from net.IP, message string) {
 	p := h.state.Peers[from.String()]
+	log.Println(from.String())
 	log.Println("Received message", fmt.Sprintf("\"%v\"", message), "from", p.Name)
 
 	h.state.UpdateMessageChannels(&api.Message{

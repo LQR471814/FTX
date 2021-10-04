@@ -8,7 +8,7 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/grandcat/zeroconf"
+	"github.com/LQR471814/zeroconf"
 )
 
 const (
@@ -104,7 +104,7 @@ func Discover(s *state.State, callback func(state.Peer)) {
 
 			callback(state.Peer{
 				Name:         entry.Instance,
-				IP:           entry.AddrIPv4[0],
+				IP:           entry.TrueAddr.(*net.UDPAddr).IP.To4(),
 				FilePort:     filePort,
 				InteractPort: interactPort,
 			})

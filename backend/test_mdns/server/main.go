@@ -9,21 +9,21 @@ import (
 
 	"time"
 
-	"github.com/grandcat/zeroconf"
+	"github.com/LQR471814/zeroconf"
 )
 
 var (
 	name     = flag.String("name", "GoZeroconfGo", "The name for the service.")
-	service  = flag.String("service", "_workstation._tcp", "Set the service type of the new service.")
+	service  = flag.String("service", "ftx", "Set the service type of the new service.")
 	domain   = flag.String("domain", "local.", "Set the network domain. Default should be fine.")
 	port     = flag.Int("port", 42424, "Set the port the service is listening to.")
-	waitTime = flag.Int("wait", 10, "Duration in [s] to publish service for.")
+	waitTime = flag.Int("wait", 10000000, "Duration in [s] to publish service for.")
 )
 
 func main() {
 	flag.Parse()
 
-	server, err := zeroconf.Register(*name, *service, *domain, 0, []string{"txtv=0", "lo=1", "la=2"}, nil)
+	server, err := zeroconf.Register(*name, *service, *domain, *port, []string{"txtv=0", "lo=1", "la=2"}, nil)
 	// server, err := zeroconf.Register(*name, *service, *domain, *port, []string{"txtv=0", "lo=1", "la=2"}, nil)
 	if err != nil {
 		log.Fatal(err)
