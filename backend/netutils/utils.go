@@ -107,19 +107,28 @@ func AddrInInterface(index int, addr *net.UDPAddr) (bool, error) {
 }
 
 func CheckLocal(target net.IP) (bool, error) {
-	intfs, err := GetInterfaces()
+	intfs, err := net.Interfaces()
 	if err != nil {
-		return false, nil
+		return false, err
 	}
 
-	local := false
 	for _, i := range intfs {
-		ip := net.ParseIP(i.Address)
-		if target.Equal(ip) {
-			local = true
-			break
+		addrs, err := i.Addrs()
+		if err != nil {
+			return false, err
+		}
+
+		for _, addr := range addrs {
+			ip, _, err := net.ParseCIDR(addr.String())
+			if err != nil {
+				return false, err
+			}
+
+			if target.Equal(ip) {
+				return true, nil
+			}
 		}
 	}
 
-	return local, nil
+	return false, nil
 }
