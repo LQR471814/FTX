@@ -43,6 +43,7 @@ export function appDefaults(): AppState {
 		self: {
 			name: defaultField,
 			ip: defaultField,
+			filePort: 0,
 		},
 		setupInfo: {
 			interfaces: []

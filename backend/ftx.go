@@ -38,8 +38,9 @@ func (h PeersHandler) OnMessage(from net.IP, message string) {
 
 	h.state.UpdateMessageChannels(&api.Message{
 		Author: &api.User{
-			Name: p.Name,
-			IP:   p.IP.String(),
+			Name:     p.Name,
+			IP:       p.IP.String(),
+			FilePort: int32(p.FilePort),
 		},
 		Contents: message,
 	})

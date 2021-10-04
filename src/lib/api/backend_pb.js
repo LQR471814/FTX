@@ -246,7 +246,8 @@ proto.api.User.prototype.toObject = function(opt_includeInstance) {
 proto.api.User.toObject = function(includeInstance, msg) {
   var f, obj = {
     ip: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    name: jspb.Message.getFieldWithDefault(msg, 2, "")
+    name: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    fileport: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
 
   if (includeInstance) {
@@ -291,6 +292,10 @@ proto.api.User.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {string} */ (reader.readString());
       msg.setName(value);
       break;
+    case 3:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setFileport(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -334,6 +339,13 @@ proto.api.User.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
+  f = message.getFileport();
+  if (f !== 0) {
+    writer.writeInt32(
+      3,
+      f
+    );
+  }
 };
 
 
@@ -370,6 +382,24 @@ proto.api.User.prototype.getName = function() {
  */
 proto.api.User.prototype.setName = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional int32 FilePort = 3;
+ * @return {number}
+ */
+proto.api.User.prototype.getFileport = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.api.User} returns this
+ */
+proto.api.User.prototype.setFileport = function(value) {
+  return jspb.Message.setProto3IntField(this, 3, value);
 };
 
 

@@ -1,6 +1,6 @@
-# UDP Server open for interacting with peers
+## UDP Server open for interacting with peers
 
-## Protocol
+### Protocol
 
 | | Leaving | Message |
 | --- | --- | --- |

@@ -77,6 +77,7 @@ export default function App() {
 				users[u.getIp()] = {
 					name: u.getName(),
 					ip: u.getIp(),
+          filePort: u.getFileport(),
 				}
 			}
 

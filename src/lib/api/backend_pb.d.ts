@@ -9,6 +9,9 @@ export class User extends jspb.Message {
   getName(): string;
   setName(value: string): User;
 
+  getFileport(): number;
+  setFileport(value: number): User;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): User.AsObject;
   static toObject(includeInstance: boolean, msg: User): User.AsObject;
@@ -21,6 +24,7 @@ export namespace User {
   export type AsObject = {
     ip: string,
     name: string,
+    fileport: number,
   }
 }
 

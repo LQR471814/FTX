@@ -19,6 +19,7 @@ service Backend {
 message User {
 	string IP = 1;
 	string Name = 2;
+	int32 FilePort = 3;
 }
 
 message Message {

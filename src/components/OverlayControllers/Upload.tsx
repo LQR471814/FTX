@@ -1,9 +1,10 @@
 import UploadRegion from "components/UploadRegion/UploadRegion"
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import UploadWorker from 'worker-loader!components/TransferStatus/upload_worker_manager.js'
+import UploadWorker from 'worker-loader!components/uploader/UploadClient.ts'
 
 import { useApp } from "context/AppContext"
 import { transferStateDefaults } from "context/Defaults"
+import { ManagerBound, WorkerBound } from "components/uploader/UploadTypes"
 
 interface Props {
 	context: UploadContext
@@ -23,46 +24,27 @@ export default function Upload(props: Props) {
 				})
 
 				if (!files) return
+
 				const worker = new UploadWorker()
-
-				const updateCurrentState = (update: any) => {
-					const currentTransfer = ctx.state.activeTransfers[props.context.id]
-
-					ctx.dispatch({
-						type: "transfer_update",
-						id: props.context.id,
-						state: {
-							...currentTransfer.state,
-							...update
-						}
-					})
-				}
-
-				worker.onmessage = (e: MessageEvent) => {
-					const msg = e.data
-
+				const handler = (msg: ManagerBound) => {
 					switch (msg.type) {
-						case 'status':
-							updateCurrentState({ status: msg.message })
-							console.log(msg.message)
-							break
-						case 'error':
-							updateCurrentState(msg.message)
-							worker.terminate()
-							break
-						case 'read_progress':
-							updateCurrentState({
-								status: "Reading in progress...",
-								progress: Math.round((msg.loaded / msg.total) * 100)
+						case 'state':
+							ctx.dispatch({
+								type: "transfer_update",
+								id: props.context.id,
+								state: msg.state
 							})
+
 							break
-						case 'upload_progress':
-							updateCurrentState({
-								status: "Uploading...",
-								progress: Math.round((msg.loaded / msg.total) * 100)
+						case 'done':
+							ctx.dispatch({
+								type: "transfer_update",
+								id: props.context.id,
+								state: {
+									status: "Upload Complete!",
+									progress: NaN
+								}
 							})
-							break
-						case 'terminate_worker':
 							worker.terminate()
 							break
 						default:
@@ -70,6 +52,8 @@ export default function Upload(props: Props) {
 							break
 					}
 				}
+
+				worker.onmessage = (e: MessageEvent) => handler(e.data as ManagerBound)
 
 				ctx.dispatch({
 					type: "transfer_new",
@@ -80,13 +64,13 @@ export default function Upload(props: Props) {
 					}
 				})
 
-				worker.postMessage(
-					{
-						type: 'start',
-						targetIp: props.context.id,
-						files: Array.from(files)
+				worker.postMessage({
+					type: 'start',
+					context: {
+						files: Array.from(files),
+						server: `ws://${props.context.id}:${props.context.port}/sendFile`,
 					}
-				)
+				} as WorkerBound)
 			}
 		} />
 	)

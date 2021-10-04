@@ -15,7 +15,8 @@ export default function UserList() {
       overlay: 'commChoice',
       display: true,
       context: {
-        id: user.ip
+        id: user.ip,
+        port: user.filePort
       }
     })
   }

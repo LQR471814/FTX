@@ -2,9 +2,9 @@ package main
 
 import (
 	"ftx/backend/api"
-	"ftx/backend/files"
 	"ftx/backend/paths"
 	"ftx/backend/state"
+	"ftx/backend/transfer"
 	"log"
 	"net"
 	"net/http"
@@ -77,12 +77,6 @@ func ServeGUI(state *state.State, listener net.Listener) {
 }
 
 func ServeFile(listener net.Listener) {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", files.FileHandler)
-
-	server := http.Server{
-		Handler: mux,
-	}
-
+	server := http.Server{Handler: http.HandlerFunc(transfer.Handler)}
 	server.Serve(listener)
 }

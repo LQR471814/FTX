@@ -4,6 +4,7 @@ type Primitive = string | number | bigint | boolean | symbol
 type User = {
 	name: string
 	ip: string
+	filePort: number
 }
 
 type OverlayType = "networkInterfaces" | "commChoice" | "uploadRegion"
