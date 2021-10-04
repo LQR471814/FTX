@@ -23,7 +23,7 @@ type Transfer struct {
 }
 
 var upgrader = websocket.Upgrader{
-	CheckOrigin:     func(r *http.Request) bool { log.Println(r.Header["Origin"]); return true }, //? Allow cross-origin requests
+	CheckOrigin:     func(*http.Request) bool { return true }, //? Allow cross-origin requests
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
