@@ -39,7 +39,13 @@ export function appDefaults(): AppState {
 		activeTransfers: {},
 		messageGroups: {},
 
-		users: {},
+		users: {
+			"127.0.0.1": {
+				name: "Dave",
+				ip: "192.168.1.144",
+				filePort: 45611,
+			}
+		},
 		self: {
 			name: defaultField,
 			ip: defaultField,

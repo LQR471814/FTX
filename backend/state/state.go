@@ -87,8 +87,9 @@ func (s *State) UpdatePeerChannels() {
 	peers := []*api.User{}
 	for _, p := range s.Peers {
 		peers = append(peers, &api.User{
-			Name: p.Name,
-			IP:   p.IP.String(),
+			Name:     p.Name,
+			IP:       p.IP.String(),
+			FilePort: int32(p.FilePort),
 		})
 	}
 
