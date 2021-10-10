@@ -4,7 +4,6 @@ import (
 	"ftx/backend/api"
 	"ftx/backend/paths"
 	"ftx/backend/state"
-	"ftx/backend/transfer"
 	"log"
 	"net"
 	"net/http"
@@ -73,10 +72,5 @@ func ServeGUI(state *state.State, listener net.Listener) {
 		},
 	}
 
-	server.Serve(listener)
-}
-
-func ServeFile(listener net.Listener) {
-	server := http.Server{Handler: http.HandlerFunc(transfer.Handler)}
 	server.Serve(listener)
 }

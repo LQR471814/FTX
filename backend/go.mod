@@ -20,10 +20,11 @@ require (
 	golang.org/x/sys v0.0.0-20210925032602-92d5a993a665 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20210909211513-a8c4777a87af // indirect
-	nhooyr.io/websocket v1.8.7 // indirect
 )
 
 require (
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
+	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.41 // indirect
+	nhooyr.io/websocket v1.8.6 // indirect
 )

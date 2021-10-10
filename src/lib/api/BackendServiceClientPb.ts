@@ -193,6 +193,84 @@ export class BackendClient {
       this.methodInfoListenMessages);
   }
 
+  methodInfoListenTransferRequests = new grpcWeb.AbstractClientBase.MethodInfo(
+    backend_pb.TransferRequest,
+    (request: backend_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    backend_pb.TransferRequest.deserializeBinary
+  );
+
+  listenTransferRequests(
+    request: backend_pb.Empty,
+    metadata?: grpcWeb.Metadata) {
+    return this.client_.serverStreaming(
+      this.hostname_ +
+        '/api.Backend/ListenTransferRequests',
+      request,
+      metadata || {},
+      this.methodInfoListenTransferRequests);
+  }
+
+  methodInfoListenTransferStates = new grpcWeb.AbstractClientBase.MethodInfo(
+    backend_pb.TransferState,
+    (request: backend_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    backend_pb.TransferState.deserializeBinary
+  );
+
+  listenTransferStates(
+    request: backend_pb.Empty,
+    metadata?: grpcWeb.Metadata) {
+    return this.client_.serverStreaming(
+      this.hostname_ +
+        '/api.Backend/ListenTransferStates',
+      request,
+      metadata || {},
+      this.methodInfoListenTransferStates);
+  }
+
+  methodInfoTransferChoice = new grpcWeb.AbstractClientBase.MethodInfo(
+    backend_pb.Empty,
+    (request: backend_pb.TransferChoiceRequest) => {
+      return request.serializeBinary();
+    },
+    backend_pb.Empty.deserializeBinary
+  );
+
+  transferChoice(
+    request: backend_pb.TransferChoiceRequest,
+    metadata: grpcWeb.Metadata | null): Promise<backend_pb.Empty>;
+
+  transferChoice(
+    request: backend_pb.TransferChoiceRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: backend_pb.Empty) => void): grpcWeb.ClientReadableStream<backend_pb.Empty>;
+
+  transferChoice(
+    request: backend_pb.TransferChoiceRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: backend_pb.Empty) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/api.Backend/TransferChoice',
+        request,
+        metadata || {},
+        this.methodInfoTransferChoice,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/api.Backend/TransferChoice',
+    request,
+    metadata || {},
+    this.methodInfoTransferChoice);
+  }
+
   methodInfoSendMessage = new grpcWeb.AbstractClientBase.MethodInfo(
     backend_pb.Empty,
     (request: backend_pb.MessageRequest) => {

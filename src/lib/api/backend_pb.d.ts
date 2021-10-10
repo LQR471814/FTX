@@ -2,6 +2,110 @@ import * as jspb from 'google-protobuf'
 
 
 
+export class File extends jspb.Message {
+  getName(): string;
+  setName(value: string): File;
+
+  getSize(): number;
+  setSize(value: number): File;
+
+  getType(): string;
+  setType(value: string): File;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): File.AsObject;
+  static toObject(includeInstance: boolean, msg: File): File.AsObject;
+  static serializeBinaryToWriter(message: File, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): File;
+  static deserializeBinaryFromReader(message: File, reader: jspb.BinaryReader): File;
+}
+
+export namespace File {
+  export type AsObject = {
+    name: string,
+    size: number,
+    type: string,
+  }
+}
+
+export class TransferChoiceRequest extends jspb.Message {
+  getId(): string;
+  setId(value: string): TransferChoiceRequest;
+
+  getAccept(): boolean;
+  setAccept(value: boolean): TransferChoiceRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): TransferChoiceRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: TransferChoiceRequest): TransferChoiceRequest.AsObject;
+  static serializeBinaryToWriter(message: TransferChoiceRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): TransferChoiceRequest;
+  static deserializeBinaryFromReader(message: TransferChoiceRequest, reader: jspb.BinaryReader): TransferChoiceRequest;
+}
+
+export namespace TransferChoiceRequest {
+  export type AsObject = {
+    id: string,
+    accept: boolean,
+  }
+}
+
+export class TransferState extends jspb.Message {
+  getId(): string;
+  setId(value: string): TransferState;
+
+  getCurrentfile(): number;
+  setCurrentfile(value: number): TransferState;
+
+  getReceived(): number;
+  setReceived(value: number): TransferState;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): TransferState.AsObject;
+  static toObject(includeInstance: boolean, msg: TransferState): TransferState.AsObject;
+  static serializeBinaryToWriter(message: TransferState, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): TransferState;
+  static deserializeBinaryFromReader(message: TransferState, reader: jspb.BinaryReader): TransferState;
+}
+
+export namespace TransferState {
+  export type AsObject = {
+    id: string,
+    currentfile: number,
+    received: number,
+  }
+}
+
+export class TransferRequest extends jspb.Message {
+  getId(): string;
+  setId(value: string): TransferRequest;
+
+  getFrom(): User | undefined;
+  setFrom(value?: User): TransferRequest;
+  hasFrom(): boolean;
+  clearFrom(): TransferRequest;
+
+  getFilesList(): Array<File>;
+  setFilesList(value: Array<File>): TransferRequest;
+  clearFilesList(): TransferRequest;
+  addFiles(value?: File, index?: number): File;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): TransferRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: TransferRequest): TransferRequest.AsObject;
+  static serializeBinaryToWriter(message: TransferRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): TransferRequest;
+  static deserializeBinaryFromReader(message: TransferRequest, reader: jspb.BinaryReader): TransferRequest;
+}
+
+export namespace TransferRequest {
+  export type AsObject = {
+    id: string,
+    from?: User.AsObject,
+    filesList: Array<File.AsObject>,
+  }
+}
+
 export class User extends jspb.Message {
   getIp(): string;
   setIp(value: string): User;

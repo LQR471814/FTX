@@ -14,6 +14,12 @@ import (
 	"ftx/backend/state"
 )
 
+type TransferRequestUnknown struct{}
+
+func (TransferRequestUnknown) Error() string {
+	return "Transfer request doesn't exist in catalog"
+}
+
 type BackendServer struct {
 	api.UnimplementedBackendServer
 	state *state.State
@@ -69,6 +75,18 @@ func (s *BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) 
 	return nil, err
 }
 
+func (s *BackendServer) ListenTransferRequests(_ *api.Empty, stream api.Backend_ListenTransferRequestsServer) error {
+	s.state.TransferRequestChannels = append(s.state.TransferRequestChannels, stream)
+	<-s.state.Context.Done()
+	return nil
+}
+
+func (s *BackendServer) ListenTransferStates(_ *api.Empty, stream api.Backend_ListenTransferStatesServer) error {
+	s.state.TransferUpdateChannels = append(s.state.TransferUpdateChannels, stream)
+	<-s.state.Context.Done()
+	return nil
+}
+
 func (s *BackendServer) ListenMessages(_ *api.Empty, stream api.Backend_ListenMessagesServer) error {
 	s.state.MessageUpdateChannels = append(s.state.MessageUpdateChannels, stream)
 	<-s.state.Context.Done()
@@ -83,23 +101,19 @@ func (s *BackendServer) ListenUsers(_ *api.Empty, stream api.Backend_ListenUsers
 	return nil
 }
 
-func (s *BackendServer) GetUsers(ctx context.Context, req *api.Empty) (*api.UsersResponse, error) {
-	result := []*api.User{}
-	for _, peer := range s.state.Peers {
-		result = append(result, &api.User{
-			IP:   peer.IP.String(),
-			Name: peer.Name,
-		})
+func (s *BackendServer) TransferChoice(ctx context.Context, req *api.TransferChoiceRequest) (*api.Empty, error) {
+	accept, ok := s.state.PendingTransfers[req.Id]
+	if !ok {
+		return nil, TransferRequestUnknown{}
 	}
 
-	return &api.UsersResponse{
-		Users: result,
-	}, nil
+	accept <- req.GetAccept()
+	return &api.Empty{}, nil
 }
 
 func (s *BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest) (*api.Empty, error) {
 	err := peers.Message(
-		s.state.Peers[req.To.IP],
+		s.state.Peers[req.To.Ip],
 		req.Message.Contents,
 	)
 	if err != nil {

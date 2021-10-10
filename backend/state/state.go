@@ -16,13 +16,25 @@ type Peer struct {
 	FilePort     int
 }
 
+func (p Peer) ToProto() *api.User {
+	return &api.User{
+		Name:     p.Name,
+		Ip:       p.IP.String(),
+		Fileport: int32(p.FilePort),
+	}
+}
+
 type State struct {
 	Settings *Settings
 
-	PeerUpdateChannels    []api.Backend_ListenUsersServer
-	MessageUpdateChannels []api.Backend_ListenMessagesServer
-	Peers                 map[string]Peer
-	Listeners             map[int]net.Listener
+	PeerUpdateChannels      []api.Backend_ListenUsersServer
+	MessageUpdateChannels   []api.Backend_ListenMessagesServer
+	TransferUpdateChannels  []api.Backend_ListenTransferStatesServer
+	TransferRequestChannels []api.Backend_ListenTransferRequestsServer
+
+	Peers            map[string]Peer
+	Listeners        map[int]net.Listener
+	PendingTransfers map[string]chan bool
 
 	Name string
 
@@ -86,11 +98,7 @@ func (s *State) ListenerPort(id int) int {
 func (s *State) UpdatePeerChannels() {
 	peers := []*api.User{}
 	for _, p := range s.Peers {
-		peers = append(peers, &api.User{
-			Name:     p.Name,
-			IP:       p.IP.String(),
-			FilePort: int32(p.FilePort),
-		})
+		peers = append(peers, p.ToProto())
 	}
 
 	log.Println(s.PeerUpdateChannels)

@@ -11,15 +11,41 @@ service Backend {
 
 	rpc ListenUsers (Empty) returns (stream UsersResponse) {}
 	rpc ListenMessages (Empty) returns (stream Message) {}
+	rpc ListenTransferRequests (Empty) returns (stream TransferRequest) {}
+	rpc ListenTransferStates (Empty) returns (stream TransferState) {}
+	rpc TransferChoice (TransferChoiceRequest) returns (Empty) {}
 	rpc SendMessage (MessageRequest) returns (Empty) {}
 
 	rpc Quit (Empty) returns (Empty) {}
 }
 
+message File {
+	string name = 1;
+	int64 size = 2;
+	string type = 3;
+}
+
+message TransferChoiceRequest {
+	string id = 1;
+	bool accept = 2;
+}
+
+message TransferState {
+	string id = 1;
+	int32 currentfile = 2;
+	int64 received = 3;
+}
+
+message TransferRequest {
+	string id = 3;
+	User from = 1;
+	repeated File files = 2;
+}
+
 message User {
-	string IP = 1;
-	string Name = 2;
-	int32 FilePort = 3;
+	string ip = 1;
+	string name = 2;
+	int32 fileport = 3;
 }
 
 message Message {
@@ -52,7 +78,7 @@ message UsersResponse {
 }
 
 message NetworkInterface {
-	int32 Index = 1;
-	string Address = 2;
-	string Name = 3;
+	int32 index = 1;
+	string address = 2;
+	string name = 3;
 }

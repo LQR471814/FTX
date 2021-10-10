@@ -3,23 +3,25 @@ package transfer
 import (
 	"bufio"
 	"encoding/json"
+	"ftx/backend/api"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
 
-	"ftx/backend/netutils"
-
+	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
-type Transfer struct {
-	state       State
-	files       []File
-	currentFile int
-	dataChan    chan []byte
-	received    int
-	conn        *websocket.Conn
+type TransferHandlers interface {
+	OnTransferRequest(*api.TransferRequest) chan bool
+	OnTransferUpdate(*api.TransferState)
+}
+
+type TransferRequest struct {
+	RemoteAddr net.Addr
+	Files      []File
 }
 
 var upgrader = websocket.Upgrader{
@@ -27,6 +29,8 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 }
+
+var handlers TransferHandlers
 
 func sendJSON(c *websocket.Conn, obj interface{}) {
 	msg, err := json.Marshal(obj)
@@ -67,10 +71,18 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
-	transfer := &Transfer{conn: conn}
+	transfer := &Transfer{
+		From: conn.RemoteAddr(),
+		ID:   uuid.New().String(),
+		conn: conn,
+	}
+
 	eventHandler(transfer, peerConnect)
 
 	for {
+		updateOffset := transfer.Files[transfer.CurrentFile].Size / 8
+		updateNext := updateOffset
+
 		msgType, contents, err := conn.ReadMessage()
 		if err != nil {
 			if strings.Contains(err.Error(), "close") {
@@ -84,15 +96,20 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			//? This will 100% come back to bite me later but this should be fine for now
 			reqs := &FileRequests{}
 			json.Unmarshal(contents, reqs)
-			transfer.files = reqs.Files
+			transfer.Files = reqs.Files
 
 			eventHandler(transfer, recvRequests)
 		case websocket.BinaryMessage:
-			f := transfer.files[transfer.currentFile]
+			f := transfer.Files[transfer.CurrentFile]
 			transfer.dataChan <- contents
-			transfer.received += len(contents)
+			transfer.Received += len(contents)
 
-			if transfer.received >= f.Size {
+			if transfer.Received > updateNext {
+				handlers.OnTransferUpdate(transfer.ToState())
+				updateNext += updateOffset
+			}
+
+			if transfer.Received >= f.Size {
 				eventHandler(transfer, recvDone)
 			}
 		}
@@ -100,14 +117,14 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func eventHandler(t *Transfer, event Event) {
-	cell, ok := EventStateMatrix[event][t.state]
-	log.Println(event, t.state, cell)
+	cell, ok := EventStateMatrix[event][t.State]
+	log.Println(event, t.State, cell)
 	if !ok {
 		log.Println("Cell doesn't exist under these circumstances")
 		return
 	}
 
-	t.state = cell.NewState
+	t.State = cell.NewState
 	for _, action := range cell.Actions {
 		actionHandler(t, action)
 	}
@@ -115,11 +132,18 @@ func eventHandler(t *Transfer, event Event) {
 
 func actionHandler(t *Transfer, action Action) {
 	switch action {
-	case DisplayFileRequests: //TODO: Add user input code here
-		log.Println(t.files)
-		eventHandler(t, userAccept) //TODO: Remove this later
+	case DisplayFileRequests:
+		log.Println(t.Files)
+
+		accept := <-handlers.OnTransferRequest(t.ToRequest())
+		if accept {
+			eventHandler(t, userAccept)
+			return
+		}
+
+		eventHandler(t, userDeny)
 	case IncrementFileIndex:
-		t.currentFile += 1
+		t.CurrentFile += 1
 	case SendStartSignal:
 		sendJSON(t.conn, Signal{
 			Type: "start",
@@ -133,13 +157,13 @@ func actionHandler(t *Transfer, action Action) {
 			Type: "complete",
 		})
 	case StartFileWriter:
-		f := t.files[t.currentFile]
+		f := t.Files[t.CurrentFile]
 		t.dataChan = make(chan []byte)
 		go fileWriter(f.Name, f.Size, t.dataChan)
 	case StopFileWriter:
 		close(t.dataChan)
 	case RecvDoneHandler:
-		if t.currentFile >= len(t.files) {
+		if t.CurrentFile >= len(t.Files) {
 			return
 		}
 
@@ -148,7 +172,11 @@ func actionHandler(t *Transfer, action Action) {
 	}
 }
 
-func Listen(port int) {
-	http.HandleFunc("/sendFile", Handler)
-	http.ListenAndServe(netutils.ConstructAddrStr(nil, port), nil)
+func Listen(listener net.Listener, h TransferHandlers) {
+	handlers = h
+	server := http.Server{
+		Handler: http.HandlerFunc(Handler),
+	}
+
+	server.Serve(listener)
 }

@@ -68,7 +68,7 @@ export default function Upload(props: Props) {
 					type: 'start',
 					context: {
 						files: Array.from(files),
-						server: `ws://${props.context.id}:${props.context.port}/sendFile`,
+						server: `ws://${props.context.id}:${props.context.port}`,
 					}
 				} as WorkerBound)
 			}

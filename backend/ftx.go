@@ -7,6 +7,7 @@ import (
 	"ftx/backend/netutils"
 	"ftx/backend/peers"
 	"ftx/backend/state"
+	"ftx/backend/transfer"
 	"log"
 	"net"
 	"os"
@@ -15,6 +16,26 @@ import (
 
 	"github.com/LQR471814/marionette"
 )
+
+type TransferHandler struct {
+	state *state.State
+}
+
+func (h TransferHandler) OnTransferRequest(t *api.TransferRequest) chan bool {
+	for _, c := range h.state.TransferRequestChannels {
+		c.Send(t)
+	}
+
+	ch := make(chan bool, 1)
+	h.state.PendingTransfers[t.Id] = ch
+	return ch
+}
+
+func (h TransferHandler) OnTransferUpdate(t *api.TransferState) {
+	for _, c := range h.state.TransferUpdateChannels {
+		c.Send(t)
+	}
+}
 
 type PeersHandler struct {
 	state *state.State
@@ -33,16 +54,17 @@ func (h PeersHandler) OnLeave(from net.IP) {
 }
 
 func (h PeersHandler) OnMessage(from net.IP, message string) {
-	p := h.state.Peers[from.String()]
+	p, ok := h.state.Peers[from.String()]
+	if !ok {
+		log.Println("Discarded message from unknown sender", from)
+		return
+	}
+
 	log.Println(from.String())
 	log.Println("Received message", fmt.Sprintf("\"%v\"", message), "from", p.Name)
 
 	h.state.UpdateMessageChannels(&api.Message{
-		Author: &api.User{
-			Name:     p.Name,
-			IP:       p.IP.String(),
-			FilePort: int32(p.FilePort),
-		},
+		Author:   p.ToProto(),
 		Contents: message,
 	})
 }
@@ -81,7 +103,11 @@ func main() {
 		s.ExitFunc()
 	}()
 
-	go ServeFile(s.Listeners[state.FILE_LISTENER_ID])
+	transfer.Listen(
+		s.Listeners[state.FILE_LISTENER_ID],
+		TransferHandler{state: s},
+	)
+
 	go ServeGUI(s, s.Listeners[state.GUI_LISTENER_ID])
 	go openGUI(s.ListenerPort(state.GUI_LISTENER_ID))
 

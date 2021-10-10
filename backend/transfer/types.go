@@ -1,5 +1,12 @@
 package transfer
 
+import (
+	"ftx/backend/api"
+	"net"
+
+	"github.com/gorilla/websocket"
+)
+
 type Signal struct {
 	Type string
 }
@@ -13,6 +20,49 @@ type File struct {
 	Name string
 	Size int
 	Type string
+}
+
+func (f File) ToProto() *api.File {
+	return &api.File{
+		Name: f.Name,
+		Size: int64(f.Size),
+		Type: f.Type,
+	}
+}
+
+type Transfer struct {
+	From        net.Addr
+	State       State
+	Files       []File
+	CurrentFile int
+	Received    int
+	ID          string
+
+	dataChan chan []byte
+	conn     *websocket.Conn
+}
+
+func (t *Transfer) ToState() *api.TransferState {
+	return &api.TransferState{
+		Id:          t.ID,
+		Currentfile: int32(t.CurrentFile),
+		Received:    int64(t.Received),
+	}
+}
+
+func (t *Transfer) ToRequest() *api.TransferRequest {
+	files := []*api.File{}
+	for _, f := range t.Files {
+		files = append(files, f.ToProto())
+	}
+
+	return &api.TransferRequest{
+		From: &api.User{
+			Ip: t.From.String(),
+		},
+		Id:    t.ID,
+		Files: files,
+	}
 }
 
 //? Note: WriteChunk / recvfilecontents is not present here

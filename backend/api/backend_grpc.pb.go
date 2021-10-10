@@ -23,6 +23,9 @@ type BackendClient interface {
 	SetSetup(ctx context.Context, in *SetSetupRequest, opts ...grpc.CallOption) (*Empty, error)
 	ListenUsers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenUsersClient, error)
 	ListenMessages(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenMessagesClient, error)
+	ListenTransferRequests(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenTransferRequestsClient, error)
+	ListenTransferStates(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenTransferStatesClient, error)
+	TransferChoice(ctx context.Context, in *TransferChoiceRequest, opts ...grpc.CallOption) (*Empty, error)
 	SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error)
 	Quit(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 }
@@ -126,6 +129,79 @@ func (x *backendListenMessagesClient) Recv() (*Message, error) {
 	return m, nil
 }
 
+func (c *backendClient) ListenTransferRequests(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenTransferRequestsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Backend_ServiceDesc.Streams[2], "/api.Backend/ListenTransferRequests", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &backendListenTransferRequestsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Backend_ListenTransferRequestsClient interface {
+	Recv() (*TransferRequest, error)
+	grpc.ClientStream
+}
+
+type backendListenTransferRequestsClient struct {
+	grpc.ClientStream
+}
+
+func (x *backendListenTransferRequestsClient) Recv() (*TransferRequest, error) {
+	m := new(TransferRequest)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *backendClient) ListenTransferStates(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenTransferStatesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Backend_ServiceDesc.Streams[3], "/api.Backend/ListenTransferStates", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &backendListenTransferStatesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Backend_ListenTransferStatesClient interface {
+	Recv() (*TransferState, error)
+	grpc.ClientStream
+}
+
+type backendListenTransferStatesClient struct {
+	grpc.ClientStream
+}
+
+func (x *backendListenTransferStatesClient) Recv() (*TransferState, error) {
+	m := new(TransferState)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *backendClient) TransferChoice(ctx context.Context, in *TransferChoiceRequest, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/api.Backend/TransferChoice", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *backendClient) SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
 	err := c.cc.Invoke(ctx, "/api.Backend/SendMessage", in, out, opts...)
@@ -153,6 +229,9 @@ type BackendServer interface {
 	SetSetup(context.Context, *SetSetupRequest) (*Empty, error)
 	ListenUsers(*Empty, Backend_ListenUsersServer) error
 	ListenMessages(*Empty, Backend_ListenMessagesServer) error
+	ListenTransferRequests(*Empty, Backend_ListenTransferRequestsServer) error
+	ListenTransferStates(*Empty, Backend_ListenTransferStatesServer) error
+	TransferChoice(context.Context, *TransferChoiceRequest) (*Empty, error)
 	SendMessage(context.Context, *MessageRequest) (*Empty, error)
 	Quit(context.Context, *Empty) (*Empty, error)
 	mustEmbedUnimplementedBackendServer()
@@ -176,6 +255,15 @@ func (UnimplementedBackendServer) ListenUsers(*Empty, Backend_ListenUsersServer)
 }
 func (UnimplementedBackendServer) ListenMessages(*Empty, Backend_ListenMessagesServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListenMessages not implemented")
+}
+func (UnimplementedBackendServer) ListenTransferRequests(*Empty, Backend_ListenTransferRequestsServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListenTransferRequests not implemented")
+}
+func (UnimplementedBackendServer) ListenTransferStates(*Empty, Backend_ListenTransferStatesServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListenTransferStates not implemented")
+}
+func (UnimplementedBackendServer) TransferChoice(context.Context, *TransferChoiceRequest) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TransferChoice not implemented")
 }
 func (UnimplementedBackendServer) SendMessage(context.Context, *MessageRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
@@ -292,6 +380,66 @@ func (x *backendListenMessagesServer) Send(m *Message) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Backend_ListenTransferRequests_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(BackendServer).ListenTransferRequests(m, &backendListenTransferRequestsServer{stream})
+}
+
+type Backend_ListenTransferRequestsServer interface {
+	Send(*TransferRequest) error
+	grpc.ServerStream
+}
+
+type backendListenTransferRequestsServer struct {
+	grpc.ServerStream
+}
+
+func (x *backendListenTransferRequestsServer) Send(m *TransferRequest) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Backend_ListenTransferStates_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(BackendServer).ListenTransferStates(m, &backendListenTransferStatesServer{stream})
+}
+
+type Backend_ListenTransferStatesServer interface {
+	Send(*TransferState) error
+	grpc.ServerStream
+}
+
+type backendListenTransferStatesServer struct {
+	grpc.ServerStream
+}
+
+func (x *backendListenTransferStatesServer) Send(m *TransferState) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _Backend_TransferChoice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TransferChoiceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BackendServer).TransferChoice(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/api.Backend/TransferChoice",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BackendServer).TransferChoice(ctx, req.(*TransferChoiceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Backend_SendMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MessageRequest)
 	if err := dec(in); err != nil {
@@ -348,6 +496,10 @@ var Backend_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Backend_SetSetup_Handler,
 		},
 		{
+			MethodName: "TransferChoice",
+			Handler:    _Backend_TransferChoice_Handler,
+		},
+		{
 			MethodName: "SendMessage",
 			Handler:    _Backend_SendMessage_Handler,
 		},
@@ -365,6 +517,16 @@ var Backend_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "ListenMessages",
 			Handler:       _Backend_ListenMessages_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "ListenTransferRequests",
+			Handler:       _Backend_ListenTransferRequests_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "ListenTransferStates",
+			Handler:       _Backend_ListenTransferStates_Handler,
 			ServerStreams: true,
 		},
 	},
