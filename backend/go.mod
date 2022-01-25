@@ -10,7 +10,7 @@ require (
 )
 
 require (
-	github.com/LQR471814/marionette v0.0.3
+	github.com/LQR471814/marionette v0.0.4
 	github.com/LQR471814/zeroconf v1.0.1
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/golang/protobuf v1.5.2 // indirect

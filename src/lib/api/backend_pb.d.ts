@@ -232,10 +232,8 @@ export class MessageRequest extends jspb.Message {
   getTo(): string;
   setTo(value: string): MessageRequest;
 
-  getMessage(): Message | undefined;
-  setMessage(value?: Message): MessageRequest;
-  hasMessage(): boolean;
-  clearMessage(): MessageRequest;
+  getMessage(): string;
+  setMessage(value: string): MessageRequest;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): MessageRequest.AsObject;
@@ -248,7 +246,7 @@ export class MessageRequest extends jspb.Message {
 export namespace MessageRequest {
   export type AsObject = {
     to: string,
-    message?: Message.AsObject,
+    message: string,
   }
 }
 

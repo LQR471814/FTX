@@ -101,7 +101,7 @@ func (s *State) UpdatePeerChannels() {
 		peers = append(peers, p.ToProto())
 	}
 
-	log.Println(s.PeerUpdateChannels)
+	log.Println("Peer Update Channels (gui)", s.PeerUpdateChannels)
 
 	for _, stream := range s.PeerUpdateChannels {
 		stream.Send(&api.UsersResponse{

@@ -123,7 +123,7 @@ func (s *BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest
 		return nil, TargetUserUnknown{}
 	}
 
-	err := peers.Message(to, req.Message.Contents)
+	err := peers.Message(to, req.Message)
 	if err != nil {
 		return nil, err
 	}

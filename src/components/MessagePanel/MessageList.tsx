@@ -5,7 +5,7 @@ import Message from "./Message"
 import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
 import { backend } from "lib/Backend"
-import { MessageRequest, Message as MessageType } from "lib/api/backend_pb"
+import { MessageRequest } from "lib/api/backend_pb"
 import { MessageGroup } from "lib/apptypes"
 
 type Props = {
@@ -92,10 +92,9 @@ function MessageList(props: Props) {
           reply={true}
           onSubmit={(contents: string) => {
             const req = new MessageRequest()
-            const msg = new MessageType()
-            msg.setContents(contents)
-
+            req.setMessage(contents)
             req.setTo(props.IP)
+
             backend.sendMessage(req, null)
 
             ctx.dispatch({

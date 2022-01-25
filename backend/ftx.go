@@ -90,11 +90,17 @@ func main() {
 				log.Fatal(err)
 			}
 
-			if !local {
-				s.Peers[p.IP.String()] = p
-				s.UpdatePeerChannels()
-				log.Println(p)
+			log.Println(p)
+
+			if local &&
+				p.FilePort == s.ListenerPort(state.FILE_LISTENER_ID) &&
+				p.InteractPort == s.ListenerPort(state.INTERACT_LISTENER_ID) {
+				return
 			}
+
+			s.Peers[p.IP.String()] = p
+			s.UpdatePeerChannels()
+			// log.Println(p)
 		},
 	)
 

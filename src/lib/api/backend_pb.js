@@ -2016,7 +2016,7 @@ proto.api.MessageRequest.prototype.toObject = function(opt_includeInstance) {
 proto.api.MessageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     to: jspb.Message.getFieldWithDefault(msg, 1, ""),
-    message: (f = msg.getMessage()) && proto.api.Message.toObject(includeInstance, f)
+    message: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -2058,8 +2058,7 @@ proto.api.MessageRequest.deserializeBinaryFromReader = function(msg, reader) {
       msg.setTo(value);
       break;
     case 2:
-      var value = new proto.api.Message;
-      reader.readMessage(value,proto.api.Message.deserializeBinaryFromReader);
+      var value = /** @type {string} */ (reader.readString());
       msg.setMessage(value);
       break;
     default:
@@ -2099,11 +2098,10 @@ proto.api.MessageRequest.serializeBinaryToWriter = function(message, writer) {
     );
   }
   f = message.getMessage();
-  if (f != null) {
-    writer.writeMessage(
+  if (f.length > 0) {
+    writer.writeString(
       2,
-      f,
-      proto.api.Message.serializeBinaryToWriter
+      f
     );
   }
 };
@@ -2128,39 +2126,20 @@ proto.api.MessageRequest.prototype.setTo = function(value) {
 
 
 /**
- * optional Message message = 2;
- * @return {?proto.api.Message}
+ * optional string message = 2;
+ * @return {string}
  */
 proto.api.MessageRequest.prototype.getMessage = function() {
-  return /** @type{?proto.api.Message} */ (
-    jspb.Message.getWrapperField(this, proto.api.Message, 2));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
 };
 
 
 /**
- * @param {?proto.api.Message|undefined} value
+ * @param {string} value
  * @return {!proto.api.MessageRequest} returns this
-*/
+ */
 proto.api.MessageRequest.prototype.setMessage = function(value) {
-  return jspb.Message.setWrapperField(this, 2, value);
-};
-
-
-/**
- * Clears the message field making it undefined.
- * @return {!proto.api.MessageRequest} returns this
- */
-proto.api.MessageRequest.prototype.clearMessage = function() {
-  return this.setMessage(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.api.MessageRequest.prototype.hasMessage = function() {
-  return jspb.Message.getField(this, 2) != null;
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 
