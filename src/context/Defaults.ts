@@ -1,3 +1,6 @@
+import { BannerStyle, IP, MessageGroup, OverlayState, TransferState } from "lib/apptypes"
+import { AppState } from "./State"
+
 const defaultField = "Loading..."
 
 export function transferStateDefaults(): TransferState {
@@ -23,7 +26,7 @@ export function bannerStylingDefaults(): BannerStyle {
 	}
 }
 
-export function messageGroupDefaults(user: User): MessageGroup {
+export function messageGroupDefaults(user: IP): MessageGroup {
 	return {
 		user: user,
 		messages: [],
@@ -31,11 +34,106 @@ export function messageGroupDefaults(user: User): MessageGroup {
 	}
 }
 
-export function appDefaults(): AppState {
+export function debugDefaults(): AppState {
 	return {
-		showBanner: false,
+		showBanner: true,
 		bannerStyling: bannerStylingDefaults(),
 
+		transferRequests: {
+			"Gaming": {
+				from: "127.0.0.1",
+				files: [
+					{
+						name: "File 1",
+						size: 1000,
+						type: "audio",
+					}
+				],
+			},
+			"Gaming2": {
+				from: "127.0.0.1",
+				files: [],
+			},
+		},
+		activeTransfers: {
+			"gaming2": {
+				outgoing: true,
+				peer: "127.0.0.1",
+				state: {
+					progress: 0.5,
+					status: "Uploading..."
+				},
+				worker: null,
+			},
+			"gaming3": {
+				outgoing: true,
+				peer: "127.0.0.1",
+				state: {
+					progress: 0.5,
+					status: "Uploading..."
+				},
+				worker: null,
+			}
+		},
+		messageGroups: {},
+
+		users: {
+			"127.0.0.1": {
+				ip: "127.0.0.1",
+				name: "Gaming",
+				fileport: 0,
+			},
+			"192.168.1.1": {
+				ip: "192.168.1.1",
+				name: "Gaming2",
+				fileport: 2,
+			}
+		},
+		self: {
+			name: defaultField,
+			ip: defaultField,
+			fileport: 0,
+		},
+		setupInfo: {
+			interfaces: [
+				{
+					address: "fdc3:24b0:afd7:9548",
+					index: 0,
+					name: "Ethernet 1"
+				},
+				{
+					address: "192.168.1.1",
+					index: 3,
+					name: "wifi-kun 1"
+				},
+				{
+					address: "192.168.1.32",
+					index: 7,
+					name: "WLAN 1"
+				},
+				{
+					address: "123.456.789.10",
+					index: 1234567,
+					name: "that one strange network bridge polluting your interface list that came from that one super obscure vpn client you installed some time ago"
+				},
+			]
+		},
+
+		showOverlay: {
+			networkInterfaces: overlayStateDefaults(false),
+			commChoice: overlayStateDefaults(false),
+			uploadRegion: overlayStateDefaults(false),
+		}
+	}
+}
+
+export function appDefaults(): AppState {
+	// return debugDefaults() //! REMOVE THIS WHEN NOT DEBUGGING
+	return {
+		showBanner: true,
+		bannerStyling: bannerStylingDefaults(),
+
+		transferRequests: {},
 		activeTransfers: {},
 		messageGroups: {},
 
@@ -43,7 +141,7 @@ export function appDefaults(): AppState {
 		self: {
 			name: defaultField,
 			ip: defaultField,
-			filePort: 0,
+			fileport: 0,
 		},
 		setupInfo: {
 			interfaces: []

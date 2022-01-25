@@ -1,5 +1,6 @@
 import { createContext, useReducer, useContext } from "react";
 import { appDefaults, messageGroupDefaults } from "./Defaults";
+import { AppState, AppAction } from "./State";
 
 const defaultState = appDefaults()
 
@@ -43,13 +44,13 @@ function appReducer(state: AppState, action: AppAction) {
 
 		case 'group_display':
 			newState.messageGroups[
-				action.id
+				action.peer
 			].displayed = action.display
 			break
 		case 'group_new':
 			newState.messageGroups[
-				action.id
-			] = messageGroupDefaults(newState.users[action.id])
+				action.peer
+			] = messageGroupDefaults(action.peer)
 			break
 
 		case 'message_send':
@@ -62,16 +63,15 @@ function appReducer(state: AppState, action: AppAction) {
 			break
 		case 'message_recv':
 			console.log(action, newState.messageGroups)
-			const user = newState.users[action.from]
 
 			let newGroup = newState.messageGroups[action.from]
 			if (!newGroup) {
-				newGroup = messageGroupDefaults(user)
+				newGroup = messageGroupDefaults(action.from)
 			}
 
 			newGroup.messages.push({
 				content: action.msg,
-				author: user.name,
+				author: action.from,
 			})
 
 			newState.messageGroups[action.from] = newGroup

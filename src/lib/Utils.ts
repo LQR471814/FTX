@@ -1,5 +1,5 @@
+import { IconAssets } from "components/Common/Icon"
 import { RefObject } from "react"
-import "styling/Root.css"
 
 const unique_ids: {
     [key: string]: number
@@ -46,4 +46,58 @@ export function refToHTMLElement(ref: RefObject<any>) {
 export function clickElement(target: HTMLElement) {
     const e = new MouseEvent('click', {})
     target.dispatchEvent(e)
+}
+
+export function getFileLogo(mimeStr: string) {
+	switch (mimeStr) {
+		case "audio":
+			return IconAssets.f_audio
+		case "font":
+			return IconAssets.f_font
+		case "image":
+			return IconAssets.f_image
+		case "video":
+			return IconAssets.f_video
+		case "text":
+			return IconAssets.f_document
+		case "application/zip" || "application/gzip":
+			return IconAssets.f_archive
+        default:
+            return IconAssets.f_default
+	}
+}
+
+const filesizeUnits: {
+    exponent: number,
+    label: string,
+}[] = [
+    {
+        exponent: 12,
+        label: "TB",
+    },
+    {
+        exponent: 9,
+        label: "GB",
+    },
+    {
+        exponent: 6,
+        label: "MB",
+    },
+    {
+        exponent: 3,
+        label: "KB",
+    },
+    {
+        exponent: 0,
+        label: "B",
+    },
+]
+
+export function getFilesizeLabel(size: number) {
+    for (const unit of filesizeUnits) {
+        if (size >= 10**unit.exponent) {
+            return size / 10**unit.exponent + unit.label
+        }
+    }
+    return size + "B"
 }

@@ -1,10 +1,12 @@
 import UploadRegion from "components/UploadRegion/UploadRegion"
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import UploadWorker from 'worker-loader!components/uploader/UploadClient.ts'
+import UploadWorker from 'worker-loader!uploader/UploadClient.ts'
 
 import { useApp } from "context/AppContext"
+import { ManagerBound, WorkerBound } from "uploader/UploadTypes"
+import { v4 as uuidv4 } from "uuid"
+import { UploadContext } from "lib/CascadingContext"
 import { transferStateDefaults } from "context/Defaults"
-import { ManagerBound, WorkerBound } from "components/uploader/UploadTypes"
 
 interface Props {
 	context: UploadContext
@@ -31,7 +33,7 @@ export default function Upload(props: Props) {
 						case 'state':
 							ctx.dispatch({
 								type: "transfer_update",
-								id: props.context.id,
+								id: props.context.peer,
 								state: msg.state
 							})
 
@@ -39,7 +41,7 @@ export default function Upload(props: Props) {
 						case 'done':
 							ctx.dispatch({
 								type: "transfer_update",
-								id: props.context.id,
+								id: props.context.peer,
 								state: {
 									status: "Upload Complete!",
 									progress: NaN
@@ -57,9 +59,11 @@ export default function Upload(props: Props) {
 
 				ctx.dispatch({
 					type: "transfer_new",
-					id: props.context.id,
+					id: uuidv4(),
 					initial: {
 						worker: worker,
+						peer: props.context.peer,
+						outgoing: true,
 						state: transferStateDefaults()
 					}
 				})
@@ -68,7 +72,7 @@ export default function Upload(props: Props) {
 					type: 'start',
 					context: {
 						files: Array.from(files),
-						server: `ws://${props.context.id}:${props.context.port}`,
+						server: `ws://${props.context.peer}:${props.context.port}`,
 					}
 				} as WorkerBound)
 			}

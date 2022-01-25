@@ -1,28 +1,27 @@
 import { Component, createRef, useEffect } from "react"
-import "./css/ChoiceOverlay.css"
-import 'styling/Root.css'
 import Overlay from 'components/Overlay/Overlay'
 import Choice from "./Choice"
 import { refToHTMLElement, transitionEffectOffset } from "lib/Utils"
 import { uniqueId } from "lib/Utils"
-import CancelButton from "components/Misc/CancelButton"
+import CancelButton from "components/Common/CancelButton"
+import { Primitive } from "lib/apptypes"
+import { IconAssets } from "components/Common/Icon"
 
 type Item = {
   label: string
   identifier: Primitive
-  icon: any
+  icon: IconAssets
 }
 
 type Props = {
   chosenCallback: (identifier: Primitive | undefined) => void //? Gets called when an item is chosen
   mainLabel: string //? The main text at the top of the Choices overlay
   componentID: string //? distinguish other Choices components from each other
-  items: Array<Item> //? List of items
+  items: Item[] //? List of items
 }
 
 export default function ChoicesContainer(props: Props) {
   const rootContainerRef = createRef<HTMLDivElement>()
-  const closeButtonRef = createRef<HTMLDivElement>()
   const choicesContainerRef = createRef<ChoiceElementsContainer>()
 
   //* Because setting the "shrink" state in ChoicesContainer component re-rendered the entire component making all the refs null I decided to put ChoicesContainer div into it's own component
@@ -42,7 +41,13 @@ export default function ChoicesContainer(props: Props) {
 
     render() {
       return (
-        <div className="ChoiceContainer">
+        <div
+          className={[
+            "flex mx-auto mb-[5%] flex-wrap centered",
+            "gap-1 max-h-screen w-[95%]",
+            "transition-opacity duration-300",
+          ].join(' ')}
+        >
           {props.items.map(
             (arrayItem) =>
               <Choice
@@ -95,12 +100,13 @@ export default function ChoicesContainer(props: Props) {
 
   return (
     <Overlay dontHandleClose={true}>
-      <div style={{
-        display: "block",
-        opacity: "0%",
-        transition: "0.5s ease-in-out all"
-      }} ref={rootContainerRef}>
-        <p className="Info">{props.mainLabel}</p>
+      <div className='block opacity-0 transition-all duration-500' ref={rootContainerRef}>
+        <p className={[
+          'grid-cols-full mt-[12vh] mb-[5vh]',
+          'text-center select-none',
+          'font-regular-bold text-highlight text-3xl leading-none',
+          'min-w-0 min-h-0 break-words max-w-full'
+        ].join(' ')}>{props.mainLabel}</p>
 
         <ChoiceElementsContainer
           componentID={props.componentID}
@@ -109,7 +115,6 @@ export default function ChoicesContainer(props: Props) {
         />
 
         <CancelButton
-          refObj={closeButtonRef}
           size={0.03}
           onClick={() => {
             closeChoice(undefined)

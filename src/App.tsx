@@ -1,20 +1,21 @@
 import { useEffect } from "react"
 import { useApp } from "context/AppContext"
 
-import Window from "components/Layout/Window/Window"
-import ArrayLayout from "components/Layout/Array/Array"
+import Window from "components/Layout/Window"
+import ArrayLayout from "components/Layout/Array"
 
 import MessageComponent from "components/MessagePanel/MessageComponent"
 import UserList from "components/UserList/UserList"
-import TransferStatus from "components/TransferStatus/TransferStatus"
-import PendingTransfers from "components/PendingTransfers/PendingTransfers"
+import TransferStatus from "components/Transfer/TransferStatus"
+import PendingTransfers from "components/Transfer/PendingTransfers"
 
 import OverlayManager from "components/OverlayControllers/OverlayManager"
 import BannerController from "components/Banner/BannerController"
 
 import { initializeBackend } from "lib/Backend"
 import { backend } from "lib/Backend"
-import { Empty, GetSetupResponse, Message, SelfResponse, UsersResponse } from "lib/api/backend_pb"
+import { Empty, GetSetupResponse, SelfResponse, Message, UsersResponse } from "lib/api/backend_pb"
+import { Interface, User } from "lib/apptypes"
 
 initializeBackend()
 
@@ -63,7 +64,7 @@ export default function App() {
 
       ctx.dispatch({
         type: "message_recv",
-        from: msg.getAuthor()!.getIp(),
+        from: msg.getAuthor(),
         msg: msg.getContents(),
       })
     })
@@ -77,7 +78,7 @@ export default function App() {
 				users[u.getIp()] = {
 					name: u.getName(),
 					ip: u.getIp(),
-          filePort: u.getFileport(),
+          fileport: u.getFileport(),
 				}
 			}
 
@@ -91,7 +92,7 @@ export default function App() {
   }, [])
 
   return (
-    <div className="AppRoot">
+    <div className="block h-screen w-screen overflow-auto p-2 box-border">
       <ArrayLayout childrenSizes="min-content minmax(0, 1fr)">
         <BannerController />
 
@@ -109,7 +110,7 @@ export default function App() {
 
             <ArrayLayout rows={true}>
               <Window title="Pending Transfers">
-                <PendingTransfers />
+                <PendingTransfers transfers={ctx.state.transferRequests} />
               </Window>
               <Window title="Transfer Status">
                 <TransferStatus activeTransfers={

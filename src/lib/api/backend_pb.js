@@ -685,7 +685,7 @@ proto.api.TransferState.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, ""),
     currentfile: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    received: jspb.Message.getFieldWithDefault(msg, 3, 0)
+    progress: jspb.Message.getFloatingPointFieldWithDefault(msg, 3, 0.0)
   };
 
   if (includeInstance) {
@@ -731,8 +731,8 @@ proto.api.TransferState.deserializeBinaryFromReader = function(msg, reader) {
       msg.setCurrentfile(value);
       break;
     case 3:
-      var value = /** @type {number} */ (reader.readInt64());
-      msg.setReceived(value);
+      var value = /** @type {number} */ (reader.readFloat());
+      msg.setProgress(value);
       break;
     default:
       reader.skipField();
@@ -777,9 +777,9 @@ proto.api.TransferState.serializeBinaryToWriter = function(message, writer) {
       f
     );
   }
-  f = message.getReceived();
-  if (f !== 0) {
-    writer.writeInt64(
+  f = message.getProgress();
+  if (f !== 0.0) {
+    writer.writeFloat(
       3,
       f
     );
@@ -824,11 +824,11 @@ proto.api.TransferState.prototype.setCurrentfile = function(value) {
 
 
 /**
- * optional int64 received = 3;
+ * optional float progress = 3;
  * @return {number}
  */
-proto.api.TransferState.prototype.getReceived = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
+proto.api.TransferState.prototype.getProgress = function() {
+  return /** @type {number} */ (jspb.Message.getFloatingPointFieldWithDefault(this, 3, 0.0));
 };
 
 
@@ -836,8 +836,8 @@ proto.api.TransferState.prototype.getReceived = function() {
  * @param {number} value
  * @return {!proto.api.TransferState} returns this
  */
-proto.api.TransferState.prototype.setReceived = function(value) {
-  return jspb.Message.setProto3IntField(this, 3, value);
+proto.api.TransferState.prototype.setProgress = function(value) {
+  return jspb.Message.setProto3FloatField(this, 3, value);
 };
 
 
@@ -880,8 +880,8 @@ proto.api.TransferRequest.prototype.toObject = function(opt_includeInstance) {
  */
 proto.api.TransferRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
+    from: jspb.Message.getFieldWithDefault(msg, 1, ""),
     id: jspb.Message.getFieldWithDefault(msg, 3, ""),
-    from: (f = msg.getFrom()) && proto.api.User.toObject(includeInstance, f),
     filesList: jspb.Message.toObjectList(msg.getFilesList(),
     proto.api.File.toObject, includeInstance)
   };
@@ -920,14 +920,13 @@ proto.api.TransferRequest.deserializeBinaryFromReader = function(msg, reader) {
     }
     var field = reader.getFieldNumber();
     switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setFrom(value);
+      break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
       msg.setId(value);
-      break;
-    case 1:
-      var value = new proto.api.User;
-      reader.readMessage(value,proto.api.User.deserializeBinaryFromReader);
-      msg.setFrom(value);
       break;
     case 2:
       var value = new proto.api.File;
@@ -963,19 +962,18 @@ proto.api.TransferRequest.prototype.serializeBinary = function() {
  */
 proto.api.TransferRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
+  f = message.getFrom();
+  if (f.length > 0) {
+    writer.writeString(
+      1,
+      f
+    );
+  }
   f = message.getId();
   if (f.length > 0) {
     writer.writeString(
       3,
       f
-    );
-  }
-  f = message.getFrom();
-  if (f != null) {
-    writer.writeMessage(
-      1,
-      f,
-      proto.api.User.serializeBinaryToWriter
     );
   }
   f = message.getFilesList();
@@ -986,6 +984,24 @@ proto.api.TransferRequest.serializeBinaryToWriter = function(message, writer) {
       proto.api.File.serializeBinaryToWriter
     );
   }
+};
+
+
+/**
+ * optional string from = 1;
+ * @return {string}
+ */
+proto.api.TransferRequest.prototype.getFrom = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.api.TransferRequest} returns this
+ */
+proto.api.TransferRequest.prototype.setFrom = function(value) {
+  return jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
@@ -1004,43 +1020,6 @@ proto.api.TransferRequest.prototype.getId = function() {
  */
 proto.api.TransferRequest.prototype.setId = function(value) {
   return jspb.Message.setProto3StringField(this, 3, value);
-};
-
-
-/**
- * optional User from = 1;
- * @return {?proto.api.User}
- */
-proto.api.TransferRequest.prototype.getFrom = function() {
-  return /** @type{?proto.api.User} */ (
-    jspb.Message.getWrapperField(this, proto.api.User, 1));
-};
-
-
-/**
- * @param {?proto.api.User|undefined} value
- * @return {!proto.api.TransferRequest} returns this
-*/
-proto.api.TransferRequest.prototype.setFrom = function(value) {
-  return jspb.Message.setWrapperField(this, 1, value);
-};
-
-
-/**
- * Clears the message field making it undefined.
- * @return {!proto.api.TransferRequest} returns this
- */
-proto.api.TransferRequest.prototype.clearFrom = function() {
-  return this.setFrom(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.api.TransferRequest.prototype.hasFrom = function() {
-  return jspb.Message.getField(this, 1) != null;
 };
 
 
@@ -1304,7 +1283,7 @@ proto.api.Message.prototype.toObject = function(opt_includeInstance) {
  */
 proto.api.Message.toObject = function(includeInstance, msg) {
   var f, obj = {
-    author: (f = msg.getAuthor()) && proto.api.User.toObject(includeInstance, f),
+    author: jspb.Message.getFieldWithDefault(msg, 1, ""),
     contents: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
@@ -1343,8 +1322,7 @@ proto.api.Message.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new proto.api.User;
-      reader.readMessage(value,proto.api.User.deserializeBinaryFromReader);
+      var value = /** @type {string} */ (reader.readString());
       msg.setAuthor(value);
       break;
     case 2:
@@ -1381,11 +1359,10 @@ proto.api.Message.prototype.serializeBinary = function() {
 proto.api.Message.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getAuthor();
-  if (f != null) {
-    writer.writeMessage(
+  if (f.length > 0) {
+    writer.writeString(
       1,
-      f,
-      proto.api.User.serializeBinaryToWriter
+      f
     );
   }
   f = message.getContents();
@@ -1399,39 +1376,20 @@ proto.api.Message.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional User author = 1;
- * @return {?proto.api.User}
+ * optional string author = 1;
+ * @return {string}
  */
 proto.api.Message.prototype.getAuthor = function() {
-  return /** @type{?proto.api.User} */ (
-    jspb.Message.getWrapperField(this, proto.api.User, 1));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /**
- * @param {?proto.api.User|undefined} value
+ * @param {string} value
  * @return {!proto.api.Message} returns this
-*/
+ */
 proto.api.Message.prototype.setAuthor = function(value) {
-  return jspb.Message.setWrapperField(this, 1, value);
-};
-
-
-/**
- * Clears the message field making it undefined.
- * @return {!proto.api.Message} returns this
- */
-proto.api.Message.prototype.clearAuthor = function() {
-  return this.setAuthor(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.api.Message.prototype.hasAuthor = function() {
-  return jspb.Message.getField(this, 1) != null;
+  return jspb.Message.setProto3StringField(this, 1, value);
 };
 
 
@@ -2057,7 +2015,7 @@ proto.api.MessageRequest.prototype.toObject = function(opt_includeInstance) {
  */
 proto.api.MessageRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    to: (f = msg.getTo()) && proto.api.User.toObject(includeInstance, f),
+    to: jspb.Message.getFieldWithDefault(msg, 1, ""),
     message: (f = msg.getMessage()) && proto.api.Message.toObject(includeInstance, f)
   };
 
@@ -2096,8 +2054,7 @@ proto.api.MessageRequest.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new proto.api.User;
-      reader.readMessage(value,proto.api.User.deserializeBinaryFromReader);
+      var value = /** @type {string} */ (reader.readString());
       msg.setTo(value);
       break;
     case 2:
@@ -2135,11 +2092,10 @@ proto.api.MessageRequest.prototype.serializeBinary = function() {
 proto.api.MessageRequest.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
   f = message.getTo();
-  if (f != null) {
-    writer.writeMessage(
+  if (f.length > 0) {
+    writer.writeString(
       1,
-      f,
-      proto.api.User.serializeBinaryToWriter
+      f
     );
   }
   f = message.getMessage();
@@ -2154,39 +2110,20 @@ proto.api.MessageRequest.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional User to = 1;
- * @return {?proto.api.User}
+ * optional string to = 1;
+ * @return {string}
  */
 proto.api.MessageRequest.prototype.getTo = function() {
-  return /** @type{?proto.api.User} */ (
-    jspb.Message.getWrapperField(this, proto.api.User, 1));
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 1, ""));
 };
 
 
 /**
- * @param {?proto.api.User|undefined} value
+ * @param {string} value
  * @return {!proto.api.MessageRequest} returns this
-*/
+ */
 proto.api.MessageRequest.prototype.setTo = function(value) {
-  return jspb.Message.setWrapperField(this, 1, value);
-};
-
-
-/**
- * Clears the message field making it undefined.
- * @return {!proto.api.MessageRequest} returns this
- */
-proto.api.MessageRequest.prototype.clearTo = function() {
-  return this.setTo(undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.api.MessageRequest.prototype.hasTo = function() {
-  return jspb.Message.getField(this, 1) != null;
+  return jspb.Message.setProto3StringField(this, 1, value);
 };
 
 

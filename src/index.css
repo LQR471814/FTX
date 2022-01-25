@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "OpenSansRegular";
+  src: url("fonts/OpenSans/opensans-regular-webfont.woff2") format("woff2");
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "OpenSansBold";
+  src: url("fonts/OpenSans/opensans-bold-webfont.woff2") format("woff2"),
+    url("fonts/OpenSans/opensans-bold-webfont.woff") format("woff");
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "SourceSansPro";
+  src: url("fonts/SourceSansPro/SourceSansPro-Regular.ttf") format("truetype");
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "PTMono-Regular";
+  src: url("fonts/PTMono/PTMono-Regular.woff") format("woff");
+  font-weight: normal;
+}
+
+@layer base {
+	.font-regular {
+		font-family: "OpenSansRegular";
+	}
+
+	.font-regular-bold {
+		font-family: "OpenSansBold", Arial, Helvetica, sans-serif;
+	}
+
+	.font-alternative {
+		font-family: "SourceSansPro";
+	}
+
+	.font-mono {
+		font-family: "PTMono-Regular";
+	}
+
+	.max-w-xxs {
+		max-width: 180px;
+	}
+}
+
+@layer utilities {
+	.centered {
+		@apply items-center justify-center
+	}
+
+	.boxover {
+		@apply top-0 left-0 w-full h-full absolute
+	}
+
+	.grid-cols-full {
+		grid-column: 1 / -1;
+	}
+}
+
+@layer components {
+	.component-container {
+		@apply overflow-y-auto p-4 h-full rounded-xl bg-dark;
+	}
+
+	.title {
+		@apply font-regular-bold text-highlight mb-2 mx-1;
+	}
+
+	.std-text {
+		@apply text-highlight mb-1 leading-5
+	}
+
+	.dropdown-gradient {
+		background: rgb(66,66,66);
+		background: linear-gradient(180deg, rgba(66,66,66,1) 0%, rgba(255,255,255,0) 80%);
+	}
+}
+
+div {
+  display: flex;
+}
+
+p, span {
+  font-family: "SourceSansPro";
+}
+
+/* Width */
+::-webkit-scrollbar {
+  width: 20px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: var(--very-round);
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  border-radius: var(--very-round);
+  background: var(--active-darker);
+
+  background-clip: content-box;
+  border: 7px solid transparent;
+}

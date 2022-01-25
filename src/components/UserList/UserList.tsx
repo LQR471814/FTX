@@ -1,9 +1,7 @@
-import "styling/Widget.css"
-import "./css/UserList.css"
-
 import UserComponent from "./User"
 import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
+import { User } from "lib/apptypes"
 
 export default function UserList() {
   const ctx = useApp()
@@ -15,14 +13,14 @@ export default function UserList() {
       overlay: 'commChoice',
       display: true,
       context: {
-        id: user.ip,
-        port: user.filePort
+        peer: user.ip,
+        port: user.fileport
       }
     })
   }
 
   return (
-    <div className="ComponentContainer">
+    <div className="component-container">
       {Object.values(users).map((user) => {
         return (
           <UserComponent
@@ -34,10 +32,7 @@ export default function UserList() {
       })}
 
       {Object.keys(users).length === 0 ?
-        <p
-          className="Tag"
-          style={{ maxWidth: "190px", margin: "auto", padding: "10px" }}
-        >
+        <p className="title m-auto p-3">
           There are currently no peers to interact with ):
         </p>
         : undefined}

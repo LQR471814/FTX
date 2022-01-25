@@ -1,4 +1,5 @@
 import { useApp } from "context/AppContext"
+import { OverlayType } from "lib/apptypes"
 import { uniqueId } from "lib/Utils"
 import React, { createElement, FC } from "react"
 import CommChoice from "./CommChoice"

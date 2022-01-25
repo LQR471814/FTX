@@ -1,5 +1,10 @@
 {
   "recommendations": [
-    "arcanis.vscode-zipfs"
+    "danileao.css-variables-autocomplete",
+    "clinyong.vscode-css-modules",
+    "zxh404.vscode-proto3",
+    "aaron-bond.better-comments",
+    "golang.go",
+    "dsznajder.es7-react-js-snippets",
   ]
 }

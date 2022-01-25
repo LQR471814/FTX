@@ -1,8 +1,11 @@
 {
   "cSpell.words": [
     "apptypes",
+    "browserslist",
     "CSRF",
     "cwebsocket",
+    "fileport",
+    "Filesize",
     "grpc",
     "grpcweb",
     "ifaces",
@@ -11,6 +14,7 @@
     "netintfs",
     "protoc",
     "Uncollapsed",
+    "uuidv",
     "Wifi",
     "Wlan"
   ],

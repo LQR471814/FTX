@@ -1,25 +1,23 @@
-import "./css/Message.css"
+import MessageInput from "./MessageInput"
 
 type Props = {
-  text?: string,
+  text?: string
   author?: string
-
-  children?: React.ReactChild
+  reply?: boolean
+  onSubmit?: (value: string) => void
 }
 
 export default function Message(props: Props) {
   return (
-    <div className="Message">
-      {props.children ? props.children : null}
-
-      {(props.text && props.author) ? (
-        <div className="Block" style={{
-          wordBreak: "break-word",
-        }}>
-          <p className="MessageAuthor">{props.author}</p>
-          <p className="MessageContent">{props.text}</p>
-        </div>
-      ) : null}
+    <div className="block p-3 mx-2 my-4 bg-neutral rounded-xl drop-shadow-lg break-words">
+      <p className="m-0 font-regular-bold text-lg text-active">
+        {props.reply ? "Reply" : props.author}
+      </p>
+      <p className="m-1 font-regular-bold text-xl text-highlight">
+        {props.reply
+            ? <MessageInput onSubmit={props.onSubmit!} />
+            : props.text}
+      </p>
     </div>
   )
 }

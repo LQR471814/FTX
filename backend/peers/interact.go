@@ -42,7 +42,6 @@ func SendToPeer(to state.Peer, buf []byte) error {
 
 func Message(to state.Peer, message string) error {
 	msg := constructMessagePacket(message)
-
 	err := SendToPeer(to, msg)
 	if err != nil {
 		return err

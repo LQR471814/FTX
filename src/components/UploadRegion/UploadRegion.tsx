@@ -1,7 +1,5 @@
 import Overlay from 'components/Overlay/Overlay'
-import "./css/UploadRegion.css"
-import "styling/Widget.css"
-import UploaderGUI from './Uploader/UploaderGUI'
+import UploaderGUI from './UploaderGUI'
 import { transitionEffectOffset } from 'lib/Utils'
 
 type Props = {
@@ -33,7 +31,13 @@ export default function UploadRegion(props: Props) {
         props.onChosen(null)
       })
     }}>
-      <div className="UploadRegionContainer" id="upload-region-root" style={{ opacity: '0' }}>
+      <div
+        className={[
+          "flex centered w-full h-full opacity-0",
+          "transition-all duration-200",
+        ].join(' ')}
+        id="upload-region-root"
+      >
         <UploaderGUI onChosen={onFileChosen} />
       </div>
     </Overlay>

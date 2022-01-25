@@ -1,6 +1,5 @@
 import { transitionEffectOffset } from "lib/Utils"
 import { createRef, useState } from "react"
-import "./css/MessageInput.css"
 
 type Props = {
 	onSubmit: (text: string) => void
@@ -11,7 +10,7 @@ export default function MessageInput(props: Props) {
 	const submitButtonRef = createRef<HTMLDivElement>()
 
 	const inputContainerStyle = {
-		padding: "10px 5px 5px 5px",
+		padding: "10px 2px 5px 2px",
 		overflow: "hidden",
 	}
 
@@ -69,26 +68,16 @@ export default function MessageInput(props: Props) {
 
 	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setMsg(e.target.value)
-
-		if (e.target.value !== "") {
-			setButtonVisibility(true)
-		} else {
-			setButtonVisibility(false)
-		}
+		setButtonVisibility(e.target.value.length > 0)
 	}
 
 	const onEnterPressed = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key !== "Enter") {
-			return
-		}
-
+		if (e.key !== "Enter") return
 		submit()
 	}
 
 	const submit = () => {
-		if (msg === "") {
-			return
-		}
+		if (msg === "") return
 
 		setMsg("")
 		props.onSubmit(msg)
@@ -105,45 +94,48 @@ export default function MessageInput(props: Props) {
 	}
 
 	return (
-		<div className="Block">
-			<p className="MessageAuthor">Reply</p>
+		<div style={inputContainerStyle}>
+			<input
+				tabIndex={-1}
+				className={[
+					"font-mono text-sm text-lightest",
+					"p-2.5 w-full rounded-xl bg-neutral-light",
+					"drop-shadow transition-all",
+					"outline-none border-none",
+					"placeholder:text-white",
+					"focus:border-2 focus:border-solid focus:border-dark",
+				].join(" ")}
+				placeholder="Message"
+				value={msg}
+				onChange={onChange}
+				onKeyDown={onEnterPressed}
+			/>
+
 			<div
-				style={inputContainerStyle}
+				className={[
+					"outline-none centered",
+					"rounded-xl overflow-hidden transition-all duration-100",
+					"hover:cursor-pointer hover:border-2 hover:border-solid hover:border-lightest",
+					"active:border-2 active:bg-accept",
+				].join(" ")}
+				onClick={submit}
+				ref={submitButtonRef}
+				style={{
+					...submitButtonStyle.normalColoring,
+					width: submitButtonStyle.widths.hidden
+				}}
 			>
-
-				<input
-					tabIndex={-1}
-					className="InputField"
-					placeholder="Message"
-					value={msg}
-					onChange={onChange}
-					onKeyDown={onEnterPressed}
-				/>
-
-				<div
-					className="SubmitButton"
-					onClick={submit}
-					ref={submitButtonRef}
+				<svg
+					width="13px"
+					height="13px"
+					viewBox="0 0 935.31 1080"
+					className="fill-neutral"
 					style={{
-						...submitButtonStyle.normalColoring,
-						width: submitButtonStyle.widths.hidden
+						margin: "auto"
 					}}
 				>
-
-					<svg
-						width="13px"
-						height="13px"
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 935.31 1080"
-						style={{
-							fill: "var(--neutral)",
-							margin: "auto"
-						}}
-					>
-						<polygon points="935.31 540 0 0 0 1080 935.31 540" />
-					</svg>
-
-				</div>
+					<polygon points="935.31 540 0 0 0 1080 935.31 540" />
+				</svg>
 			</div>
 		</div>
 	)

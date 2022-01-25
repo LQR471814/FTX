@@ -46,7 +46,7 @@ func (t *Transfer) ToState() *api.TransferState {
 	return &api.TransferState{
 		Id:          t.ID,
 		Currentfile: int32(t.CurrentFile),
-		Received:    int64(t.Received),
+		Progress:    float32(t.Received) / float32(t.Files[t.CurrentFile].Size),
 	}
 }
 
@@ -57,17 +57,14 @@ func (t *Transfer) ToRequest() *api.TransferRequest {
 	}
 
 	return &api.TransferRequest{
-		From: &api.User{
-			Ip: t.From.String(),
-		},
+		From:  t.From.String(),
 		Id:    t.ID,
 		Files: files,
 	}
 }
 
 //? Note: WriteChunk / recvfilecontents is not present here
-//?  because it would make things unnecessarily complex and
-//?  ineffecient
+//?  because it would make things unnecessarily complex and inefficient
 
 //?  The logic is still implemented, it's just not through the handlers
 

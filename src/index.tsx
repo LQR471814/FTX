@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom'
-import 'styling/Root.css'
+import './index.css'
 import App from './App'
 import { AppProvider } from './context/AppContext'
 

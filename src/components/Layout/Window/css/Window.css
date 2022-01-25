@@ -1,9 +1,0 @@
-.Window {
-  display: flex;
-  flex-direction: column;
-
-  background-color: var(--neutral-lighter);
-  margin: 5px;
-  padding: 10px;
-  border-radius: var(--round);
-}

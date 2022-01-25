@@ -3,12 +3,10 @@ import ChoicesContainer from "components/Choice/ChoicesContainer"
 import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
 
-import { ReactComponent as OtherIcon } from "styling/assets/other.svg"
-import { ReactComponent as WifiIcon } from "styling/assets/interfaceLogos/wifi.svg"
-import { ReactComponent as EthernetIcon } from "styling/assets/interfaceLogos/ethernet.svg"
-
 import { NetworkInterface, SetSetupRequest } from "lib/api/backend_pb"
 import { backend } from "lib/Backend"
+import { Interface, Primitive } from "lib/apptypes"
+import { IconAssets } from "components/Common/Icon"
 
 const wifiKeywords = [
   "wi-fi",
@@ -77,19 +75,15 @@ export default function Interfaces() {
       items={
         ctx.state.setupInfo.interfaces.map(
           (intf: Interface) => {
-            const item = {
+            return {
               label: `${intf.name} [${intf.address}]`,
-              icon: OtherIcon,
+              icon: containsKeywords(intf.name, wifiKeywords)
+                ? IconAssets.i_wifi
+                : containsKeywords(intf.name, lanKeywords)
+                    ? IconAssets.i_ethernet
+                    : IconAssets.i_other,
               identifier: intf.index,
             }
-
-            if (containsKeywords(intf.name, wifiKeywords)) {
-              item.icon = WifiIcon
-            } else if (containsKeywords(intf.name, lanKeywords)) {
-              item.icon = EthernetIcon
-            }
-
-            return item
           }
         )
       }

@@ -1,16 +1,12 @@
 //? This component acts as a SINGLE message group containing a reply box and a bunch of messages
 
-import { createRef, useCallback, useEffect } from "react"
-import "styling/Widget.css"
-import "styling/Root.css"
-import "./css/MessagePanel.css"
-
+import { createRef, useCallback, useEffect, useRef } from "react"
 import Message from "./Message"
-import MessageInput from "./MessageInput"
 import { useApp } from "context/AppContext"
 import { uniqueId } from "lib/Utils"
 import { backend } from "lib/Backend"
-import { MessageRequest, Message as MessageType, User } from "lib/api/backend_pb"
+import { MessageRequest, Message as MessageType } from "lib/api/backend_pb"
+import { MessageGroup } from "lib/apptypes"
 
 type Props = {
   group: MessageGroup
@@ -19,61 +15,67 @@ type Props = {
 
 function MessageList(props: Props) {
   const groupContainerRef = createRef<HTMLDivElement>()
-  const messageGroupCollapsibleRef = createRef<HTMLDivElement>()
+  const collapsibleRef = createRef<HTMLDivElement>()
+
+  const baseGroupClass = "block p-1 transition-all duration-300 overflow-hidden"
+  const hiddenGroup = "max-h-0"
+  const displayedGroup = "max-h-auto dropdown-gradient p-3"
+
+  const groupAddendum = useRef(hiddenGroup);
+
+  const baseCollapsibleClass = [
+    "block bg-neutral-light bg-opacity-50 p-3 border-active",
+    "transition-all duration-100",
+    "hover:bg-opacity-70 hover:cursor-pointer hover:border-2",
+    "active:bg-opacity-100 active:border-neutral"
+  ].join(' ')
+  const hiddenCollapsible = "rounded-2xl"
+  const displayedCollapsible = "rounded-t-2xl"
+
+  const collapsibleAddendum = useRef(hiddenCollapsible)
 
   const ctx = useApp()
+
+  const createClass = (base: string, addendum: string) =>
+    base + ' ' + addendum
 
   const onToggleCollapse = () => {
     ctx.dispatch({
       type: 'group_display',
       display: !props.group.displayed,
-      id: props.IP
+      peer: props.IP
     })
   }
 
   const display = useCallback((display: boolean) => {
-    if (!display) {
-      groupContainerRef.current!.style.maxHeight = "0px"
-      return
-    }
+    const newGroupAddendum = display ? displayedGroup : hiddenGroup
+    const newCollapsibleAddendum = display ? displayedCollapsible : hiddenCollapsible
 
-    Object.assign(groupContainerRef.current!.style, {
-      background: '',
-      maxHeight: groupContainerRef.current!.scrollHeight.toString() + "px"
-    })
+    groupAddendum.current = newGroupAddendum
+    groupContainerRef.current!.className = `${baseGroupClass} ${newGroupAddendum}`
 
-    groupContainerRef.current!.classList.add('Uncollapsed')
-    messageGroupCollapsibleRef.current!.classList.add('Uncollapsed')
-
-    messageGroupCollapsibleRef.current!.style.borderRadius = "var(--very-round) var(--very-round) 0px 0px"
-  }, [groupContainerRef, messageGroupCollapsibleRef])
-
-  const onCollapseFinish = () => {
-    if (groupContainerRef.current!.style.maxHeight === "0px") {
-      groupContainerRef.current!.style.background = 'none'
-
-      messageGroupCollapsibleRef.current!.classList.remove('Uncollapsed')
-      messageGroupCollapsibleRef.current!.style.borderRadius = ""
-    }
-  }
+    collapsibleAddendum.current = newCollapsibleAddendum
+    collapsibleRef.current!.className = `${baseCollapsibleClass} ${newCollapsibleAddendum}`
+  }, [baseCollapsibleClass, collapsibleRef, groupContainerRef])
 
   useEffect(() => {
     display(props.group.displayed)
   }, [props.group.displayed, display])
 
   return (
-    <div className="MessageList">
+    <div className="block w-full mb-3">
       <div
-        className="MessageGroupCollapsible"
+        className={baseCollapsibleClass}
         onClick={onToggleCollapse}
-        ref={messageGroupCollapsibleRef}
+        ref={collapsibleRef}
       >
-        <span className="MessageGroupUser">{props.group.user.name}</span>
+        <span className="font-regular-bold text-highlight m-1 text-3xl select-none">
+          {ctx.state.users[props.group.user].name}
+        </span>
       </div>
 
       <div
-        className="MessageGroupContainer"
-        onTransitionEnd={onCollapseFinish}
+        className={createClass(baseGroupClass, groupAddendum.current)}
         ref={groupContainerRef}
       >
         {props.group.messages.map((message) => {
@@ -86,23 +88,14 @@ function MessageList(props: Props) {
           )
         })}
 
-        <Message>
-          <MessageInput onSubmit={(contents: string) => {
+        <Message
+          reply={true}
+          onSubmit={(contents: string) => {
             const req = new MessageRequest()
-
-            const author = new User()
-            author.setName(ctx.state.self.name)
-            author.setIp(ctx.state.self.ip)
-
             const msg = new MessageType()
             msg.setContents(contents)
-            msg.setAuthor(author)
 
-            const to = new User()
-            to.setIp(props.IP)
-
-            req.setMessage(msg)
-            req.setTo(to)
+            req.setTo(props.IP)
             backend.sendMessage(req, null)
 
             ctx.dispatch({
@@ -110,9 +103,8 @@ function MessageList(props: Props) {
               msg: contents,
               destination: props.IP
             })
-          }} />
-        </Message>
-
+          }}
+        />
       </div>
     </div>
   )

@@ -174,9 +174,6 @@ func actionHandler(t *Transfer, action Action) {
 
 func Listen(listener net.Listener, h TransferHandlers) {
 	handlers = h
-	server := http.Server{
-		Handler: http.HandlerFunc(Handler),
-	}
-
+	server := http.Server{Handler: http.HandlerFunc(Handler)}
 	server.Serve(listener)
 }

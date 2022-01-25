@@ -57,8 +57,8 @@ export class TransferState extends jspb.Message {
   getCurrentfile(): number;
   setCurrentfile(value: number): TransferState;
 
-  getReceived(): number;
-  setReceived(value: number): TransferState;
+  getProgress(): number;
+  setProgress(value: number): TransferState;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TransferState.AsObject;
@@ -72,18 +72,16 @@ export namespace TransferState {
   export type AsObject = {
     id: string,
     currentfile: number,
-    received: number,
+    progress: number,
   }
 }
 
 export class TransferRequest extends jspb.Message {
+  getFrom(): string;
+  setFrom(value: string): TransferRequest;
+
   getId(): string;
   setId(value: string): TransferRequest;
-
-  getFrom(): User | undefined;
-  setFrom(value?: User): TransferRequest;
-  hasFrom(): boolean;
-  clearFrom(): TransferRequest;
 
   getFilesList(): Array<File>;
   setFilesList(value: Array<File>): TransferRequest;
@@ -100,8 +98,8 @@ export class TransferRequest extends jspb.Message {
 
 export namespace TransferRequest {
   export type AsObject = {
+    from: string,
     id: string,
-    from?: User.AsObject,
     filesList: Array<File.AsObject>,
   }
 }
@@ -133,10 +131,8 @@ export namespace User {
 }
 
 export class Message extends jspb.Message {
-  getAuthor(): User | undefined;
-  setAuthor(value?: User): Message;
-  hasAuthor(): boolean;
-  clearAuthor(): Message;
+  getAuthor(): string;
+  setAuthor(value: string): Message;
 
   getContents(): string;
   setContents(value: string): Message;
@@ -151,7 +147,7 @@ export class Message extends jspb.Message {
 
 export namespace Message {
   export type AsObject = {
-    author?: User.AsObject,
+    author: string,
     contents: string,
   }
 }
@@ -233,10 +229,8 @@ export namespace SetSetupRequest {
 }
 
 export class MessageRequest extends jspb.Message {
-  getTo(): User | undefined;
-  setTo(value?: User): MessageRequest;
-  hasTo(): boolean;
-  clearTo(): MessageRequest;
+  getTo(): string;
+  setTo(value: string): MessageRequest;
 
   getMessage(): Message | undefined;
   setMessage(value?: Message): MessageRequest;
@@ -253,7 +247,7 @@ export class MessageRequest extends jspb.Message {
 
 export namespace MessageRequest {
   export type AsObject = {
-    to?: User.AsObject,
+    to: string,
     message?: Message.AsObject,
   }
 }

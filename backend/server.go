@@ -14,6 +14,12 @@ import (
 	"ftx/backend/state"
 )
 
+type TargetUserUnknown struct{}
+
+func (TargetUserUnknown) Error() string {
+	return "The user you are attempting to interact with is not listed in backend state"
+}
+
 type TransferRequestUnknown struct{}
 
 func (TransferRequestUnknown) Error() string {
@@ -112,10 +118,12 @@ func (s *BackendServer) TransferChoice(ctx context.Context, req *api.TransferCho
 }
 
 func (s *BackendServer) SendMessage(ctx context.Context, req *api.MessageRequest) (*api.Empty, error) {
-	err := peers.Message(
-		s.state.Peers[req.To.Ip],
-		req.Message.Contents,
-	)
+	to, ok := s.state.Peers[req.To]
+	if !ok {
+		return nil, TargetUserUnknown{}
+	}
+
+	err := peers.Message(to, req.Message.Contents)
 	if err != nil {
 		return nil, err
 	}

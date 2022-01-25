@@ -1,11 +1,10 @@
 import { createRef, useCallback } from "react"
-import "./css/ChoiceOverlay.css"
-import "./css/Choice.css"
-import "styling/Root.css"
 import { setWithoutTransition } from "lib/Utils"
+import { Primitive } from "lib/apptypes"
+import Icon, { IconAssets } from "components/Common/Icon"
 
 type Props = {
-  icon: any
+  icon: IconAssets
   label: string
   identifier: Primitive
   closeCallback: (identifier: Primitive) => void
@@ -13,7 +12,6 @@ type Props = {
 }
 
 export default function Choice(props: Props) {
-  const iconRef = createRef<any>()
   const tagRef = createRef<HTMLParagraphElement>()
 
   const movePixels = 1000
@@ -45,26 +43,27 @@ export default function Choice(props: Props) {
 
   return (
     <div
-      className="ChoiceDiv"
-      onClick={() => {
-        props.closeCallback(props.identifier)
-      }}
+      className={
+        [
+          "flex flex-col text-center break-words items-center",
+          "border-2 border-solid border-transparent",
+          "max-w-xxs p-5 rounded-xl",
+          "transition-all duration-300",
+          "hover:!scale-110 hover:cursor-pointer",
+          "hover:border-highlight hover:bg-back hover:bg-opacity-20",
+        ].join(" ")
+      }
+      onClick={() => props.closeCallback(props.identifier)}
       ref={choiceDivRefCallback}
     >
-
-      <props.icon
-        ref={iconRef}
-        style={{
-          width: "90px",
-          height: "90px",
-          fill: "",
+      <Icon
+        asset={props.icon}
+        options={{
+          size: "90px",
         }}
-      />
-
-      <p
-        className="Tag"
-        ref={tagRef}
-      >
+        className="fill-highlight-lighter"
+       />
+      <p className="title pt-5" ref={tagRef}>
         {props.label}
       </p>
     </div>

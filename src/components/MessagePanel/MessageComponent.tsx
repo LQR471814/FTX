@@ -1,10 +1,8 @@
 //? This component contains all message groups
 
 import { useEffect, useRef } from "react"
-import "styling/Widget.css"
-import "styling/Root.css"
-
 import MessageList from "./MessageList"
+import { MessageGroup } from "lib/apptypes"
 
 type Props = {
   groups: Record<string, MessageGroup>
@@ -19,7 +17,7 @@ function MessageComponent(props: Props) {
 
   return (
     <div
-      className="ComponentContainer"
+      className="component-container"
       id="MessageGroupsContainer"
       style={{ flexDirection: "column" }}
       onScroll={() => { prevScroll.current = document.getElementById("MessageGroupsContainer")!.scrollTop }}

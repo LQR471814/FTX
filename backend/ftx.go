@@ -64,7 +64,7 @@ func (h PeersHandler) OnMessage(from net.IP, message string) {
 	log.Println("Received message", fmt.Sprintf("\"%v\"", message), "from", p.Name)
 
 	h.state.UpdateMessageChannels(&api.Message{
-		Author:   p.ToProto(),
+		Author:   p.IP.String(),
 		Contents: message,
 	})
 }
@@ -78,6 +78,8 @@ func main() {
 		log.Fatal(err)
 	}
 	defer onQuit(s)
+
+	log.Println("Registering mDNS and listening for peers")
 
 	peers.Register(s)
 	peers.StartServer(PeersHandler{s}, s.ListenerPort(state.INTERACT_LISTENER_ID))
@@ -96,6 +98,8 @@ func main() {
 		},
 	)
 
+	log.Println("Listening for sys interrupt")
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() { //? Quit on signal interrupt
@@ -103,17 +107,19 @@ func main() {
 		s.ExitFunc()
 	}()
 
-	transfer.Listen(
+	log.Println("Listening for transfers")
+
+	go transfer.Listen(
 		s.Listeners[state.FILE_LISTENER_ID],
 		TransferHandler{state: s},
 	)
 
-	go ServeGUI(s, s.Listeners[state.GUI_LISTENER_ID])
-	go openGUI(s.ListenerPort(state.GUI_LISTENER_ID))
-
 	log.Println("Serving filerecv on", s.ListenerPort(state.FILE_LISTENER_ID))
 	log.Println("Serving interact on", s.ListenerPort(state.INTERACT_LISTENER_ID))
 	log.Println("Serving gui on", s.ListenerPort(state.GUI_LISTENER_ID))
+
+	go ServeGUI(s, s.Listeners[state.GUI_LISTENER_ID])
+	go openGUI(s.ListenerPort(state.GUI_LISTENER_ID))
 
 	<-s.Context.Done()
 }
