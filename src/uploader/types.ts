@@ -12,16 +12,3 @@ export type WorkerBound =
 export type ManagerBound =
   | { type: "state", state: TransferState }
   | { type: "done" }
-
-export type ClientBound =
-  | { Type: "start" }
-  | { Type: "exit" }
-  | { Type: "complete" }
-
-export type ServerBound =
-  | { Type: "files"
-      Files: {
-        Name: string
-        Size: number
-        Type: string //? Mimetype
-      }[] }

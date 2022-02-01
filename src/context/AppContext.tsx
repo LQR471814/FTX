@@ -20,16 +20,23 @@ function appReducer(state: AppState, action: AppAction) {
 			newState.bannerStyling = action.bannerStyling
 			break
 
-		case "self_update":
+		case 'self_update':
 			newState.self.name = action.hostname
 			break
 
-		case "setup_update_netintfs":
+		case 'setup_update_netintfs':
 			newState.setupInfo.interfaces = action.interfaces
 			break
 
-		case "peers_set":
+		case 'peers_set':
 			newState.users = action.users
+			break
+
+		case 'request_new':
+			newState.transferRequests[action.request.id] = action.request
+			break
+		case 'request_remove':
+			delete newState.transferRequests[action.id]
 			break
 
 		case 'transfer_new':
@@ -71,7 +78,7 @@ function appReducer(state: AppState, action: AppAction) {
 
 			newGroup.messages.push({
 				content: action.msg,
-				author: action.from,
+				author: state.users[action.from].name,
 			})
 
 			newState.messageGroups[action.from] = newGroup

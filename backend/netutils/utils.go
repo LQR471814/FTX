@@ -132,3 +132,7 @@ func CheckLocal(target net.IP) (bool, error) {
 
 	return false, nil
 }
+
+func ListenerPort(l net.Listener) int {
+	return l.Addr().(*net.TCPAddr).Port
+}

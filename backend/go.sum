@@ -4,8 +4,12 @@ dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
+github.com/LQR471814/go-utils v0.0.1 h1:wrdyICxqWGirFNAiL57upZGCyv5OqyRTPXmCKp1N40k=
+github.com/LQR471814/go-utils v0.0.1/go.mod h1:7OvAmNLStPDTXzevraVhkUuuC2T2jPxabe52qzVHx0c=
 github.com/LQR471814/marionette v0.0.4 h1:M+ks4XUaaka/zIFU81cznaOHbWuNUYInYp7ofdrwzU0=
 github.com/LQR471814/marionette v0.0.4/go.mod h1:7JceuNSjnFJNYjYdAgvhjPQiCc0/haj4zC8VjLLV6vo=
+github.com/LQR471814/websocket-ftp/server v0.3.0 h1:uVp1ewKcffHW7yCNcFT2GBjKGMRMPHYPykbemhl7jjs=
+github.com/LQR471814/websocket-ftp/server v0.3.0/go.mod h1:dLDcZK/53CSgU3VTzBNT+WbMsrlqGWpEERTK/2/N1LM=
 github.com/LQR471814/zeroconf v1.0.1 h1:NciO1pkUK0R0EoEfPj0/Iv+l9fR3I3zg9qnznVDoDrI=
 github.com/LQR471814/zeroconf v1.0.1/go.mod h1:KgMoLpB4d1yQEMeoXL8VtX5DWPhs+jNZ1jU/5ssRMGQ=
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
@@ -140,8 +144,6 @@ github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/
 github.com/google/renameio v0.1.0/go.mod h1:KWCgfxg9yswjAJkECMjeO8J8rahYeXnNhOm40UhjYkI=
 github.com/google/uuid v1.0.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
-github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
 github.com/gorilla/context v1.1.1/go.mod h1:kBGZzfjB9CEq2AlWe17Uuf7NDRt0dE0s8S51q0aT7Yg=
 github.com/gorilla/mux v1.6.2/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=

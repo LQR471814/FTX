@@ -1,11 +1,11 @@
-import { User, MessageGroup, BannerStyle, IP, Transfer, Interface, OverlayType, OverlayState, TransferState, TransferRequest } from "lib/apptypes"
+import { User, MessageGroup, BannerStyle, IP, Transfer, Interface, OverlayType, OverlayState, TransferState, TransferMetadata } from "lib/apptypes"
 import { CascadingContext } from "lib/CascadingContext"
 
 export type AppState = {
 	showBanner: boolean
 	bannerStyling: BannerStyle
 
-	transferRequests: Record<string, TransferRequest>
+	transferRequests: Record<string, TransferMetadata>
 	activeTransfers: Record<string, Transfer>
 	messageGroups: Record<IP, MessageGroup>
 
@@ -27,6 +27,9 @@ type UpdateSelfAction = { type: "self_update", hostname: string }
 type UpdateInterfaces = { type: "setup_update_netintfs", interfaces: Interface[] }
 
 type SetPeersAction = { type: "peers_set", users: Record<IP, User> }
+
+type NewRequestAction = { type: "request_new", request: TransferMetadata }
+type RemoveRequestAction = { type: "request_remove", id: string }
 
 //TODO: Update with more sound state later
 type NewTransferAction = { type: "transfer_new", id: string, initial: Transfer }
@@ -52,6 +55,8 @@ export type AppAction =
 	| SetPeersAction
 	| UpdateSelfAction
 	| UpdateInterfaces
+	| NewRequestAction
+	| RemoveRequestAction
 	| NewTransferAction
 	| UpdateTransferAction
 	| StopTransferAction

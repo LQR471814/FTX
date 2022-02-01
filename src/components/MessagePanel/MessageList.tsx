@@ -13,7 +13,7 @@ type Props = {
   IP: string
 }
 
-function MessageList(props: Props) {
+export default function MessageList(props: Props) {
   const groupContainerRef = createRef<HTMLDivElement>()
   const collapsibleRef = createRef<HTMLDivElement>()
 
@@ -108,5 +108,3 @@ function MessageList(props: Props) {
     </div>
   )
 }
-
-export default MessageList

@@ -9,6 +9,10 @@ require (
 	google.golang.org/protobuf v1.27.1
 )
 
+require github.com/LQR471814/websocket-ftp/server v0.3.0
+
+require github.com/LQR471814/go-utils v0.0.1 // indirect
+
 require (
 	github.com/LQR471814/marionette v0.0.4
 	github.com/LQR471814/zeroconf v1.0.1
@@ -24,7 +28,6 @@ require (
 
 require (
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
-	github.com/google/uuid v1.3.0
 	github.com/miekg/dns v1.1.41 // indirect
 	nhooyr.io/websocket v1.8.6 // indirect
 )

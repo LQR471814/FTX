@@ -1,9 +1,9 @@
 import UploadRegion from "components/UploadRegion/UploadRegion"
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import UploadWorker from 'worker-loader!uploader/UploadClient.ts'
+import UploadWorker from 'worker-loader!uploader/uploader.ts'
 
 import { useApp } from "context/AppContext"
-import { ManagerBound, WorkerBound } from "uploader/UploadTypes"
+import { ManagerBound, WorkerBound } from "uploader/types"
 import { v4 as uuidv4 } from "uuid"
 import { UploadContext } from "lib/CascadingContext"
 import { transferStateDefaults } from "context/Defaults"
@@ -28,20 +28,22 @@ export default function Upload(props: Props) {
 				if (!files) return
 
 				const worker = new UploadWorker()
-				const handler = (msg: ManagerBound) => {
+
+				const id = uuidv4()
+				worker.onmessage = (e: MessageEvent) => {
+					const msg = e.data as ManagerBound
 					switch (msg.type) {
 						case 'state':
 							ctx.dispatch({
 								type: "transfer_update",
-								id: props.context.peer,
+								id: id,
 								state: msg.state
 							})
-
 							break
 						case 'done':
 							ctx.dispatch({
 								type: "transfer_update",
-								id: props.context.peer,
+								id: id,
 								state: {
 									status: "Upload Complete!",
 									progress: NaN
@@ -50,16 +52,14 @@ export default function Upload(props: Props) {
 							worker.terminate()
 							break
 						default:
-							console.log(msg)
+							console.error(msg)
 							break
 					}
 				}
 
-				worker.onmessage = (e: MessageEvent) => handler(e.data as ManagerBound)
-
 				ctx.dispatch({
 					type: "transfer_new",
-					id: uuidv4(),
+					id: id,
 					initial: {
 						worker: worker,
 						peer: props.context.peer,

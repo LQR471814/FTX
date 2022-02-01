@@ -49,10 +49,12 @@ export function debugDefaults(): AppState {
 						type: "audio",
 					}
 				],
+				id: "id1"
 			},
 			"Gaming2": {
 				from: "127.0.0.1",
 				files: [],
+				id: "id2"
 			},
 		},
 		activeTransfers: {
@@ -60,7 +62,7 @@ export function debugDefaults(): AppState {
 				outgoing: true,
 				peer: "127.0.0.1",
 				state: {
-					progress: 0.5,
+					progress: 0.42,
 					status: "Uploading..."
 				},
 				worker: null,
@@ -69,7 +71,7 @@ export function debugDefaults(): AppState {
 				outgoing: true,
 				peer: "127.0.0.1",
 				state: {
-					progress: 0.5,
+					progress: 0.61,
 					status: "Uploading..."
 				},
 				worker: null,

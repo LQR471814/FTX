@@ -3,9 +3,11 @@ package state
 import (
 	"context"
 	"ftx/backend/api"
+	"ftx/backend/flags"
 	"log"
 	"net"
 	"os"
+	"strconv"
 )
 
 //? There is a separate type def here instead of directly using "api.User" because api.User contains some extra things that aren't pure data
@@ -32,8 +34,13 @@ type State struct {
 	TransferUpdateChannels  []api.Backend_ListenTransferStatesServer
 	TransferRequestChannels []api.Backend_ListenTransferRequestsServer
 
-	Peers            map[string]Peer
-	Listeners        map[int]net.Listener
+	Peers map[string]Peer
+
+	MDNSListener     net.Listener
+	GUIListener      net.Listener
+	FileListener     net.Listener
+	InteractListener net.Listener
+
 	PendingTransfers map[string]chan bool
 
 	Name string
@@ -42,21 +49,7 @@ type State struct {
 	ExitFunc context.CancelFunc
 }
 
-const (
-	MDNS_LISTENER_ID int = iota
-	GUI_LISTENER_ID
-	FILE_LISTENER_ID
-	INTERACT_LISTENER_ID
-)
-
-var LISTENER_IDENTIFIERS = []int{
-	MDNS_LISTENER_ID,
-	GUI_LISTENER_ID,
-	FILE_LISTENER_ID,
-	INTERACT_LISTENER_ID,
-}
-
-func CreateState() (*State, error) {
+func CreateState(conf flags.BackendConfig) (*State, error) {
 	var err error
 
 	state := State{}
@@ -76,23 +69,40 @@ func CreateState() (*State, error) {
 
 	state.PeerUpdateChannels = []api.Backend_ListenUsersServer{}
 	state.MessageUpdateChannels = []api.Backend_ListenMessagesServer{}
+	state.TransferRequestChannels = []api.Backend_ListenTransferRequestsServer{}
 
 	state.Context, state.ExitFunc = context.WithCancel(context.Background())
 	state.Peers = make(map[string]Peer)
-	state.Listeners = make(map[int]net.Listener)
+	state.PendingTransfers = make(map[string]chan bool)
 
-	for _, id := range LISTENER_IDENTIFIERS {
-		state.Listeners[id], err = net.Listen("tcp", ":0")
-		if err != nil {
-			return nil, err
-		}
+	filePort := "0"
+	if conf.FILE_PORT > 0 {
+		filePort = strconv.Itoa(conf.FILE_PORT)
+	}
+
+	interactPort := "0"
+	if conf.INTERACT_PORT > 0 {
+		interactPort = strconv.Itoa(conf.INTERACT_PORT)
+	}
+
+	state.MDNSListener, err = net.Listen("tcp", ":0")
+	if err != nil {
+		return nil, err
+	}
+	state.GUIListener, err = net.Listen("tcp", ":0")
+	if err != nil {
+		return nil, err
+	}
+	state.FileListener, err = net.Listen("tcp", ":"+filePort)
+	if err != nil {
+		return nil, err
+	}
+	state.InteractListener, err = net.Listen("tcp", ":"+interactPort)
+	if err != nil {
+		return nil, err
 	}
 
 	return &state, nil
-}
-
-func (s *State) ListenerPort(id int) int {
-	return (*s).Listeners[id].Addr().(*net.TCPAddr).Port
 }
 
 func (s *State) UpdatePeerChannels() {

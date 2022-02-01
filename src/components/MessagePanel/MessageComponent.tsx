@@ -23,12 +23,12 @@ function MessageComponent(props: Props) {
       onScroll={() => { prevScroll.current = document.getElementById("MessageGroupsContainer")!.scrollTop }}
     >
       {Object.keys(props.groups).map(
-        (ID) => {
+        (IP) => {
           return (
             <MessageList
-              group={props.groups[ID]}
-              IP={ID}
-              key={ID}
+              group={props.groups[IP]}
+              IP={IP}
+              key={IP}
             />
           )
         }

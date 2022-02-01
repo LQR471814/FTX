@@ -25,7 +25,7 @@ export default function Banner(props: Props) {
 
         <button
           className={[
-            "mx-1 px-1 rounded-xl",
+            "mx-1 px-2 rounded-xl",
             "border-2 border-solid border-lightest",
             "text-base leading-none text-lightest",
             "bg-transparent outline-none transitional-all duration-150",

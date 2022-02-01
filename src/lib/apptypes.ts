@@ -98,7 +98,7 @@ export type File = {
 	type: string,
 }
 
-export function protoToTransferRequest(req: ProtoTransferRequest): TransferRequest | null {
+export function protoToTransferData(req: ProtoTransferRequest): TransferMetadata | null {
 	const files = []
 	for (const f of req.getFilesList()) {
 		files.push(protoToFile(f))
@@ -106,13 +106,15 @@ export function protoToTransferRequest(req: ProtoTransferRequest): TransferReque
 
 	return {
 		from: req.getFrom(),
-		files: files
+		files: files,
+		id: req.getId(),
 	}
 }
 
-export type TransferRequest = {
+export type TransferMetadata = {
 	from: string
 	files: File[]
+	id: string
 }
 
 export function protoToTransferState(state: ProtoTransferState): TransferState {

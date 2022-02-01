@@ -68,7 +68,15 @@ func ServeGUI(state *state.State, listener net.Listener) {
 
 	server := http.Server{
 		Handler: LimitHandler{
-			redirect: SplitGRPCTraffic(fs.ServeHTTP, wrappedServer),
+			redirect: SplitGRPCTraffic(
+				func(w http.ResponseWriter, r *http.Request) {
+					if strings.HasSuffix(r.RequestURI, ".js") {
+						w.Header().Set("Content-Type", "text/javascript")
+					}
+					fs.ServeHTTP(w, r)
+				},
+				wrappedServer,
+			),
 		},
 	}
 

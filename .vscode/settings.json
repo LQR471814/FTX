@@ -11,6 +11,7 @@
     "ifaces",
     "intf",
     "mcast",
+    "mdns",
     "netintfs",
     "protoc",
     "Uncollapsed",
@@ -24,5 +25,6 @@
     "**/.pnp.*": true
   },
   "editor.tabSize": 2,
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": ".yarn/sdks/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }

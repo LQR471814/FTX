@@ -14,8 +14,8 @@ import BannerController from "components/Banner/BannerController"
 
 import { initializeBackend } from "lib/Backend"
 import { backend } from "lib/Backend"
-import { Empty, GetSetupResponse, SelfResponse, Message, UsersResponse } from "lib/api/backend_pb"
-import { Interface, User } from "lib/apptypes"
+import { Empty, GetSetupResponse, SelfResponse, Message, UsersResponse, TransferRequest } from "lib/api/backend_pb"
+import { Interface, User, File } from "lib/apptypes"
 
 initializeBackend()
 
@@ -63,9 +63,34 @@ export default function App() {
       const msg = r as Message
 
       ctx.dispatch({
-        type: "message_recv",
+        type: 'message_recv',
         from: msg.getAuthor(),
         msg: msg.getContents(),
+      })
+    })
+
+    const transferStream = backend.listenTransferRequests(new Empty())
+    transferStream.on('data', (r: any) => {
+      const msg = r as TransferRequest
+
+      const files: File[] = []
+      for (const f of msg.getFilesList()) {
+        files.push({
+          name: f.getName(),
+          size: f.getSize(),
+          type: f.getType(),
+        })
+      }
+
+      console.log("New request", msg.getId(), msg.getFrom(), files)
+
+      ctx.dispatch({
+        type: 'request_new',
+        request: {
+          from: msg.getFrom(),
+          files: files,
+          id: msg.getId()
+        }
       })
     })
 

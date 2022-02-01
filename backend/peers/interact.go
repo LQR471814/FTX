@@ -22,7 +22,11 @@ const (
 )
 
 func SendToPeer(to state.Peer, buf []byte) error {
-	addr, err := net.ResolveUDPAddr("udp", netutils.ConstructAddrStr(to.IP, to.InteractPort))
+	addr, err := net.ResolveUDPAddr(
+		"udp",
+		netutils.ConstructAddrStr(to.IP, to.InteractPort),
+	)
+
 	if err != nil {
 		return err
 	}
@@ -47,7 +51,10 @@ func Message(to state.Peer, message string) error {
 		return err
 	}
 
-	log.Println("Send", fmt.Sprintf("\"%v\"", message), "to", netutils.ConstructAddrStr(to.IP, to.InteractPort))
+	log.Println(
+		"Send", fmt.Sprintf("\"%v\"", message), "to", netutils.ConstructAddrStr(to.IP, to.InteractPort),
+	)
+
 	return nil
 }
 
@@ -67,12 +74,12 @@ func Quit(s *state.State) error {
 
 func Register(s *state.State) {
 	descriptor := make([]string, DESCRIPTOR_LENGTH)
-	descriptor[FILE_PORT_INDEX] = strconv.Itoa(s.ListenerPort(state.FILE_LISTENER_ID))
-	descriptor[INTERACT_PORT_INDEX] = strconv.Itoa(s.ListenerPort(state.INTERACT_LISTENER_ID))
+	descriptor[FILE_PORT_INDEX] = strconv.Itoa(netutils.ListenerPort(s.FileListener))
+	descriptor[INTERACT_PORT_INDEX] = strconv.Itoa(netutils.ListenerPort(s.InteractListener))
 
 	_, err := zeroconf.Register(
 		s.Name, MDNS_SERVICE_STR, "local.",
-		s.ListenerPort(state.MDNS_LISTENER_ID),
+		netutils.ListenerPort(s.MDNSListener),
 		descriptor, nil,
 	)
 

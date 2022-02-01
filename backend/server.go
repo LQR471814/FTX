@@ -20,10 +20,12 @@ func (TargetUserUnknown) Error() string {
 	return "The user you are attempting to interact with is not listed in backend state"
 }
 
-type TransferRequestUnknown struct{}
+type TransferRequestUnknown struct {
+	ID string
+}
 
-func (TransferRequestUnknown) Error() string {
-	return "Transfer request doesn't exist in catalog"
+func (err TransferRequestUnknown) Error() string {
+	return "Transfer request ID " + err.ID + " doesn't exist in catalog"
 }
 
 type BackendServer struct {
@@ -110,8 +112,9 @@ func (s *BackendServer) ListenUsers(_ *api.Empty, stream api.Backend_ListenUsers
 func (s *BackendServer) TransferChoice(ctx context.Context, req *api.TransferChoiceRequest) (*api.Empty, error) {
 	accept, ok := s.state.PendingTransfers[req.Id]
 	if !ok {
-		return nil, TransferRequestUnknown{}
+		return nil, TransferRequestUnknown{req.Id}
 	}
+	log.Println("Choice", accept, "on", req.Id)
 
 	accept <- req.GetAccept()
 	return &api.Empty{}, nil

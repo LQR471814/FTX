@@ -2,7 +2,7 @@ import ChoiceContainer from "components/Choice/ChoicesContainer"
 import Icon, { IconAssets } from "components/Common/Icon"
 import { useApp } from 'context/AppContext'
 import { TransferChoiceRequest } from "lib/api/backend_pb"
-import { TransferRequest, File } from 'lib/apptypes'
+import { TransferMetadata, File } from 'lib/apptypes'
 import { backend } from "lib/Backend"
 import { getFileLogo, getFilesizeLabel, refToHTMLElement, transitionEffectOffset } from 'lib/Utils'
 import { useRef, useState } from 'react'
@@ -122,7 +122,7 @@ function TransferRequestComponent(
 }
 
 type Props = {
-  transfers: Record<string, TransferRequest>
+  transfers: Record<string, TransferMetadata>
 }
 
 export default function PendingTransfers(props: Props) {
@@ -137,8 +137,11 @@ export default function PendingTransfers(props: Props) {
           name={ctx.state.users[t.from].name}
           onChoice={(choice) => {
             const choiceRequest = new TransferChoiceRequest()
+
+            console.log("Choice", t.id, choice)
+
             choiceRequest.setAccept(choice)
-            choiceRequest.setId(t.from)
+            choiceRequest.setId(t.id)
             backend.transferChoice(choiceRequest, null)
           }}
           onView={() => setViewing(t.files)}

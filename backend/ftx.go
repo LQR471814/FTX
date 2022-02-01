@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"ftx/backend/api"
+	"ftx/backend/flags"
 	"ftx/backend/netutils"
 	"ftx/backend/peers"
 	"ftx/backend/state"
@@ -16,26 +17,6 @@ import (
 
 	"github.com/LQR471814/marionette"
 )
-
-type TransferHandler struct {
-	state *state.State
-}
-
-func (h TransferHandler) OnTransferRequest(t *api.TransferRequest) chan bool {
-	for _, c := range h.state.TransferRequestChannels {
-		c.Send(t)
-	}
-
-	ch := make(chan bool, 1)
-	h.state.PendingTransfers[t.Id] = ch
-	return ch
-}
-
-func (h TransferHandler) OnTransferUpdate(t *api.TransferState) {
-	for _, c := range h.state.TransferUpdateChannels {
-		c.Send(t)
-	}
-}
 
 type PeersHandler struct {
 	state *state.State
@@ -60,7 +41,6 @@ func (h PeersHandler) OnMessage(from net.IP, message string) {
 		return
 	}
 
-	log.Println(from.String())
 	log.Println("Received message", fmt.Sprintf("\"%v\"", message), "from", p.Name)
 
 	h.state.UpdateMessageChannels(&api.Message{
@@ -69,11 +49,10 @@ func (h PeersHandler) OnMessage(from net.IP, message string) {
 	})
 }
 
-//lint:ignore U1000 main is used (duh)
 func main() {
 	log.SetFlags(log.Lshortfile | log.Ltime)
 
-	s, err := state.CreateState()
+	s, err := state.CreateState(flags.Parse())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -82,7 +61,7 @@ func main() {
 	log.Println("Registering mDNS and listening for peers")
 
 	peers.Register(s)
-	peers.StartServer(PeersHandler{s}, s.ListenerPort(state.INTERACT_LISTENER_ID))
+	peers.StartServer(PeersHandler{s}, netutils.ListenerPort(s.InteractListener))
 	peers.Discover(
 		s, func(p state.Peer) {
 			local, err := netutils.CheckLocal(p.IP)
@@ -90,13 +69,13 @@ func main() {
 				log.Fatal(err)
 			}
 
-			log.Println(p)
-
 			if local &&
-				p.FilePort == s.ListenerPort(state.FILE_LISTENER_ID) &&
-				p.InteractPort == s.ListenerPort(state.INTERACT_LISTENER_ID) {
+				p.FilePort == netutils.ListenerPort(s.FileListener) &&
+				p.InteractPort == netutils.ListenerPort(s.InteractListener) {
 				return
 			}
+
+			log.Println("Add peer", p)
 
 			s.Peers[p.IP.String()] = p
 			s.UpdatePeerChannels()
@@ -105,7 +84,6 @@ func main() {
 	)
 
 	log.Println("Listening for sys interrupt")
-
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() { //? Quit on signal interrupt
@@ -114,18 +92,22 @@ func main() {
 	}()
 
 	log.Println("Listening for transfers")
+	go transfer.Serve(s)
 
-	go transfer.Listen(
-		s.Listeners[state.FILE_LISTENER_ID],
-		TransferHandler{state: s},
-	)
+	log.Println("Serving filerecv on", netutils.ListenerPort(s.FileListener))
+	log.Println("Serving interact on", netutils.ListenerPort(s.InteractListener))
+	log.Println("Serving gui on", netutils.ListenerPort(s.GUIListener))
 
-	log.Println("Serving filerecv on", s.ListenerPort(state.FILE_LISTENER_ID))
-	log.Println("Serving interact on", s.ListenerPort(state.INTERACT_LISTENER_ID))
-	log.Println("Serving gui on", s.ListenerPort(state.GUI_LISTENER_ID))
+	go ServeGUI(s, s.GUIListener)
+	go openGUI(netutils.ListenerPort(s.GUIListener))
 
-	go ServeGUI(s, s.Listeners[state.GUI_LISTENER_ID])
-	go openGUI(s.ListenerPort(state.GUI_LISTENER_ID))
+	s.Peers["192.168.1.173"] = state.Peer{
+		Name:         "Test Peer",
+		IP:           net.IPv4(192, 168, 1, 173),
+		InteractPort: 3000,
+		FilePort:     3001,
+	} //! DEBUG
+	s.UpdatePeerChannels()
 
 	<-s.Context.Done()
 }
