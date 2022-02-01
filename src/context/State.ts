@@ -29,12 +29,13 @@ type UpdateInterfaces = { type: "setup_update_netintfs", interfaces: Interface[]
 type SetPeersAction = { type: "peers_set", users: Record<IP, User> }
 
 type NewRequestAction = { type: "request_new", request: TransferMetadata }
-type RemoveRequestAction = { type: "request_remove", id: string }
+type AcceptRequestAction = { type: "request_accept", id: string }
+type DenyRequestAction = { type: "request_deny", id: string }
 
 //TODO: Update with more sound state later
 type NewTransferAction = { type: "transfer_new", id: string, initial: Transfer }
 type UpdateTransferAction = { type: "transfer_update", id: string, state: TransferState }
-type StopTransferAction = { type: "transfer_stop", id: string }
+type RemoveTransferAction = { type: "transfer_remove", id: string }
 
 //TODO: Finish state for these as well
 type NewGroupAction = { type: "group_new", peer: IP }
@@ -56,10 +57,11 @@ export type AppAction =
 	| UpdateSelfAction
 	| UpdateInterfaces
 	| NewRequestAction
-	| RemoveRequestAction
+	| AcceptRequestAction
+	| DenyRequestAction
 	| NewTransferAction
 	| UpdateTransferAction
-	| StopTransferAction
+	| RemoveTransferAction
 	| NewGroupAction
 	| GroupDisplayAction
 	| SendMessageAction

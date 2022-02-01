@@ -1,12 +1,8 @@
 import Icon, { IconAssets } from 'components/Common/Icon'
 import ProgressBar from 'components/Common/ProgressBar'
 import { useApp } from 'context/AppContext'
-import { Transfer, TransferState, User } from 'lib/apptypes'
+import { TransferState, User } from 'lib/apptypes'
 import { uniqueId } from 'lib/Utils'
-
-type Props = {
-  activeTransfers: Transfer[]
-}
 
 function TransferComponent(props: { user: User, state: TransferState }) {
   return (
@@ -32,12 +28,11 @@ function TransferComponent(props: { user: User, state: TransferState }) {
   )
 }
 
-export default function TransferStatus(props: Props) {
+export default function TransferStatus() {
   const ctx = useApp()
-
   return (
     <div className="flex-col component-container">
-      {props.activeTransfers.map((t) => {
+      {Object.values(ctx.state.activeTransfers).map((t) => {
         return <TransferComponent
           key={uniqueId('Transfer')}
           state={t.state}

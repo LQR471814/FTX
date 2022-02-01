@@ -31,8 +31,8 @@ type State struct {
 
 	PeerUpdateChannels      []api.Backend_ListenUsersServer
 	MessageUpdateChannels   []api.Backend_ListenMessagesServer
-	TransferUpdateChannels  []api.Backend_ListenTransferStatesServer
-	TransferRequestChannels []api.Backend_ListenTransferRequestsServer
+	TransferUpdateChannels  []api.Backend_ListenIncomingStatesServer
+	TransferRequestChannels []api.Backend_ListenIncomingRequestsServer
 
 	Peers map[string]Peer
 
@@ -69,7 +69,8 @@ func CreateState(conf flags.BackendConfig) (*State, error) {
 
 	state.PeerUpdateChannels = []api.Backend_ListenUsersServer{}
 	state.MessageUpdateChannels = []api.Backend_ListenMessagesServer{}
-	state.TransferRequestChannels = []api.Backend_ListenTransferRequestsServer{}
+	state.TransferRequestChannels = []api.Backend_ListenIncomingRequestsServer{}
+	state.TransferUpdateChannels = []api.Backend_ListenIncomingStatesServer{}
 
 	state.Context, state.ExitFunc = context.WithCancel(context.Background())
 	state.Peers = make(map[string]Peer)

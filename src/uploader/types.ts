@@ -11,4 +11,4 @@ export type WorkerBound =
 
 export type ManagerBound =
   | { type: "state", state: TransferState }
-  | { type: "done" }
+  | { type: "done", denied: boolean }

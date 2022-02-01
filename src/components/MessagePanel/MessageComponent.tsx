@@ -2,31 +2,35 @@
 
 import { useEffect, useRef } from "react"
 import MessageList from "./MessageList"
-import { MessageGroup } from "lib/apptypes"
+import { useApp } from "context/AppContext"
 
-type Props = {
-  groups: Record<string, MessageGroup>
-}
-
-function MessageComponent(props: Props) {
+function MessageComponent() {
+  const ctx = useApp()
   const prevScroll = useRef(0)
 
   useEffect(() => {
-    document.getElementById("MessageGroupsContainer")!.scrollTop = prevScroll.current
+    document.getElementById(
+      "MessageGroupsContainer"
+    )!.scrollTop = prevScroll.current
   })
 
   return (
     <div
-      className="component-container"
+      className="component-container flex-col"
       id="MessageGroupsContainer"
-      style={{ flexDirection: "column" }}
-      onScroll={() => { prevScroll.current = document.getElementById("MessageGroupsContainer")!.scrollTop }}
+      onScroll={
+        () => {
+          prevScroll.current = document.getElementById(
+            "MessageGroupsContainer"
+          )!.scrollTop
+        }
+      }
     >
-      {Object.keys(props.groups).map(
+      {Object.keys(ctx.state.messageGroups).map(
         (IP) => {
           return (
             <MessageList
-              group={props.groups[IP]}
+              group={ctx.state.messageGroups[IP]}
               IP={IP}
               key={IP}
             />

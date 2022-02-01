@@ -5,7 +5,7 @@ const defaultField = "Loading..."
 
 export function transferStateDefaults(): TransferState {
 	return {
-		status: "",
+		status: "Pending...",
 		progress: NaN
 	}
 }
@@ -44,17 +44,17 @@ export function debugDefaults(): AppState {
 				from: "127.0.0.1",
 				files: [
 					{
-						name: "File 1",
+						name: "File 1.mp3",
 						size: 1000,
 						type: "audio",
 					}
 				],
-				id: "id1"
+				id: "Gaming"
 			},
 			"Gaming2": {
 				from: "127.0.0.1",
 				files: [],
-				id: "id2"
+				id: "Gaming2"
 			},
 		},
 		activeTransfers: {

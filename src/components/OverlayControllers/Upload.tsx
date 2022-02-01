@@ -41,14 +41,22 @@ export default function Upload(props: Props) {
 							})
 							break
 						case 'done':
+							setTimeout(() => {
+								ctx.dispatch({
+									type: "transfer_remove",
+									id: id,
+								})
+							}, 3000)
+
 							ctx.dispatch({
 								type: "transfer_update",
 								id: id,
 								state: {
-									status: "Upload Complete!",
+									status: msg.denied ? "Transfer Denied." : "Upload Complete!",
 									progress: NaN
 								}
 							})
+
 							worker.terminate()
 							break
 						default:

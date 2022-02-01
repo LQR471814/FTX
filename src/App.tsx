@@ -10,11 +10,10 @@ import TransferStatus from "components/Transfer/TransferStatus"
 import PendingTransfers from "components/Transfer/PendingTransfers"
 
 import OverlayManager from "components/OverlayControllers/OverlayManager"
-import BannerController from "components/Banner/BannerController"
 
 import { initializeBackend } from "lib/Backend"
 import { backend } from "lib/Backend"
-import { Empty, GetSetupResponse, SelfResponse, Message, UsersResponse, TransferRequest } from "lib/api/backend_pb"
+import { Empty, GetSetupResponse, SelfResponse, Message, UsersResponse, TransferRequest, TransferState } from "lib/api/backend_pb"
 import { Interface, User, File } from "lib/apptypes"
 
 initializeBackend()
@@ -58,8 +57,8 @@ export default function App() {
       }
     })
 
-    const messageStream = backend.listenMessages(new Empty())
-    messageStream.on('data', (r: any) => {
+    const messages = backend.listenMessages(new Empty())
+    messages.on('data', (r: any) => {
       const msg = r as Message
 
       ctx.dispatch({
@@ -69,8 +68,8 @@ export default function App() {
       })
     })
 
-    const transferStream = backend.listenTransferRequests(new Empty())
-    transferStream.on('data', (r: any) => {
+    const transferRequests = backend.listenIncomingRequests(new Empty())
+    transferRequests.on('data', (r: any) => {
       const msg = r as TransferRequest
 
       const files: File[] = []
@@ -94,8 +93,30 @@ export default function App() {
       })
     })
 
-    const userStream = backend.listenUsers(new Empty())
-    userStream.on('data', (r: any) => {
+    const transferStates = backend.listenIncomingStates(new Empty())
+    transferStates.on('data', (r: any) => {
+      const msg = r as TransferState
+      if (msg.getProgress() === 1) {
+        setTimeout(() => {
+          ctx.dispatch({
+            type: 'transfer_remove',
+            id: msg.getId()
+          })
+        }, 3000)
+      }
+
+      ctx.dispatch({
+        type: 'transfer_update',
+        id: msg.getId(),
+        state: {
+          progress: msg.getProgress(),
+          status: "Receiving..."
+        }
+      })
+    })
+
+    const users = backend.listenUsers(new Empty())
+    users.on('data', (r: any) => {
       const response = r as UsersResponse
 
 			const users: Record<string, User> = {}
@@ -118,35 +139,31 @@ export default function App() {
 
   return (
     <div className="block h-screen w-screen overflow-auto p-2 box-border">
-      <ArrayLayout childrenSizes="min-content minmax(0, 1fr)">
-        <BannerController />
+      {/* <ArrayLayout childrenSizes="min-content minmax(0, 1fr)">
+        <BannerController /> */}
 
-        <ArrayLayout rows={true}>
-          <Window title="Messages">
-            <MessageComponent
-              groups={ctx.state.messageGroups}
-            />
+      <ArrayLayout rows={true}>
+        <Window title="Messages">
+          <MessageComponent />
+        </Window>
+
+        <ArrayLayout childrenSizes="min-content 1fr">
+          <Window title="User List">
+            <UserList />
           </Window>
 
-          <ArrayLayout childrenSizes="min-content 1fr">
-            <Window title="User List">
-              <UserList />
+          <ArrayLayout rows={true}>
+            <Window title="Pending Transfers">
+              <PendingTransfers />
             </Window>
-
-            <ArrayLayout rows={true}>
-              <Window title="Pending Transfers">
-                <PendingTransfers transfers={ctx.state.transferRequests} />
-              </Window>
-              <Window title="Transfer Status">
-                <TransferStatus activeTransfers={
-                  Object.values(ctx.state.activeTransfers)
-                } />
-              </Window>
-            </ArrayLayout>
+            <Window title="Transfer Status">
+              <TransferStatus />
+            </Window>
           </ArrayLayout>
-
         </ArrayLayout>
+
       </ArrayLayout>
+      {/* </ArrayLayout> */}
 
       <OverlayManager />
     </div>

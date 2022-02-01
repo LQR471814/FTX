@@ -17,6 +17,7 @@ export enum IconAssets {
 	f_archive,
 	f_audio,
 	f_document,
+	f_pdf,
 	f_font,
 	f_image,
 	f_video,
@@ -88,6 +89,11 @@ export const icons: AssetMap = {
 		<svg viewBox="0 0 24 24" width="24" height="24" {...props}>
 			<path fill="none" d="M0 0h24v24H0z" />
 			<path d="M3 3.993C3 3.445 3.445 3 3.993 3h16.014c.548 0 .993.445.993.993v16.014a.994.994 0 0 1-.993.993H3.993A.994.994 0 0 1 3 20.007V3.993zM5 5v14h14V5H5zm5.622 3.415l4.879 3.252a.4.4 0 0 1 0 .666l-4.88 3.252a.4.4 0 0 1-.621-.332V8.747a.4.4 0 0 1 .622-.332z" />
+		</svg>,
+	[IconAssets.f_pdf]: (props: ReactSVGProps) =>
+		<svg viewBox="0 0 24 24" width="24" height="24" {...props}>
+			<path fill="none" d="M0 0h24v24H0z"/>
+			<path d="M12 16H8V8h4a4 4 0 1 1 0 8zm-2-6v4h2a2 2 0 1 0 0-4h-2zm5-6H5v16h14V8h-4V4zM3 2.992C3 2.444 3.447 2 3.999 2H16l5 5v13.993A1 1 0 0 1 20.007 22H3.993A1 1 0 0 1 3 21.008V2.992z"/>
 		</svg>,
 	[IconAssets.message]: (props: ReactSVGProps) =>
 		<svg viewBox="0 0 223 220" {...props}>

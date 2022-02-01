@@ -193,7 +193,7 @@ export class BackendClient {
       this.methodInfoListenMessages);
   }
 
-  methodInfoListenTransferRequests = new grpcWeb.AbstractClientBase.MethodInfo(
+  methodInfoListenIncomingRequests = new grpcWeb.AbstractClientBase.MethodInfo(
     backend_pb.TransferRequest,
     (request: backend_pb.Empty) => {
       return request.serializeBinary();
@@ -201,18 +201,18 @@ export class BackendClient {
     backend_pb.TransferRequest.deserializeBinary
   );
 
-  listenTransferRequests(
+  listenIncomingRequests(
     request: backend_pb.Empty,
     metadata?: grpcWeb.Metadata) {
     return this.client_.serverStreaming(
       this.hostname_ +
-        '/api.Backend/ListenTransferRequests',
+        '/api.Backend/ListenIncomingRequests',
       request,
       metadata || {},
-      this.methodInfoListenTransferRequests);
+      this.methodInfoListenIncomingRequests);
   }
 
-  methodInfoListenTransferStates = new grpcWeb.AbstractClientBase.MethodInfo(
+  methodInfoListenIncomingStates = new grpcWeb.AbstractClientBase.MethodInfo(
     backend_pb.TransferState,
     (request: backend_pb.Empty) => {
       return request.serializeBinary();
@@ -220,15 +220,15 @@ export class BackendClient {
     backend_pb.TransferState.deserializeBinary
   );
 
-  listenTransferStates(
+  listenIncomingStates(
     request: backend_pb.Empty,
     metadata?: grpcWeb.Metadata) {
     return this.client_.serverStreaming(
       this.hostname_ +
-        '/api.Backend/ListenTransferStates',
+        '/api.Backend/ListenIncomingStates',
       request,
       metadata || {},
-      this.methodInfoListenTransferStates);
+      this.methodInfoListenIncomingStates);
   }
 
   methodInfoTransferChoice = new grpcWeb.AbstractClientBase.MethodInfo(

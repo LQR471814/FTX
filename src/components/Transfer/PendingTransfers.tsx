@@ -2,7 +2,7 @@ import ChoiceContainer from "components/Choice/ChoicesContainer"
 import Icon, { IconAssets } from "components/Common/Icon"
 import { useApp } from 'context/AppContext'
 import { TransferChoiceRequest } from "lib/api/backend_pb"
-import { TransferMetadata, File } from 'lib/apptypes'
+import { File } from 'lib/apptypes'
 import { backend } from "lib/Backend"
 import { getFileLogo, getFilesizeLabel, refToHTMLElement, transitionEffectOffset } from 'lib/Utils'
 import { useRef, useState } from 'react'
@@ -121,31 +121,32 @@ function TransferRequestComponent(
   </div>
 }
 
-type Props = {
-  transfers: Record<string, TransferMetadata>
-}
-
-export default function PendingTransfers(props: Props) {
+export default function PendingTransfers() {
   const ctx = useApp()
   const [viewing, setViewing] = useState<File[] | null>(null);
 
   return (
     <div className="component-container flex-col">
-      {Object.values(props.transfers).map((t, i) => (
-        <TransferRequestComponent
-          key={i}
-          name={ctx.state.users[t.from].name}
-          onChoice={(choice) => {
-            const choiceRequest = new TransferChoiceRequest()
+      {Object.values(ctx.state.transferRequests).map((t, i) => {
+        console.log(ctx.state.transferRequests)
+        return (
+          <TransferRequestComponent
+            key={i}
+            name={ctx.state.users[t.from].name}
+            onChoice={(choice) => {
+              const choiceRequest = new TransferChoiceRequest()
 
-            console.log("Choice", t.id, choice)
+              choiceRequest.setAccept(choice)
+              choiceRequest.setId(t.id)
+              backend.transferChoice(choiceRequest, null)
 
-            choiceRequest.setAccept(choice)
-            choiceRequest.setId(t.id)
-            backend.transferChoice(choiceRequest, null)
-          }}
-          onView={() => setViewing(t.files)}
-        />)
+              ctx.dispatch({
+                type: choice ? 'request_accept' : 'request_deny',
+                id: t.id
+              })
+            } }
+            onView={() => setViewing(t.files)} />)
+      }
       )}
 
       {

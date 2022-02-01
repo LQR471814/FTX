@@ -48,23 +48,26 @@ export function clickElement(target: HTMLElement) {
     target.dispatchEvent(e)
 }
 
+const fileMapping: {
+    [key: string]: IconAssets
+} = {
+    "audio": IconAssets.f_audio,
+    "font": IconAssets.f_font,
+    "image": IconAssets.f_image,
+    "video": IconAssets.f_video,
+    "text": IconAssets.f_document,
+    "application/pdf": IconAssets.f_pdf,
+    "application/zip": IconAssets.f_archive,
+    "application/gzip": IconAssets.f_archive,
+}
+
 export function getFileLogo(mimeStr: string) {
-	switch (mimeStr) {
-		case "audio":
-			return IconAssets.f_audio
-		case "font":
-			return IconAssets.f_font
-		case "image":
-			return IconAssets.f_image
-		case "video":
-			return IconAssets.f_video
-		case "text":
-			return IconAssets.f_document
-		case "application/zip" || "application/gzip":
-			return IconAssets.f_archive
-        default:
-            return IconAssets.f_default
-	}
+    for (const typeStr of Object.keys(fileMapping)) {
+        if (mimeStr.includes(typeStr)) {
+            return fileMapping[typeStr]!
+        }
+    }
+    return IconAssets.f_default
 }
 
 const filesizeUnits: {
@@ -96,8 +99,8 @@ const filesizeUnits: {
 export function getFilesizeLabel(size: number) {
     for (const unit of filesizeUnits) {
         if (size >= 10**unit.exponent) {
-            return size / 10**unit.exponent + unit.label
+            return (size / 10**unit.exponent).toFixed(2) + " " + unit.label
         }
     }
-    return size + "B"
+    return size + " B"
 }

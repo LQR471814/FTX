@@ -83,13 +83,13 @@ func (s *BackendServer) SetSetup(ctx context.Context, req *api.SetSetupRequest) 
 	return nil, err
 }
 
-func (s *BackendServer) ListenTransferRequests(_ *api.Empty, stream api.Backend_ListenTransferRequestsServer) error {
+func (s *BackendServer) ListenIncomingRequests(_ *api.Empty, stream api.Backend_ListenIncomingRequestsServer) error {
 	s.state.TransferRequestChannels = append(s.state.TransferRequestChannels, stream)
 	<-s.state.Context.Done()
 	return nil
 }
 
-func (s *BackendServer) ListenTransferStates(_ *api.Empty, stream api.Backend_ListenTransferStatesServer) error {
+func (s *BackendServer) ListenIncomingStates(_ *api.Empty, stream api.Backend_ListenIncomingStatesServer) error {
 	s.state.TransferUpdateChannels = append(s.state.TransferUpdateChannels, stream)
 	<-s.state.Context.Done()
 	return nil

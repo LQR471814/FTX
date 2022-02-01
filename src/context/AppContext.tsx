@@ -1,5 +1,5 @@
 import { createContext, useReducer, useContext } from "react";
-import { appDefaults, messageGroupDefaults } from "./Defaults";
+import { appDefaults, messageGroupDefaults, transferStateDefaults } from "./Defaults";
 import { AppState, AppAction } from "./State";
 
 const defaultState = appDefaults()
@@ -35,7 +35,16 @@ function appReducer(state: AppState, action: AppAction) {
 		case 'request_new':
 			newState.transferRequests[action.request.id] = action.request
 			break
-		case 'request_remove':
+		case 'request_accept':
+			newState.activeTransfers[action.id] = {
+				outgoing: false,
+				peer: newState.transferRequests[action.id].from,
+				state: transferStateDefaults(),
+				worker: null
+			}
+			delete newState.transferRequests[action.id]
+			break
+		case 'request_deny':
 			delete newState.transferRequests[action.id]
 			break
 
@@ -43,10 +52,17 @@ function appReducer(state: AppState, action: AppAction) {
 			newState.activeTransfers[action.id] = action.initial
 			break
 		case 'transfer_update':
+			if (action.state.progress === 1) {
+				newState.activeTransfers[action.id].state = {
+					status: "Completed!",
+					progress: NaN,
+				}
+				break
+			}
 			newState.activeTransfers[action.id].state = action.state
 			break
-		case 'transfer_stop':
-			console.error("transfer_stop is currently unsupported!")
+		case 'transfer_remove':
+			delete newState.activeTransfers[action.id]
 			break
 
 		case 'group_display':

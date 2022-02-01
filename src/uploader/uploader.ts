@@ -34,6 +34,8 @@ onmessage = (message) => {
 	}
 }
 
+let denied = true
+
 const hooks: Hooks = {
 	onstart: () => postMessage({
 			type: "state",
@@ -46,9 +48,6 @@ const hooks: Hooks = {
 				progress: s / t
 			}
 		} as ManagerBound),
-	onsuccess: () => postMessage({
-			type: "state",
-			state: { status: "Success!" }
-	}),
-	onclose: () => postMessage({ type: "done" })
+	onsuccess: () => denied = false,
+	onclose: () => postMessage({ type: "done", denied: denied })
 }
