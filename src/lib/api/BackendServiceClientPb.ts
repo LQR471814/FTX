@@ -231,6 +231,25 @@ export class BackendClient {
       this.methodInfoListenIncomingStates);
   }
 
+  methodInfoListenFinishedStates = new grpcWeb.AbstractClientBase.MethodInfo(
+    backend_pb.TransferState,
+    (request: backend_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    backend_pb.TransferState.deserializeBinary
+  );
+
+  listenFinishedStates(
+    request: backend_pb.Empty,
+    metadata?: grpcWeb.Metadata) {
+    return this.client_.serverStreaming(
+      this.hostname_ +
+        '/api.Backend/ListenFinishedStates',
+      request,
+      metadata || {},
+      this.methodInfoListenFinishedStates);
+  }
+
   methodInfoTransferChoice = new grpcWeb.AbstractClientBase.MethodInfo(
     backend_pb.Empty,
     (request: backend_pb.TransferChoiceRequest) => {

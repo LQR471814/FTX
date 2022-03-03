@@ -96,15 +96,6 @@ export default function App() {
     const transferStates = backend.listenIncomingStates(new Empty())
     transferStates.on('data', (r: any) => {
       const msg = r as TransferState
-      if (msg.getProgress() === 1) {
-        setTimeout(() => {
-          ctx.dispatch({
-            type: 'transfer_remove',
-            id: msg.getId()
-          })
-        }, 3000)
-      }
-
       ctx.dispatch({
         type: 'transfer_update',
         id: msg.getId(),
@@ -113,6 +104,18 @@ export default function App() {
           status: "Receiving..."
         }
       })
+    })
+
+    const completionStates = backend.listenFinishedStates(new Empty())
+    completionStates.on('data', (r: any) => {
+      const msg = r as TransferState
+      console.log("done")
+      setTimeout(() => {
+        ctx.dispatch({
+          type: 'transfer_remove',
+          id: msg.getId()
+        })
+      }, 3000)
     })
 
     const users = backend.listenUsers(new Empty())

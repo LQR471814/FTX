@@ -40,8 +40,8 @@ export function debugDefaults(): AppState {
 		bannerStyling: bannerStylingDefaults(),
 
 		transferRequests: {
-			"Gaming": {
-				from: "127.0.0.1",
+			"Desktop 2": {
+				from: "192.168.1.1",
 				files: [
 					{
 						name: "File 1.mp3",
@@ -51,27 +51,22 @@ export function debugDefaults(): AppState {
 				],
 				id: "Gaming"
 			},
-			"Gaming2": {
-				from: "127.0.0.1",
-				files: [],
-				id: "Gaming2"
-			},
 		},
 		activeTransfers: {
-			"gaming2": {
+			"Desktop 2": {
 				outgoing: true,
-				peer: "127.0.0.1",
+				peer: "192.168.1.1",
 				state: {
-					progress: 0.42,
-					status: "Uploading..."
+					progress: 0.1,
+					status: "Pending..."
 				},
 				worker: null,
 			},
-			"gaming3": {
+			"some dude's macbook": {
 				outgoing: true,
-				peer: "127.0.0.1",
+				peer: "192.168.1.114",
 				state: {
-					progress: 0.61,
+					progress: 0.81,
 					status: "Uploading..."
 				},
 				worker: null,
@@ -80,14 +75,14 @@ export function debugDefaults(): AppState {
 		messageGroups: {},
 
 		users: {
-			"127.0.0.1": {
-				ip: "127.0.0.1",
-				name: "Gaming",
-				fileport: 0,
-			},
 			"192.168.1.1": {
 				ip: "192.168.1.1",
-				name: "Gaming2",
+				name: "Desktop 2",
+				fileport: 2,
+			},
+			"192.168.1.114": {
+				ip: "192.168.1.114",
+				name: "some dude's macbook",
 				fileport: 2,
 			}
 		},

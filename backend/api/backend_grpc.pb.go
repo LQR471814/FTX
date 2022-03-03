@@ -25,6 +25,7 @@ type BackendClient interface {
 	ListenMessages(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenMessagesClient, error)
 	ListenIncomingRequests(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenIncomingRequestsClient, error)
 	ListenIncomingStates(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenIncomingStatesClient, error)
+	ListenFinishedStates(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenFinishedStatesClient, error)
 	TransferChoice(ctx context.Context, in *TransferChoiceRequest, opts ...grpc.CallOption) (*Empty, error)
 	SendMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*Empty, error)
 	Quit(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
@@ -193,6 +194,38 @@ func (x *backendListenIncomingStatesClient) Recv() (*TransferState, error) {
 	return m, nil
 }
 
+func (c *backendClient) ListenFinishedStates(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Backend_ListenFinishedStatesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &Backend_ServiceDesc.Streams[4], "/api.Backend/ListenFinishedStates", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &backendListenFinishedStatesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Backend_ListenFinishedStatesClient interface {
+	Recv() (*TransferState, error)
+	grpc.ClientStream
+}
+
+type backendListenFinishedStatesClient struct {
+	grpc.ClientStream
+}
+
+func (x *backendListenFinishedStatesClient) Recv() (*TransferState, error) {
+	m := new(TransferState)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *backendClient) TransferChoice(ctx context.Context, in *TransferChoiceRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
 	err := c.cc.Invoke(ctx, "/api.Backend/TransferChoice", in, out, opts...)
@@ -231,6 +264,7 @@ type BackendServer interface {
 	ListenMessages(*Empty, Backend_ListenMessagesServer) error
 	ListenIncomingRequests(*Empty, Backend_ListenIncomingRequestsServer) error
 	ListenIncomingStates(*Empty, Backend_ListenIncomingStatesServer) error
+	ListenFinishedStates(*Empty, Backend_ListenFinishedStatesServer) error
 	TransferChoice(context.Context, *TransferChoiceRequest) (*Empty, error)
 	SendMessage(context.Context, *MessageRequest) (*Empty, error)
 	Quit(context.Context, *Empty) (*Empty, error)
@@ -261,6 +295,9 @@ func (UnimplementedBackendServer) ListenIncomingRequests(*Empty, Backend_ListenI
 }
 func (UnimplementedBackendServer) ListenIncomingStates(*Empty, Backend_ListenIncomingStatesServer) error {
 	return status.Errorf(codes.Unimplemented, "method ListenIncomingStates not implemented")
+}
+func (UnimplementedBackendServer) ListenFinishedStates(*Empty, Backend_ListenFinishedStatesServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListenFinishedStates not implemented")
 }
 func (UnimplementedBackendServer) TransferChoice(context.Context, *TransferChoiceRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TransferChoice not implemented")
@@ -422,6 +459,27 @@ func (x *backendListenIncomingStatesServer) Send(m *TransferState) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _Backend_ListenFinishedStates_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(BackendServer).ListenFinishedStates(m, &backendListenFinishedStatesServer{stream})
+}
+
+type Backend_ListenFinishedStatesServer interface {
+	Send(*TransferState) error
+	grpc.ServerStream
+}
+
+type backendListenFinishedStatesServer struct {
+	grpc.ServerStream
+}
+
+func (x *backendListenFinishedStatesServer) Send(m *TransferState) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _Backend_TransferChoice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(TransferChoiceRequest)
 	if err := dec(in); err != nil {
@@ -527,6 +585,11 @@ var Backend_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "ListenIncomingStates",
 			Handler:       _Backend_ListenIncomingStates_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "ListenFinishedStates",
+			Handler:       _Backend_ListenFinishedStates_Handler,
 			ServerStreams: true,
 		},
 	},

@@ -11,8 +11,11 @@ service Backend {
 
 	rpc ListenUsers (Empty) returns (stream UsersResponse) {}
 	rpc ListenMessages (Empty) returns (stream Message) {}
+
 	rpc ListenIncomingRequests (Empty) returns (stream TransferRequest) {}
 	rpc ListenIncomingStates (Empty) returns (stream TransferState) {}
+	rpc ListenFinishedStates (Empty) returns (stream TransferState) {}
+
 	rpc TransferChoice (TransferChoiceRequest) returns (Empty) {}
 	rpc SendMessage (MessageRequest) returns (Empty) {}
 

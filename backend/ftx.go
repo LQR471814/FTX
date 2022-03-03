@@ -101,14 +101,6 @@ func main() {
 	go ServeGUI(s, s.GUIListener)
 	go openGUI(netutils.ListenerPort(s.GUIListener))
 
-	s.Peers["192.168.1.173"] = state.Peer{
-		Name:         "Test Peer",
-		IP:           net.IPv4(192, 168, 1, 173),
-		InteractPort: 3000,
-		FilePort:     3001,
-	} //! DEBUG
-	s.UpdatePeerChannels()
-
 	<-s.Context.Done()
 }
 

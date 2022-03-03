@@ -32,6 +32,7 @@ type State struct {
 	PeerUpdateChannels      []api.Backend_ListenUsersServer
 	MessageUpdateChannels   []api.Backend_ListenMessagesServer
 	TransferUpdateChannels  []api.Backend_ListenIncomingStatesServer
+	FinishTransferChannels  []api.Backend_ListenFinishedStatesServer
 	TransferRequestChannels []api.Backend_ListenIncomingRequestsServer
 
 	Peers map[string]Peer

@@ -95,6 +95,12 @@ func (s *BackendServer) ListenIncomingStates(_ *api.Empty, stream api.Backend_Li
 	return nil
 }
 
+func (s *BackendServer) ListenFinishedStates(_ *api.Empty, stream api.Backend_ListenFinishedStatesServer) error {
+	s.state.FinishTransferChannels = append(s.state.FinishTransferChannels, stream)
+	<-s.state.Context.Done()
+	return nil
+}
+
 func (s *BackendServer) ListenMessages(_ *api.Empty, stream api.Backend_ListenMessagesServer) error {
 	s.state.MessageUpdateChannels = append(s.state.MessageUpdateChannels, stream)
 	<-s.state.Context.Done()

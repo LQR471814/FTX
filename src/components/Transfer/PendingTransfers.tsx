@@ -128,7 +128,6 @@ export default function PendingTransfers() {
   return (
     <div className="component-container flex-col">
       {Object.values(ctx.state.transferRequests).map((t, i) => {
-        console.log(ctx.state.transferRequests)
         return (
           <TransferRequestComponent
             key={i}

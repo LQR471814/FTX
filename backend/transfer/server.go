@@ -30,7 +30,13 @@ func (h TransferHandler) OnTransferUpdate(t *wsftp.Transfer) {
 }
 
 func (h TransferHandler) OnTransferComplete(t *wsftp.Transfer, f wsftp.File) {}
-func (h TransferHandler) OnAllTransfersComplete(t *wsftp.Transfer)           {}
+
+func (h TransferHandler) OnAllTransfersComplete(t *wsftp.Transfer) {
+	log.Println(t)
+	for _, c := range h.state.FinishTransferChannels {
+		c.Send(ToState(t))
+	}
+}
 
 func Serve(s *state.State) {
 	server := wsftp.NewServer(wsftp.ServerConfig{
