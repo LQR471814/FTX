@@ -1,8 +1,12 @@
-<h1 align="center">FTX</h1>
+<h2 align="center">FTX</h2>
 
-<h3 align="center">
+<h4 align="center">
 	<i>React.js Frontend + Golang Backend = File Transfer and Messaging Program</i>
-</h3>
+</h4>
+
+<br/>
+
+![app showcase 1](https://github.com/LQR471814/FTX/blob/master/showcase/showcase_1.png)
 
 ### Building
 
@@ -20,4 +24,4 @@ You can also build specific components of the app individually
 
 `node build.js <action 'frontend' | 'rpc' | 'backend' | 'distribution'>`
 
-**WARNING: THIS APPLICATION IS IN NO MEANS SECURE, ANYBODY ON THE SAME NETWORK CAN SNIFF MESSAGES AND FILES SENT TO PEERS, USE ONLY ON TRUSTED NETWORKS**
+**WARNING: This application is in no means secure, that means: do NOT use it in a coffee shop's public network**
